@@ -1,10 +1,7 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var WidgetModel = require("models/WidgetModel");
-    var Generator = require("app/Generator")
-    require("backbone");
+    var WidgetModel = require("../models/WidgetModel");
+    var Generator = require("../Generator")
 
     var WidgetCollection = Backbone.Collection.extend({
 
@@ -42,5 +39,4 @@ define(function(require, exports, module) {
 
     });
 
-    return WidgetCollection;
-});
+    exports.WidgetCollection = WidgetCollection;

@@ -1,11 +1,7 @@
-define([
-  'models/LinkModel'
-],
-function(LinkModel) {
+var LinkModel = require('../models/LinkModel');
 
   var LinkCollection = Backbone.Collection.extend({
     model: LinkModel
   });
 
-  return LinkCollection;
-});
+  exports.LinkCollection = LinkCollection;

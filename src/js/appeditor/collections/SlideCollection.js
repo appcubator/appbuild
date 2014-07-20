@@ -1,11 +1,7 @@
-define([
-  'models/SlideModel'
-],
-function(SlideModel) {
+var SlideModel = require('models/SlideModel');
 
   var SlideCollection = Backbone.Collection.extend({
     model : SlideModel
   });
 
-  return SlideCollection;
-});
+  exports.SlideCollection = SlideCollection;

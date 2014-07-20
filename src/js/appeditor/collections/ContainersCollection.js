@@ -1,9 +1,4 @@
-define([
-  'models/WidgetContainerModel',
-  'backbone'
-],
-function(WidgetContainerModel,
-         Backbone) {
+var WidgetContainerModel = require('../models/WidgetContainerModel');
 
   var ContainersCollection = Backbone.Collection.extend({
 
@@ -34,5 +29,4 @@ function(WidgetContainerModel,
     }
   });
 
-  return ContainersCollection;
-});
+  exports.ContainersCollection = ContainersCollection;

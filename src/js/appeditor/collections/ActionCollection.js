@@ -1,11 +1,7 @@
-define([
-  'models/ActionModel'
-],
-function(ActionModel) {
+var ActionModel = require('../models/ActionModel');
 
   var ActionCollection = Backbone.Collection.extend({
     model: ActionModel
   });
 
-  return ActionCollection;
-});
+  exports.ActionCollection = ActionCollection;

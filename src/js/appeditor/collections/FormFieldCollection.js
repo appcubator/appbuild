@@ -1,12 +1,8 @@
-define([
-    'models/FormFieldModel',
-    'mixins/BackboneConvenience'
-  ],
-  function(FormFieldModel) {
+var FormFieldModel = require('../models/FormFieldModel');
+
 
     var FormFieldCollection = Backbone.Collection.extend({
       model: FormFieldModel
     });
 
-    return FormFieldCollection;
-  });
+    exports.FormFieldCollection = FormFieldCollection;

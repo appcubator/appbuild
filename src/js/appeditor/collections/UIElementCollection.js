@@ -1,7 +1,4 @@
-define([
-  'models/UIElementModel'
-],
-function(UIElementModel) {
+var UIElementModel = require('../models/UIElementModel');
 
   var UIElementCollection = Backbone.Collection.extend({
     model : UIElementModel,
@@ -11,5 +8,4 @@ function(UIElementModel) {
     }
   });
 
-  return UIElementCollection;
-});
+  exports.UIElementCollection = UIElementCollection;

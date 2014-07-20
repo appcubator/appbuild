@@ -1,9 +1,7 @@
-define(function(require, exports, module) {
-
     'use strict';
-    var SectionModel = require('models/SectionModel');
-    var WidgetCollection = require('collections/WidgetCollection');
-    var ColumnModel = require('models/ColumnModel');
+    var SectionModel = require('../models/SectionModel');
+    var WidgetCollection = require('./WidgetCollection');
+    var ColumnModel = require('../models/ColumnModel');
 
     var SectionCollection = Backbone.Collection.extend({
 
@@ -99,5 +97,4 @@ define(function(require, exports, module) {
         }
     });
 
-    return SectionCollection;
-});
+    exports.SectionCollection = SectionCollection;

@@ -1,8 +1,3 @@
-define([
-  'backbone'
-],
-function() {
-
   var LoginRouteCollection = Backbone.Collection.extend({
 
     initialize: function() {
@@ -35,5 +30,4 @@ function() {
 
   });
 
-  return LoginRouteCollection;
-});
+  exports.LoginRouteCollection = LoginRouteCollection;

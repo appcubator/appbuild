@@ -1,8 +1,4 @@
-define([
-        'models/TemplateModel',
-        'mixins/BackboneConvenience'
-    ],
-    function(TemplateModel) {
+var TemplateModel = require('models/TemplateModel');
 
         var TemplateCollection = Backbone.Collection.extend({
             model: TemplateModel,
@@ -20,5 +16,4 @@ define([
             }
         });
 
-        return TemplateCollection;
-    });
+        exports.TemplateCollection = TemplateCollection;

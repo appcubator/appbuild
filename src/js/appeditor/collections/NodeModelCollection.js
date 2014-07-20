@@ -1,4 +1,3 @@
-
     'use strict';
 
     var NodeModelModel = require('../models/NodeModelModel');
