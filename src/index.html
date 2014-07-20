@@ -117,25 +117,21 @@
   </div>
 
   <script type="text/javascript">
-    var appId = {{ app.id }};
+    var appId = 0;
     // var appUrl = "{{ app.url }}";
     // var appGitRepo = "{{ app.git_url }}";
-    var appState = {{ app.state_json|fix_solidus|safe }};
-    var uieState = {{ app.uie_state_json|fix_solidus|safe }};
-    var mobileUieState = {{ app.mobile_uie_state_json|fix_solidus|safe }};
-    var statics = {{ statics|fix_solidus|safe }};
-    var themes = {{ themes|fix_solidus|safe }};
-    var mobileThemes = {{ mobile_themes|fix_solidus|safe }};
-    var staticVersion = "{{STATIC_VERSION}}";
-    var is_deployed = {{ is_deployed }}
+    var appState = {};
+    var uieState = {};
+    var statics = {};
+    var themes = {};
     var v1 = {};
     var v1State = {};
     var pageId = null;
     var innerDoc;
   </script>
-  <script data-main="./js/application/main-app/main" src="./js/libs/require.js">
-  </script>
-  <script src="./js/application/main-app/expander-browser.js"></script>
+  <script type="text/javascript" src="./js/libs.js"></script>
+  <script type="text/javascript" src="./js/expander.js"></script>
+  <script type="text/javascript" src="./js/appbuild.js"></script>
 
 </body>
 </html>

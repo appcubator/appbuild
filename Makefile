@@ -10,12 +10,21 @@ build:
 	mkdir -p dist/img
 
 	# build vendors
-	# ./node_modules/browserify/bin/cmd.js vendors/vendors.coffee >> public/js/vendors.js
-	# build appeditor
-	# ./node_modules/browserify/bin/cmd.js src/main.coffee >> public/js/jsonbrowser.js
-	# build website
-	# ./node_modules/browserify/bin/cmd.js src/main.coffee >> public/js/jsonbrowser.js
+	npm install --prefix ./src/js/libs/
+	rm ./src/js/libs.js
+	./node_modules/browserify/bin/cmd.js ./src/js/libs/libs.js >> ./src/js/libs.js
+	cp ./src/js/libs.js ./dist/js/libs.js
 
+	# build appeditor
+	rm ./src/js/appbuild.js
+	./node_modules/browserify/bin/cmd.js ./src/js/appeditor/main.js >> ./src/js/appbuild.js
+	cp ./src/js/appbuild.js ./dist/js/appbuild.js
+
+	# build appmake
+	cp ./src/js/expander.js ./dist/js/expander.js
+
+	# HTML
+	cp ./src/index.html ./dist/index.html
 
 	# CSS
 	cp -rf ./src/css/ ./dist/css/

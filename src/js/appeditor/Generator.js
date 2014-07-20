@@ -1,5 +1,3 @@
-define(function(require, exports, module) {
-
     'use strict';
 
     var _ = require('underscore');
@@ -62,6 +60,4 @@ define(function(require, exports, module) {
         return this.expander.findGenData(plugins, this.expander.parseGenID(generatorPath));
     };
 
-    return Generator;
-
-});
+    exports.Generator = Generator;

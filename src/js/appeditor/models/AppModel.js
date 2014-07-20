@@ -1,10 +1,8 @@
-define(function(require, exports, module) {
-
     'use strict';
 
     require('backbone');
 
-    var AppInfoModel = require('models/AppInfoModel'),
+    var AppInfoModel = require('./AppInfoModel'),
         NodeModelCollection = require('collections/NodeModelCollection'),
         TemplateCollection = require('collections/TemplateCollection'),
         PluginsModel = require('models/PluginsModel'),
@@ -67,5 +65,4 @@ define(function(require, exports, module) {
         }
     });
 
-    return AppModel;
-});
+    modules.AppModel = AppModel;
