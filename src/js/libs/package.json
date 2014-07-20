@@ -1,0 +1,19 @@
+{
+  "name": "Appcubator-libs",
+  "version": "0.0.1",
+  "author": "Ilter Canberk <ilter@appcubator.com>",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "dependencies": {
+    "backbone" : "1.0.0",
+    "underscore": "1.x",
+    "jquery": "*",
+    "jquery-ui": "*"
+  }
+}
