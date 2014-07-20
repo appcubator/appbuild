@@ -11,14 +11,14 @@ build:
 
 	# build vendors
 	npm install --prefix ./src/js/libs/
-	rm ./src/js/libs.js
-	./node_modules/browserify/bin/cmd.js ./src/js/libs/libs.js >> ./src/js/libs.js
-	cp ./src/js/libs.js ./dist/js/libs.js
+	# rm ./src/js/libs.js
+	./node_modules/browserify/bin/cmd.js ./src/js/libs/libs.js >> ./dist/js/libs.js
+	#cp ./src/js/libs.js ./dist/js/libs.js
 
 	# build appeditor
-	rm ./src/js/appbuild.js
-	./node_modules/browserify/bin/cmd.js ./src/js/appeditor/main.js >> ./src/js/appbuild.js
-	cp ./src/js/appbuild.js ./dist/js/appbuild.js
+	# rm ./src/js/appbuild.js
+	./node_modules/browserify/bin/cmd.js ./src/js/appeditor/main.js >> ./dist/js/appbuild.js
+	# cp ./src/js/appbuild.js ./dist/js/appbuild.js
 
 	# build appmake
 	cp ./src/js/expander.js ./dist/js/expander.js
@@ -40,10 +40,9 @@ build:
 	cp ./src/index.html ./dist/index.html
 	# TODO: build appcubator-plugin
 
-	# compile less
 
 buildw:
-	./node_modules/coffee-script/bin/coffee scripts/watch.coffee . make build
+	node scripts/watch.js ./src/ make build
 
 # test:
 # 	make

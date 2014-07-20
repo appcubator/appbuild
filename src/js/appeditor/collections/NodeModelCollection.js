@@ -1,10 +1,9 @@
-define(function(require, exports, module) {
 
     'use strict';
 
-    var NodeModelModel = require('models/NodeModelModel');
+    var NodeModelModel = require('../models/NodeModelModel');
 
-    var TableCollection = Backbone.Collection.extend({
+    var NodeModelCollection = Backbone.Collection.extend({
         model: NodeModelModel,
         uniqueKeys: ["name"],
 
@@ -46,5 +45,5 @@ define(function(require, exports, module) {
 
     });
 
-    return TableCollection;
-});
+    exports.NodeModelCollection = NodeModelCollection;
+

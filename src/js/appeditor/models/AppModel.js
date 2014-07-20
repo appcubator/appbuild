@@ -3,10 +3,10 @@
     require('backbone');
 
     var AppInfoModel = require('./AppInfoModel'),
-        NodeModelCollection = require('collections/NodeModelCollection'),
-        TemplateCollection = require('collections/TemplateCollection'),
-        PluginsModel = require('models/PluginsModel'),
-        RouteCollection = require('collections/RouteCollection');
+        NodeModelCollection = require('../collections/NodeModelCollection'),
+        TemplateCollection = require('../collections/TemplateCollection'),
+        PluginsModel = require('./PluginsModel'),
+        RouteCollection = require('../collections/RouteCollection');
 
 
     var AppModel = Backbone.Model.extend({
@@ -65,4 +65,4 @@
         }
     });
 
-    modules.AppModel = AppModel;
+    exports.AppModel = AppModel;

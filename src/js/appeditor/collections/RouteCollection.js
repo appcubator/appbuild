@@ -1,8 +1,4 @@
-define(function(require, exports, module) {
-
-    require('backbone');
-
-    var RouteModel = require('models/RouteModel');
+    var RouteModel = require('../models/RouteModel');
 
     var RouteCollection = Backbone.Collection.extend({
 
@@ -31,5 +27,4 @@ define(function(require, exports, module) {
 
     });
 
-    return RouteCollection;
-});
+    exports.RouteCollection = RouteCollection;

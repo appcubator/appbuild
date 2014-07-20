@@ -4,7 +4,7 @@ var AppModel = require('./models/AppModel');
 if (window) {
 
     window.onerror = function(){
-        alert('I\'m a bug, please squash me.')
+        alert("I\'m a bug, please squash me.");
     }
 
     if (!appState) throw "No appstate";
@@ -28,6 +28,7 @@ if (window) {
     g_guides = {};
     keyDispatcher = new KeyDispatcher();
     mouseDispatcher = new MouseDispatcher();
+
 
     v1 = {};
     v1 = new AppRouter();

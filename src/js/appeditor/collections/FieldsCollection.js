@@ -1,7 +1,4 @@
-define([
-  'models/FieldModel'
-],
-function(FieldModel) {
+  var FieldModel = ('../models/FieldModel')
 
   var FieldsCollection = Backbone.Collection.extend({
     model : FieldModel,
@@ -11,5 +8,4 @@ function(FieldModel) {
     }
   });
 
-  return FieldsCollection;
-});
+  exports.FieldsCollection = FieldsCollection;

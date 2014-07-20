@@ -1,8 +1,6 @@
-define([
-    'collections/WhereCollection',
-    'app/Generator',
-    'backbone',
-], function(WhereCollection, Generator) {
+    var WhereCollection = require('../collections/WhereCollection');
+    var Generator = require('../Generator');
+
 
     var NodeModelMethodModel = Backbone.Model.extend({
         /* Note that this may have name/code or it may be a generator */
@@ -71,5 +69,4 @@ define([
 
     });
 
-    return NodeModelMethodModel;
-});
+    exports.NodeModelMethodModel = NodeModelMethodModel;

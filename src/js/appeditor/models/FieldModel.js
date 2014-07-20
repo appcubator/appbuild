@@ -1,4 +1,3 @@
-define(['backbone'], function() {
 
     var FieldModel = Backbone.Model.extend({
         defaults: {
@@ -75,6 +74,4 @@ define(['backbone'], function() {
 
     });
 
-    return FieldModel;
-
-});
+    exports.FieldModel = FieldModel;

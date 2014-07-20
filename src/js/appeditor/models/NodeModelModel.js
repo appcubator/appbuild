@@ -1,16 +1,13 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    require('backbone');
-
-    var FieldsCollection = require('collections/FieldsCollection');
-    var NodeModelMethodModel = require('models/NodeModelMethodModel');
+    var FieldsCollection = require('../collections/FieldsCollection');
+    var NodeModelMethodModel = require('./NodeModelMethodModel');
 
     var NodeModelModel = Backbone.Model.extend({
 
         defaults: {
-            fields: new FieldsCollection()
+            fields: {}
+            //new FieldsCollection()
         },
 
         initialize: function(bone) {
@@ -95,5 +92,4 @@ define(function(require, exports, module) {
         }
     });
 
-    return NodeModelModel;
-});
+    exports.NodeModelModel = NodeModelModel;

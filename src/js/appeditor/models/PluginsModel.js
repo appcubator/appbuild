@@ -1,10 +1,7 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    require('backbone');
-    var PluginModel = require('models/PluginModel');
-    var NodeModelMethodModel = require('models/NodeModelMethodModel');
+    var PluginModel = require('./PluginModel');
+    var NodeModelMethodModel = require('./NodeModelMethodModel');
 
     /* Contains metadata and convenience methods for Plugins */
     var PluginsModel = Backbone.Model.extend({
@@ -245,5 +242,4 @@ define(function(require, exports, module) {
 
     });
 
-    return PluginsModel;
-});
+    exports.PluginsModel = PluginsModel;

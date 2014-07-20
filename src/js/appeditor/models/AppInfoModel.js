@@ -1,8 +1,3 @@
-define([
-"backbone"
-],
-function() {
-
   var AppInfoModel = Backbone.Model.extend({
     initialize: function(bone) {
       // this.set("name", bone.name);
@@ -11,5 +6,4 @@ function() {
     }
   });
 
-  return AppInfoModel;
-});
+  exports.AppInfoModel = AppInfoModel;

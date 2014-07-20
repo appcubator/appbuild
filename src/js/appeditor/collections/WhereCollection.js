@@ -1,5 +1,4 @@
-define(["models/WhereModel", "backbone"],
-function(WhereModel) {
+var WhereModel = require("../models/WhereModel");
 
   var WhereCollection = Backbone.Collection.extend({
     model: WhereModel,
@@ -12,5 +11,4 @@ function(WhereModel) {
     }
   });
 
-  return WhereCollection;
-});
+exports.WhereCollection = WhereCollection;
