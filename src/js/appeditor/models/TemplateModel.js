@@ -1,8 +1,6 @@
-define(function(require, exports, module) {
-
     'use strict';
-    require('backbone');
-    var SectionCollection= require('collections/SectionCollection');
+
+    var SectionCollection= require('../collections/SectionCollection');
 
     var TemplateModel = Backbone.Model.extend({
 
@@ -23,7 +21,7 @@ define(function(require, exports, module) {
         getUIElements: function() {
             if(this.widgetsCollection) return this.widgetsCollection;
 
-            var WidgetCollection = require('collections/WidgetCollection');
+            var WidgetCollection = require('../collections/WidgetCollection');
             var sections = this.getSections();
             this.widgetsCollection = new WidgetCollection();
 
@@ -46,5 +44,4 @@ define(function(require, exports, module) {
         }
     });
 
-    return TemplateModel;
-});
+    exports.TemplateModel = TemplateModel;

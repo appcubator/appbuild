@@ -1,4 +1,4 @@
-var TemplateModel = require('models/TemplateModel');
+var TemplateModel = require('../models/TemplateModel');
 
         var TemplateCollection = Backbone.Collection.extend({
             model: TemplateModel,

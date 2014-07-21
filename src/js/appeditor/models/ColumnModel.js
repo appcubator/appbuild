@@ -1,15 +1,10 @@
-define(function(require, exports, module) {
-
     'use strict';
-
-    require('backbone');
-    require('mixins/BackboneConvenience');
 
     var ColumnModel = Backbone.Model.extend({
 
         initialize: function(bone) {
             var bone = bone || {};
-            var WidgetCollection = require('collections/WidgetCollection');
+            var WidgetCollection = require('../collections/WidgetCollection');
             this.set("uielements", new WidgetCollection(bone.uielements||[]));
 
             if (!this.generate) {
@@ -41,5 +36,4 @@ define(function(require, exports, module) {
         }
     });
 
-    return ColumnModel;
-});
+    exports.ColumnModel = ColumnModel;

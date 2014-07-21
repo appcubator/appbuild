@@ -1,7 +1,5 @@
     'use strict';
 
-    require('backbone');
-
     var AppInfoModel = require('./AppInfoModel'),
         NodeModelCollection = require('../collections/NodeModelCollection'),
         TemplateCollection = require('../collections/TemplateCollection'),

@@ -1,10 +1,3 @@
-define([
-    'require',
-    'backbone'
-], function(require) {
-
-    var Backbone = require('backbone');
-
     var PluginModel = Backbone.Model.extend({
 
         getName: function() {
@@ -21,5 +14,4 @@ define([
 
     });
 
-    return PluginModel;
-});
+    exports.PluginModel = PluginModel;

@@ -1,7 +1,5 @@
     'use strict';
 
-    var _ = require('underscore');
-
     var Generator = function(pluginsGetter) {
         /* Pass either an object of the plugins to use, or pass a function which when called returns the plugins. */
         this.expander = initExpander();

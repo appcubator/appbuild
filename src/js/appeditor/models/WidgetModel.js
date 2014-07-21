@@ -1,9 +1,7 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var LayoutModel = require('models/LayoutModel');
-    var FormFieldCollection = require('collections/FormFieldCollection');
+    var LayoutModel = require('./LayoutModel');
+    var FormFieldCollection = require('../collections/FormFieldCollection');
 
     var WidgetModel = Backbone.Model.extend({
         selected: false,
@@ -21,7 +19,7 @@ define(function(require, exports, module) {
 
             if (bone.fields) { this.set('fields', new FormFieldCollection(bone.fields || [])); }
             if (bone.row) {
-                var RowModel    = require('models/RowModel');
+                var RowModel    = require('../models/RowModel');
                 this.set('row', new RowModel(bone.row || {}));
             }
 
@@ -230,7 +228,7 @@ define(function(require, exports, module) {
 
         getWidgetsCollection: function () {
             if(this.widgetsCollection) return this.widgetsCollection;
-            var WidgetCollection = require('collections/WidgetCollection');
+            var WidgetCollection = require('../collections/WidgetCollection');
             this.widgetsCollection = new WidgetCollection();
 
             this.get('row').get('columns').each(function(columnModel) {
@@ -282,5 +280,4 @@ define(function(require, exports, module) {
 
     });
 
-    return WidgetModel;
-});
+    exports.WidgetModel = WidgetModel;

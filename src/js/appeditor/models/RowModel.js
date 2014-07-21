@@ -1,11 +1,6 @@
-define(function(require, exports, module) {
-
     'use strict';
-    require('backbone');
-    require('mixins/BackboneConvenience');
 
-    var ColumnModel = require('models/ColumnModel');
-
+    var ColumnModel = require('./ColumnModel');
     var RowModel = Backbone.Model.extend({
 
         initialize: function(bone) {
@@ -29,5 +24,4 @@ define(function(require, exports, module) {
 
     });
 
-    return RowModel;
-});
+    exports.RowModel = RowModel;
