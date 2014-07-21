@@ -1,4 +1,4 @@
-var UIElementModel = require('../models/UIElementModel');
+var UIElementModel = require('../models/UIElementModel').UIElementModel;
 
   var UIElementCollection = Backbone.Collection.extend({
     model : UIElementModel,

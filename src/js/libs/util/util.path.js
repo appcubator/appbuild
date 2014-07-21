@@ -1,6 +1,3 @@
-define(['util'], function() {
-
-
         util.path = function(path) {
 
             return {
@@ -55,5 +52,3 @@ define(['util'], function() {
             };
 
         };
-
-    });

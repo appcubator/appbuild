@@ -1,4 +1,4 @@
-  var FieldModel = ('../models/FieldModel')
+  var FieldModel = ('../models/FieldModel').FieldModel;
 
   var FieldsCollection = Backbone.Collection.extend({
     model : FieldModel,

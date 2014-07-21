@@ -492,17 +492,17 @@ require.define("/Generator.js",function(require,module,exports,__dirname,__filen
         return this.expander.findGenData(plugins, this.expander.parseGenID(generatorPath));
     };
 
-   module.exports = Generator;
+    exports.Generator = Generator;
 
 });
 
 require.define("/models/AppModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var AppInfoModel = require('./AppInfoModel'),
-        NodeModelCollection = require('../collections/NodeModelCollection'),
-        TemplateCollection = require('../collections/TemplateCollection'),
-        PluginsModel = require('./PluginsModel'),
-        RouteCollection = require('../collections/RouteCollection');
+    var AppInfoModel = require('./AppInfoModel').AppInfoModel,
+        NodeModelCollection = require('../collections/NodeModelCollection').NodeModelCollection,
+        TemplateCollection = require('../collections/TemplateCollection').TemplateCollection,
+        PluginsModel = require('./PluginsModel').PluginsModel,
+        RouteCollection = require('../collections/RouteCollection').RouteCollection;
 
 
     var AppModel = Backbone.Model.extend({
@@ -561,7 +561,7 @@ require.define("/models/AppModel.js",function(require,module,exports,__dirname,_
         }
     });
 
-    module.exports = AppModel;
+    exports.AppModel = AppModel;
 
 });
 
@@ -578,7 +578,7 @@ require.define("/models/AppInfoModel.js",function(require,module,exports,__dirna
 
 require.define("/collections/NodeModelCollection.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var NodeModelModel = require('../models/NodeModelModel');
+    var NodeModelModel = require('../models/NodeModelModel').NodeModelModel;
 
     var NodeModelCollection = Backbone.Collection.extend({
         model: NodeModelModel,
@@ -629,8 +629,8 @@ require.define("/collections/NodeModelCollection.js",function(require,module,exp
 
 require.define("/models/NodeModelModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var FieldsCollection = require('../collections/FieldsCollection');
-    var NodeModelMethodModel = require('./NodeModelMethodModel');
+    var FieldsCollection = require('../collections/FieldsCollection').FieldsCollection;
+    var NodeModelMethodModel = require('./NodeModelMethodModel').NodeModelMethodModel;
 
     var NodeModelModel = Backbone.Model.extend({
 
@@ -725,7 +725,7 @@ require.define("/models/NodeModelModel.js",function(require,module,exports,__dir
 
 });
 
-require.define("/collections/FieldsCollection.js",function(require,module,exports,__dirname,__filename,process,global){  var FieldModel = ('../models/FieldModel')
+require.define("/collections/FieldsCollection.js",function(require,module,exports,__dirname,__filename,process,global){  var FieldModel = ('../models/FieldModel').FieldModel;
 
   var FieldsCollection = Backbone.Collection.extend({
     model : FieldModel,
@@ -813,7 +813,7 @@ require.define("/models/NodeModelMethodModel.js",function(require,module,exports
 
 });
 
-require.define("/collections/WhereCollection.js",function(require,module,exports,__dirname,__filename,process,global){var WhereModel = require("../models/WhereModel");
+require.define("/collections/WhereCollection.js",function(require,module,exports,__dirname,__filename,process,global){var WhereModel = require("../models/WhereModel").WhereModel;
 
   var WhereCollection = Backbone.Collection.extend({
     model: WhereModel,
@@ -837,7 +837,7 @@ require.define("/models/WhereModel.js",function(require,module,exports,__dirname
   exports.WhereModel = WhereModel;
 });
 
-require.define("/collections/TemplateCollection.js",function(require,module,exports,__dirname,__filename,process,global){var TemplateModel = require('../models/TemplateModel');
+require.define("/collections/TemplateCollection.js",function(require,module,exports,__dirname,__filename,process,global){var TemplateModel = require('../models/TemplateModel').TemplateModel;
 
         var TemplateCollection = Backbone.Collection.extend({
             model: TemplateModel,
@@ -860,7 +860,7 @@ require.define("/collections/TemplateCollection.js",function(require,module,expo
 
 require.define("/models/TemplateModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var SectionCollection= require('../collections/SectionCollection');
+    var SectionCollection= require('../collections/SectionCollection').SectionCollection;
 
     var TemplateModel = Backbone.Model.extend({
 
@@ -908,9 +908,9 @@ require.define("/models/TemplateModel.js",function(require,module,exports,__dirn
 });
 
 require.define("/collections/SectionCollection.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
-    var SectionModel = require('../models/SectionModel');
-    var WidgetCollection = require('./WidgetCollection');
-    var ColumnModel = require('../models/ColumnModel');
+    var SectionModel = require('../models/SectionModel').SectionModel;
+    var WidgetCollection = require('./WidgetCollection').WidgetCollection;
+    var ColumnModel = require('../models/ColumnModel').ColumnModel;
 
     var SectionCollection = Backbone.Collection.extend({
 
@@ -1108,8 +1108,8 @@ require.define("/models/SectionModel.js",function(require,module,exports,__dirna
 
 require.define("/collections/WidgetCollection.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var WidgetModel = require("../models/WidgetModel");
-    var Generator = require("../Generator")
+    var WidgetModel = require("../models/WidgetModel").WidgetModel;
+    var Generator = require("../Generator").Generator;
 
     var WidgetCollection = Backbone.Collection.extend({
 
@@ -1449,7 +1449,7 @@ require.define("/models/LayoutModel.js",function(require,module,exports,__dirnam
     exports.LayoutModel = LayoutModel;
 });
 
-require.define("/collections/FormFieldCollection.js",function(require,module,exports,__dirname,__filename,process,global){var FormFieldModel = require('../models/FormFieldModel');
+require.define("/collections/FormFieldCollection.js",function(require,module,exports,__dirname,__filename,process,global){var FormFieldModel = require('../models/FormFieldModel').FormFieldModel;
 
 
     var FormFieldCollection = Backbone.Collection.extend({
@@ -1826,7 +1826,7 @@ require.define("/models/PluginModel.js",function(require,module,exports,__dirnam
 
 });
 
-require.define("/collections/RouteCollection.js",function(require,module,exports,__dirname,__filename,process,global){    var RouteModel = require('../models/RouteModel');
+require.define("/collections/RouteCollection.js",function(require,module,exports,__dirname,__filename,process,global){    var RouteModel = require('../models/RouteModel').RouteModel;
 
     var RouteCollection = Backbone.Collection.extend({
 
@@ -1859,7 +1859,8 @@ require.define("/collections/RouteCollection.js",function(require,module,exports
 
 });
 
-require.define("/models/RouteModel.js",function(require,module,exports,__dirname,__filename,process,global){        var UrlModel = require('./UrlModel');
+require.define("/models/RouteModel.js",function(require,module,exports,__dirname,__filename,process,global){        var UrlModel = require('./UrlModel').UrlModel;
+
         var RouteModel = Backbone.Model.extend({
 
             defaults: {
@@ -2058,16 +2059,442 @@ require.define("/models/UrlModel.js",function(require,module,exports,__dirname,_
 
 });
 
-require.define("/main.js",function(require,module,exports,__dirname,__filename,process,global){var Generator = require('./Generator');
-var AppModel = require('./models/AppModel');
+require.define("/models/ThemeModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+
+    var UIElementCollection = require('../collections/UIElementCollection').UIElementCollection;
+
+    var ThemeModel = Backbone.Model.extend({
+
+        initialize: function(themeState) {
+            this.set('basecss', themeState.basecss || "font-size:14px;");
+            //this.set('pages', new PageDesignCollection(themeState.pages));
+
+            this.set('buttons', new UIElementCollection(themeState["buttons"], "button"));
+            this.set('images', new UIElementCollection(themeState["images"], "image"));
+            this.set('headerTexts', new UIElementCollection(themeState["headerTexts"], "header-text"));
+            this.set('texts', new UIElementCollection(themeState["texts"], "text"));
+            this.set('links', new UIElementCollection(themeState["links"], "link"));
+            this.set('textInputs', new UIElementCollection(themeState["textInputs"], "text-input"));
+            this.set('passwords', new UIElementCollection(themeState["passwords"], "password"));
+            this.set('textAreas', new UIElementCollection(themeState["textAreas"], "text-area"));
+            this.set('lines', new UIElementCollection(themeState["lines"], "line"));
+            this.set('dropdowns', new UIElementCollection(themeState["dropdowns"], "dropdown"));
+            this.set('boxes', new UIElementCollection(themeState["boxes"], "box"));
+            this.set('forms', new UIElementCollection((themeState["forms"] || []), "form"));
+            this.set('lists', new Backbone.Collection((themeState["lists"] || []), "list"));
+            this.set('fonts', new Backbone.Collection(themeState["fonts"] || []));
+        },
+
+        getUIElementCollections: function() {
+
+            return [this.get('buttons'), this.get('images'), this.get('headerTexts'),
+                this.get('texts'), this.get('links'), this.get('textInputs'),
+                this.get('passwords'), this.get('textAreas'), this.get('lines'),
+                this.get('dropdowns'), this.get('boxes'), this.get('forms'),
+                this.get('lists')];
+        },
+
+        getStyleWithClassAndType: function(className, type) {
+            var model = null;
+
+            if (!this.has(type))
+            {
+                type = this.rectifier(type);
+                if (!this.has(type)) return null;
+            }
+
+            this.get(type).each(function(styleModel) {
+                if (styleModel.get('class_name') == className) {
+                    model = styleModel;
+                }
+            });
+
+            return model;
+        },
+
+        getUIEVals: function(type) {
+
+            if(this.has(type)) {
+                return this.get(type);
+            }
+
+            switch(type) {
+                case "button":
+                    return this.getUIEVals("buttons");
+                case "header":
+                    return this.getUIEVals("headerTexts");
+                case "image":
+                    return this.getUIEVals("images");
+                case "text":
+                    return this.getUIEVals("texts");
+                case "link":
+                    return this.getUIEVals("links");
+                case "line":
+                    return this.getUIEVals("lines");
+                case "box":
+                    return this.getUIEVals("boxes");
+                case "create-form":
+                case "form":
+                    return this.getUIEVals("forms");
+            }
+
+            return this.getUIEVals("texts");
+        },
+
+        getBaseClass: function (type) {
+            if(this.has(type)) {
+                return this.get(type).first().get('class_name');
+            }
+            return null;
+        },
+
+        getBaseStyleOf: function(type) {
+
+            if(this.has(type)) {
+                return this.get(type).first();
+            }
+
+            if(this.has(this.rectifier(type))) {
+                return this.get(this.rectifier(type)).first();
+            }
+
+            return null;
+        },
+
+        rectifier: function (falseType) {
+            switch(falseType) {
+                case "button":
+                    return "buttons";
+                case "header":
+                    return "headerTexts";
+                case "image":
+                    return "images";
+                case "text":
+                    return "texts";
+                case "link":
+                    return "links";
+                case "line":
+                    return "lines";
+                case "box":
+                    return "boxes";
+                case "form":
+                    return "forms";
+            }
+
+            return null;
+        },
+
+        serialize: function() {
+            var json = _.clone(this.attributes);
+
+            json["buttons"] = this.get('buttons').serialize();
+            json["images"] = this.get('images').serialize();
+            json["headerTexts"] = this.get('headerTexts').serialize();
+            json["texts"] = this.get('texts').serialize();
+            json["links"] = this.get('links').serialize();
+            json["textInputs"] = this.get('textInputs').serialize();
+            json["passwords"] = this.get('passwords').serialize();
+            json["textAreas"] = this.get('textAreas').serialize();
+            json["lines"] = this.get('lines').serialize();
+            json["dropdowns"] = this.get('dropdowns').serialize();
+            json["boxes"] = this.get('boxes').serialize();
+            json["forms"] = this.get('forms').serialize();
+            json["lists"] = this.get('lists').serialize();
+            json["fonts"] = this.get('fonts').serialize();
+
+            return json;
+        }
+
+    });
+
+    exports.ThemeModel = ThemeModel;
+
+});
+
+require.define("/collections/UIElementCollection.js",function(require,module,exports,__dirname,__filename,process,global){var UIElementModel = require('../models/UIElementModel').UIElementModel;
+
+  var UIElementCollection = Backbone.Collection.extend({
+    model : UIElementModel,
+
+    initialize: function (models, type) {
+      this.type = type;
+    }
+  });
+
+  exports.UIElementCollection = UIElementCollection;
+
+});
+
+require.define("/models/UIElementModel.js",function(require,module,exports,__dirname,__filename,process,global){  var UIElementModel = Backbone.Model.extend({
+    initialize: function(bone) {
+
+      this.set('style', bone.style||'');
+      this.set('hoverStyle', bone.hoverStyle||'');
+      this.set('activeStyle', bone.activeStyle||'');
+
+    }
+  });
+
+  exports.UIElementModel = UIElementModel;
+});
+
+require.define("/mixins/BackboneConvenience.js",function(require,module,exports,__dirname,__filename,process,global){        Backbone.View.prototype.close = function() {
+
+            this.undelegateEvents();
+            this.$el.removeData().unbind();
+            this.remove();
+            this.unbind();
+
+            if (this.subviews) {
+                _(this.subviews).each(function(subview) {
+                    subview.close();
+                });
+                this.subviews = null;
+            }
+        };
+
+        Backbone.View.prototype._ensureElement = function() {
+            if (!this.el) {
+                var attrs = {};
+                if (this.id) attrs.id = _.result(this, 'id');
+                if (this.className) attrs['class'] = _.result(this, 'className');
+                var $el = Backbone.$('<' + _.result(this, 'tagName') + '>').attr(attrs);
+                this.setElement($el, false);
+            } else {
+                this.setElement(_.result(this, 'el'), false);
+            }
+
+            if (this.css) {
+                util.loadCSS(this.css);
+            }
+        };
+
+        Backbone.isModel = function(obj) {
+            if (obj && obj.attributes) return true;
+            return false;
+        };
+
+        Backbone.isCollection = function(obj) {
+            if (obj && obj.models) return true;
+            return false;
+        };
+
+        Backbone.isString = function(obj) {
+            return toString.call(obj) == '[object String]';
+        };
+
+        Backbone.View.prototype.deepListenTo = function(obj, event, handler) {
+            if (Backbone.isModel(obj)) {
+                this.listenTo(obj, event, handler);
+                _.each(obj.attributes, function(val, key) {
+                    this.deepListenTo(val, event, handler);
+                }, this);
+            } else if (Backbone.isCollection(obj)) {
+                this.listenTo(obj, event, handler);
+                _.each(obj.models, function(model) {
+                    this.deepListenTo(model, event, handler);
+                }, this);
+            }
+        };
+
+        Backbone.View.prototype.listenToModels = function(coll, event, handler) {
+
+            coll.each(function(model) {
+                this.listenTo(model, event, function() {
+                    handler(model);
+                });
+            }, this);
+
+            var self = this;
+            this.listenTo(coll, 'add', function(model) {
+                self.listenTo(model, event, handler);
+            });
+        };
+
+        Backbone.View.prototype.createSubview = function(cls, data) {
+
+            var view = new cls(data);
+            view.superview = this;
+            this.subviews = this.subviews || [];
+            this.subviews.push(view);
+
+            if(this.topview) { view.topview = this.topview; }
+
+            return view;
+        };
+
+        Backbone.Collection.prototype.add = function(models, options) {
+            /* make things validate by default*/
+            models = _.isArray(models) ? models : [models];
+            options = _.extend({
+                validate: true
+            }, options);
+            var dupes = [];
+            var addOptions = {
+                add: true,
+                merge: false,
+                remove: false
+            };
+
+            if (this.uniqueKeys) {
+                if (!_.isArray(models)) models = models ? [models] : [];
+
+                _.each(models, function(model) {
+                    this.each(function(_model) {
+                        var dupe = null;
+                        _.each(this.uniqueKeys, function(key) {
+                            var _modelVal = _model.attributes ? _model.get(key) : _model[key];
+                            if (_modelVal === model.get(key) ||
+                                (Backbone.isString(_modelVal) && Backbone.isString(model.get(key)) &&
+                                    _modelVal.toLowerCase() === model.get(key).toLowerCase()
+                                )) {
+                                dupe = model;
+                                this.trigger('duplicate', key, model.get(key));
+                                return;
+                            }
+                        }, this);
+
+                        if (dupe) {
+                            dupes.push(dupe);
+                            return;
+                        }
+                    }, this);
+
+                }, this);
+            }
+
+            models = _.difference(models, dupes);
+
+            return this.set(models, _.defaults(options || {}, addOptions));
+        };
+
+        Backbone.Collection.prototype.push = function(model, options) {
+            model = this._prepareModel(model, options);
+            var dupe = null;
+            if (this.uniqueKeys) {
+
+                this.each(function(_model) {
+
+                    _.each(this.uniqueKeys, function(key) {
+
+                        if (_model.get(key) === model.get(key)) {
+                            dupe = _model;
+                            this.trigger('duplicate', key, model.get(key));
+                            return;
+                        }
+                    }, this);
+
+                    if (dupe) {
+                        return;
+                    }
+                }, this);
+            }
+
+            if (dupe) return dupe;
+
+            this.add(model, _.extend({
+                at: this.length
+            }, options));
+            return model;
+        };
+
+        Backbone.Model.prototype.setGenerator = function(generatorStr) {
+            this.generate = generatorStr;
+        };
+
+        Backbone.Model.prototype.serialize = function(options) {
+            var options = options || {};
+            var json = {};
+            var data = this.toJSON(options);
+
+            if (this.generate) {
+                json.generate = this.generate;
+                json.data = data;
+                if(options.generate) json.data.cid = this.cid;
+            } else {
+                json = data;
+            }
+
+            return json;
+        };
+
+        Backbone.Collection.prototype.setGenerator = function(generatorStr) {
+            this.generate = generatorStr;
+        };
+
+        Backbone.Collection.prototype.serialize = function(options) {
+            options = options || {};
+            var json = {};
+
+            var data = this.map(function(model) {
+                return model.serialize(options);
+            });
+
+            if (this.generate) {
+                json.generate = this.generate;
+                json.data = data;
+            } else {
+                json = data;
+            }
+
+            return json;
+        };
+
+        Backbone.Model.prototype.expand = function(options) {
+        	var options = options || {};
+            if (this.generate && options.generate !== false) {
+                var data = this.toJSON({ generate: true });
+                data.cid = this.cid;
+                return G.generate(this.generate, data);
+            } else {
+                return this.toJSON();
+            }
+
+            return null;
+        };
+
+        Backbone.Model.prototype.updateJSON = function(bone) {
+
+            this.set(bone, {silent: true});
+
+            _.each(this.attributes, function(val, key) {
+                if(!bone[key]) {
+                    this.unset(key, {silent: true});
+                }
+            }, this);
+
+            this.trigger('change');
+        };
+
+        Backbone.Collection.prototype.expand = function() {
+
+            if (this.generate) {
+                var data = this.serialize({ generate: true });
+                data = data.data;
+                return G.generate(this.generate, data);
+            } else {
+                return this.toJSON();
+            }
+
+            return null;
+        };
+
+});
+
+require.define("/main.js",function(require,module,exports,__dirname,__filename,process,global){var Generator = require('./Generator').Generator;
+var AppModel = require('./models/AppModel').AppModel;
+var RouteCollection = require('./collections/RouteCollection').RouteCollection;
+var ThemeModel = require('./models/ThemeModel').ThemeModel;
+require('./mixins/BackboneConvenience');
 
 if (window) {
 
     window.onerror = function(){
-        alert("I\'m a bug, please squash me.");
+        //alert("I\'m a bug, please squash me.");
     }
 
     if (!appState) throw "No appstate";
+
 
     /* Initialize v1State */
     window.v1State = new Backbone.Model();

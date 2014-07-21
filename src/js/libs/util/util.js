@@ -1,5 +1,3 @@
-define(['backbone'], function() {
-
     var util = {
 
         log_to_server: function(key_str, val_dict, app_id) {
@@ -550,13 +548,3 @@ define(['backbone'], function() {
     document.addEventListener("touchstart", function() {}, true);
 
     window.util = util;
-
-    if (typeof window.define === "function" && window.define.amd) {
-        window.define("util", [], function() {
-            return window.util;
-        });
-    }
-
-    return util;
-
-});

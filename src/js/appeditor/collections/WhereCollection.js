@@ -1,4 +1,4 @@
-var WhereModel = require("../models/WhereModel");
+var WhereModel = require("../models/WhereModel").WhereModel;
 
   var WhereCollection = Backbone.Collection.extend({
     model: WhereModel,

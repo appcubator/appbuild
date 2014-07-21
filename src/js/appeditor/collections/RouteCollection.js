@@ -1,4 +1,4 @@
-    var RouteModel = require('../models/RouteModel');
+    var RouteModel = require('../models/RouteModel').RouteModel;
 
     var RouteCollection = Backbone.Collection.extend({
 

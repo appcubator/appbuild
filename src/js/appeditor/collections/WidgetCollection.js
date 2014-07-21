@@ -1,7 +1,7 @@
     'use strict';
 
-    var WidgetModel = require("../models/WidgetModel");
-    var Generator = require("../Generator")
+    var WidgetModel = require("../models/WidgetModel").WidgetModel;
+    var Generator = require("../Generator").Generator;
 
     var WidgetCollection = Backbone.Collection.extend({
 

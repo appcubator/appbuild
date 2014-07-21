@@ -1,7 +1,7 @@
     'use strict';
-    var SectionModel = require('../models/SectionModel');
-    var WidgetCollection = require('./WidgetCollection');
-    var ColumnModel = require('../models/ColumnModel');
+    var SectionModel = require('../models/SectionModel').SectionModel;
+    var WidgetCollection = require('./WidgetCollection').WidgetCollection;
+    var ColumnModel = require('../models/ColumnModel').ColumnModel;
 
     var SectionCollection = Backbone.Collection.extend({
 

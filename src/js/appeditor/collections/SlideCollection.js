@@ -1,4 +1,4 @@
-var SlideModel = require('models/SlideModel');
+var SlideModel = require('models/SlideModel').SlideModel;
 
   var SlideCollection = Backbone.Collection.extend({
     model : SlideModel

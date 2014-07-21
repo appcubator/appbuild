@@ -1,4 +1,4 @@
-var LinkModel = require('../models/LinkModel');
+var LinkModel = require('../models/LinkModel').LinkModel;
 
   var LinkCollection = Backbone.Collection.extend({
     model: LinkModel

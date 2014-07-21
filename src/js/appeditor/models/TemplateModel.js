@@ -1,6 +1,6 @@
     'use strict';
 
-    var SectionCollection= require('../collections/SectionCollection');
+    var SectionCollection= require('../collections/SectionCollection').SectionCollection;
 
     var TemplateModel = Backbone.Model.extend({
 

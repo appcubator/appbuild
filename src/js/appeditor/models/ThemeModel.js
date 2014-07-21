@@ -1,8 +1,6 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var UIElementCollection = require('collections/UIElementCollection');
+    var UIElementCollection = require('../collections/UIElementCollection').UIElementCollection;
 
     var ThemeModel = Backbone.Model.extend({
 
@@ -148,5 +146,4 @@ define(function(require, exports, module) {
 
     });
 
-    return ThemeModel;
-});
+    exports.ThemeModel = ThemeModel;

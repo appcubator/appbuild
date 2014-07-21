@@ -1,7 +1,7 @@
     'use strict';
 
-    var FieldsCollection = require('../collections/FieldsCollection');
-    var NodeModelMethodModel = require('./NodeModelMethodModel');
+    var FieldsCollection = require('../collections/FieldsCollection').FieldsCollection;
+    var NodeModelMethodModel = require('./NodeModelMethodModel').NodeModelMethodModel;
 
     var NodeModelModel = Backbone.Model.extend({
 

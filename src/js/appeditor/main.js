@@ -1,13 +1,17 @@
-var Generator = require('./Generator');
-var AppModel = require('./models/AppModel');
+var Generator = require('./Generator').Generator;
+var AppModel = require('./models/AppModel').AppModel;
+var RouteCollection = require('./collections/RouteCollection').RouteCollection;
+var ThemeModel = require('./models/ThemeModel').ThemeModel;
+require('./mixins/BackboneConvenience');
 
 if (window) {
 
     window.onerror = function(){
-        alert("I\'m a bug, please squash me.");
+        //alert("I\'m a bug, please squash me.");
     }
 
     if (!appState) throw "No appstate";
+
 
     /* Initialize v1State */
     window.v1State = new Backbone.Model();

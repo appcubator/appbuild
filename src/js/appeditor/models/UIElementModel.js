@@ -1,4 +1,3 @@
-define(['backbone'], function() {
   var UIElementModel = Backbone.Model.extend({
     initialize: function(bone) {
 
@@ -9,5 +8,4 @@ define(['backbone'], function() {
     }
   });
 
-  return UIElementModel;
-});
+  exports.UIElementModel = UIElementModel;

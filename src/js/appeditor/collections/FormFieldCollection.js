@@ -1,4 +1,4 @@
-var FormFieldModel = require('../models/FormFieldModel');
+var FormFieldModel = require('../models/FormFieldModel').FormFieldModel;
 
 
     var FormFieldCollection = Backbone.Collection.extend({

@@ -1,4 +1,4 @@
-var WidgetContainerModel = require('../models/WidgetContainerModel');
+var WidgetContainerModel = require('../models/WidgetContainerModel').WidgetContainerModel;
 
   var ContainersCollection = Backbone.Collection.extend({
 

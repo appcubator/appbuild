@@ -1,10 +1,10 @@
     'use strict';
 
-    var AppInfoModel = require('./AppInfoModel'),
-        NodeModelCollection = require('../collections/NodeModelCollection'),
-        TemplateCollection = require('../collections/TemplateCollection'),
-        PluginsModel = require('./PluginsModel'),
-        RouteCollection = require('../collections/RouteCollection');
+    var AppInfoModel = require('./AppInfoModel').AppInfoModel,
+        NodeModelCollection = require('../collections/NodeModelCollection').NodeModelCollection,
+        TemplateCollection = require('../collections/TemplateCollection').TemplateCollection,
+        PluginsModel = require('./PluginsModel').PluginsModel,
+        RouteCollection = require('../collections/RouteCollection').RouteCollection;
 
 
     var AppModel = Backbone.Model.extend({
@@ -63,4 +63,4 @@
         }
     });
 
-    module.exports = AppModel;
+    exports.AppModel = AppModel;

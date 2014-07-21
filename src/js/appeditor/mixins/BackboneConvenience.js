@@ -1,12 +1,3 @@
-/* Backbone objects need to call _.bindAll(this); on initialization */ 
-define([
-        'backbone',
-        'app/Generator',
-        'util'
-    ],
-
-    function(Backbone, Generator) {
-
         Backbone.View.prototype.close = function() {
 
             this.undelegateEvents();
@@ -247,4 +238,3 @@ define([
 
             return null;
         };
-    });

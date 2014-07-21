@@ -1,4 +1,5 @@
-        var UrlModel = require('./UrlModel');
+        var UrlModel = require('./UrlModel').UrlModel;
+
         var RouteModel = Backbone.Model.extend({
 
             defaults: {

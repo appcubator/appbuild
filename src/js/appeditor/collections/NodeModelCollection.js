@@ -1,6 +1,6 @@
     'use strict';
 
-    var NodeModelModel = require('../models/NodeModelModel');
+    var NodeModelModel = require('../models/NodeModelModel').NodeModelModel;
 
     var NodeModelCollection = Backbone.Collection.extend({
         model: NodeModelModel,

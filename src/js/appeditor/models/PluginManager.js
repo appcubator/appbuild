@@ -1,11 +1,3 @@
-define([
-
-    ], function(require, exports, module) {
-    'use strict';
-
-    require('backbone');
-
-
     var PluginManager = Backbone.Model.extend({
         initialize: function(options) {
             _.bindAll(this);
@@ -27,5 +19,4 @@ define([
          d
     });
 
-    return PluginManager;
-});
+    exports.PluginManager = PluginManager;
