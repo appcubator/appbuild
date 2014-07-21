@@ -1,5 +1,3 @@
-define(function(require, exports, module) {
-
     'use strict';
 
     var UrlView = require('app/pages/UrlView');
@@ -11,8 +9,6 @@ define(function(require, exports, module) {
     var PageView = require('app/pages/PageView');
 
     var PageTemplatePicker = require('editor/PageTemplatePicker');
-    // var NavbarView = require('editor/NavbarView');
-    // var FooterView = require('editor/FooterView');
     var GuideView = require('editor/GuideView');
     var TutorialView = require('tutorial/TutorialView');
     var DeployView = require('app/DeployView');
@@ -354,4 +350,3 @@ define(function(require, exports, module) {
     });
 
     return EditorView;
-});

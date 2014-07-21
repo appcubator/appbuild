@@ -1,20 +1,15 @@
-define(function(require, exports, module) {
 
-    'use strict';
-    require('backbone');
+    var ToolBarView = require('./template_editor/ToolBarView').ToolBarView;
+    var EditorView = require('./template_editor/EditorView').EditorView;
+    var PluginsView = require('./plugins_view/PluginsView').PluginsView;
+    var SettingsView = require('./SettingsView').SettingsView;
+    var RoutesView = require('./RoutesView').RoutesView;
 
-    var DeployManagerModel = require('./DeployManagerModel');
-    var ToolBarView = require('editor/ToolBarView');
-    var EditorView = require('editor/EditorView');
-    var PluginsView = require('app/plugins_view/PluginsView');
-    var SettingsView = require('app/SettingsView');
-    var RoutesView = require('app/RoutesView');
+    var PluginsModel = require('./models/PluginsModel').PluginsModel;
 
-    var PluginsModel = require('models/PluginsModel');
-
-    var SoftErrorView = require("app/SoftErrorView");
-    var ErrorDialogueView = require('mixins/ErrorDialogueView');
-    var NodeModelsView = require('app/models_view/NodeModelsView');
+    var SoftErrorView = require("./SoftErrorView").SoftErrorView;
+    var ErrorDialogueView = require('./mixins/ErrorDialogueView').ErrorDialogueView;
+    var NodeModelsView = require('./models_view/NodeModelsView').NodeModelsView;
 
 
     var AppView = Backbone.View.extend({
@@ -474,5 +469,4 @@ define(function(require, exports, module) {
 
     });
 
-    return AppView;
-});
+    exports.AppView = AppView;

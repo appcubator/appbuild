@@ -1,9 +1,5 @@
-define([
-  'backbone',
-  'mixins/BackboneModal',
-  'util'
-],
-function(Backbone) {
+
+  require('./BackboneModal');
 
   var ErrorDialogueView = Backbone.ModalView.extend({
     tagName: 'div',
@@ -42,5 +38,4 @@ function(Backbone) {
     }
   });
 
-  return ErrorDialogueView;
-});
+  exports.ErrorDialogueView = ErrorDialogueView;

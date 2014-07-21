@@ -1,10 +1,4 @@
-define([
-  'backbone',
-  'mixins/BackboneModal',
-  'util'
-],
-function(Backbone) {
-
+  require('./ModalView');
   var ErrorModalView = Backbone.ModalView.extend({
     tagName: 'div',
     className: 'deployed',
@@ -28,5 +22,4 @@ function(Backbone) {
     }
   });
 
-  return ErrorModalView;
-});
+  exports.ErrorModalView = ErrorModalView;

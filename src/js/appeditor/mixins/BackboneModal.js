@@ -1,10 +1,3 @@
-define([
-  'backbone',
-  'jquery-ui'
-],
-
-function() {
-
   Backbone.ModalView = Backbone.View.extend({
     width: 500,
     padding: 30,
@@ -157,6 +150,3 @@ function() {
     }
 
   });
-
-  return Backbone;
-});

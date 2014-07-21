@@ -1,8 +1,5 @@
-define([ ], function () {
-
-  var MousDispatcher = function() {
+  var MouseDispatcher = function() {
     this.isMousedownActive = false;
   };
 
-  return MousDispatcher;
-});
+  exports.MouseDispatcher = MouseDispatcher;

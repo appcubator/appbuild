@@ -1,9 +1,4 @@
-define([
-  'backbone',
-  'mixins/BackboneModal',
-  'util'
-],
-function(Backbone) {
+  require('./BackboneModal');
 
   var SimpleModalView = Backbone.ModalView.extend({
     tagName: 'div',
@@ -25,5 +20,4 @@ function(Backbone) {
     }
   });
 
-  return SimpleModalView;
-});
+  exports.SimpleModalView = SimpleModalView;

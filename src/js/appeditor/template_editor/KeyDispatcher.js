@@ -1,8 +1,3 @@
-define([
-  'jquery.hotkeys'
-],
-function () {
-
   var KeyDispatcher = function() {
     
     this.bindings = {};
@@ -51,5 +46,4 @@ function () {
 
   };
 
-  return KeyDispatcher;
-});
+  exports.KeyDispatcher = KeyDispatcher;

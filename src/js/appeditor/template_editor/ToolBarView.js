@@ -1,11 +1,9 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var RouteModel = require('models/RouteModel'),
-        TemplateModel = require('models/TemplateModel');
+    var RouteModel = require('../models/RouteModel');
+    var TemplateModel = require('../models/TemplateModel');
 
-    require('mixins/BackboneNameBox');
+    require('../mixins/BackboneNameBox');
 
     var tempTemplateItem = [
                 '<li class="go-to-page" id="tb-template-<%= templateModel.cid %>">',
@@ -128,4 +126,3 @@ define(function(require, exports, module) {
     });
 
     return ToolBarView;
-});

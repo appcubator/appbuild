@@ -1,8 +1,4 @@
-define(function(require, exports, module) {
 
-    'use strict';
-
-    require('backbone');
     var DeployView = require('DeployView');
     var ErrorDialogueView = require('mixins/ErrorDialogueView');
 
@@ -116,5 +112,3 @@ define(function(require, exports, module) {
 	});
 
     return DeployManagerModel;
-
-});

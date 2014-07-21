@@ -1,16 +1,9 @@
-define(function(require, exports, module) {
     'use strict';
 
-    var SimpleModalView = require("mixins/SimpleModalView");
-    var ErrorDialogueView = require("mixins/ErrorDialogueView");
-    var SimpleDialogueView = require("mixins/SimpleDialogueView");
-
-    var TutorialView = require("tutorial/TutorialView"),
-        AppView = require("app/AppView"),
-        DeployView = require("app/DeployView"),
-        AccountDropdownView = require("app/AccountDropdownView"),
-        Striper = require('app/Striper'),
-        DashboardsView = require('app/DashboardsView');
+    var SimpleModalView = require("./mixins/SimpleModalView").SimpleModalView;
+    var ErrorDialogueView = require("./mixins/ErrorDialogueView").ErrorDialogueView;
+    var SimpleDialogueView = require("./mixins/SimpleDialogueView").SimpleDialogueView;
+    var AppView = require("./AppView").AppView;
 
     var AppRouter = Backbone.Router.extend({
 
@@ -222,6 +215,4 @@ define(function(require, exports, module) {
 
     });
 
-    return AppRouter;
-
-});
+    exports.AppRouter = AppRouter;
