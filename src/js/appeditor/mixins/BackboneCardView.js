@@ -1,10 +1,3 @@
-define([
-        'backbone',
-        'jquery-ui'
-    ],
-
-    function() {
-
         Backbone.CardView = Backbone.View.extend({
             width: 800,
             padding: 0,
@@ -163,5 +156,4 @@ define([
 
         });
 
-        return Backbone;
-    });
+     

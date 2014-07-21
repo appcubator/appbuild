@@ -1,10 +1,3 @@
-define([
-        'backbone',
-        'jquery-ui'
-    ],
-
-    function() {
-
         Backbone.DropdownView = Backbone.View.extend({
 
             toggleElement: null,
@@ -75,6 +68,3 @@ define([
             }
 
         });
-
-        return Backbone;
-    });

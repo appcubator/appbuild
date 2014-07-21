@@ -1,10 +1,3 @@
-define([
-  'backbone',
-  'jquery-ui'
-],
-
-function(Backbone) {
-
   Backbone.PickOneView = Backbone.View.extend({
     el: null,
     tagName: 'div',
@@ -83,7 +76,3 @@ function(Backbone) {
     }
 
   });
-
-  return Backbone;
-
-});

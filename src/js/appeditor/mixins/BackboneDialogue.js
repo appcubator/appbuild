@@ -1,10 +1,3 @@
-define([
-  'backbone',
-  'jquery-ui'
-],
-
-function() {
-
   Backbone.DialogueView = Backbone.View.extend({
     width: 500,
     height: 160,
@@ -129,6 +122,3 @@ function() {
     }
 
   });
-
-  return Backbone;
-});

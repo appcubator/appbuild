@@ -1,7 +1,5 @@
-define([
-        'editor/WidgetClassPickerView'
-    ],
-    function(WidgetClassPickerView) {
+
+    var WidgetClassPickerView = require('./WidgetClassPickerView').WidgetClassPickerView;
 
         var ToolTipHints = {
             "a-left": "Align left",
@@ -126,5 +124,4 @@ define([
             }
         });
 
-        return WidgetLayoutEditorView;
-    });
+        exports.WidgetLayoutEditorView = WidgetLayoutEditorView;

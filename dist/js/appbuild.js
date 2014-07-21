@@ -3018,14 +3018,7 @@ require.define("/mixins/SimpleDialogueView.js",function(require,module,exports,_
 
 });
 
-require.define("/mixins/BackboneDialogue.js",function(require,module,exports,__dirname,__filename,process,global){define([
-  'backbone',
-  'jquery-ui'
-],
-
-function() {
-
-  Backbone.DialogueView = Backbone.View.extend({
+require.define("/mixins/BackboneDialogue.js",function(require,module,exports,__dirname,__filename,process,global){  Backbone.DialogueView = Backbone.View.extend({
     width: 500,
     height: 160,
     padding: 0,
@@ -3149,9 +3142,6 @@ function() {
     }
 
   });
-
-  return Backbone;
-});
 
 });
 
@@ -3759,14 +3749,7 @@ require.define("/template_editor/ToolBarView.js",function(require,module,exports
     exports.ToolBarView = ToolBarView;
 });
 
-require.define("/mixins/BackboneNameBox.js",function(require,module,exports,__dirname,__filename,process,global){define([
-  'backbone',
-  'jquery-ui'
-],
-
-function(Backbone) {
-
-  Backbone.NameBox = Backbone.View.extend({
+require.define("/mixins/BackboneNameBox.js",function(require,module,exports,__dirname,__filename,process,global){  Backbone.NameBox = Backbone.View.extend({
     el: null,
     tagName: 'div',
     txt: "",
@@ -3829,8 +3812,6 @@ function(Backbone) {
   });
 
   return Backbone;
-
-});
 
 });
 
@@ -4407,12 +4388,8 @@ require.define("/pages/UrlView.js",function(require,module,exports,__dirname,__f
     exports.UrlView = UrlView;
 });
 
-require.define("/mixins/DialogueView.js",function(require,module,exports,__dirname,__filename,process,global){define([
-  'backbone',
-  'mixins/BackboneDialogue',
-  'util'
-],
-function(Backbone) {
+require.define("/mixins/DialogueView.js",function(require,module,exports,__dirname,__filename,process,global){
+  require('./BackboneDialogue');
 
   var SimpleDialogueView = Backbone.DialogueView.extend({
     tagName: 'div',
@@ -4451,9 +4428,7 @@ function(Backbone) {
 
   });
 
-  return SimpleDialogueView;
-});
-
+  exports.SimpleDialogueView = SimpleDialogueView;
 });
 
 require.define("/mixins/ErrorModalView.js",function(require,module,exports,__dirname,__filename,process,global){  require('./BackboneModal');
@@ -4484,12 +4459,7 @@ require.define("/mixins/ErrorModalView.js",function(require,module,exports,__dir
 
 });
 
-require.define("/mixins/DebugOverlay.js",function(require,module,exports,__dirname,__filename,process,global){define([
-  'backbone',
-  'mixins/BackboneModal',
-  'util'
-],
-function(Backbone) {
+require.define("/mixins/DebugOverlay.js",function(require,module,exports,__dirname,__filename,process,global){  require('./BackboneModal');
 
   var ErrorModalView = Backbone.ModalView.extend({
     tagName: 'div',
@@ -4607,8 +4577,7 @@ function(Backbone) {
     }
   });
 
-  return ErrorModalView;
-});
+  exports.ErrorModalView = ErrorModalView;
 
 });
 
@@ -4984,14 +4953,7 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
 
 });
 
-require.define("/mixins/BackboneUI.js",function(require,module,exports,__dirname,__filename,process,global){define([
-  'backbone',
-  'jquery-ui'
-],
-
-function(Backbone) {
-
-  Backbone.UIView = Backbone.View.extend({
+require.define("/mixins/BackboneUI.js",function(require,module,exports,__dirname,__filename,process,global){  Backbone.UIView = Backbone.View.extend({
 
     resizableAndDraggable: function() {
       var self = this;
@@ -5081,10 +5043,6 @@ function(Backbone) {
     }
 
   });
-
-  return Backbone;
-
-});
 
 });
 
@@ -5194,14 +5152,7 @@ require.define("/template_editor/WidgetSettingsView.js",function(require,module,
 
 });
 
-require.define("/mixins/BackboneCardView.js",function(require,module,exports,__dirname,__filename,process,global){define([
-        'backbone',
-        'jquery-ui'
-    ],
-
-    function() {
-
-        Backbone.CardView = Backbone.View.extend({
+require.define("/mixins/BackboneCardView.js",function(require,module,exports,__dirname,__filename,process,global){        Backbone.CardView = Backbone.View.extend({
             width: 800,
             padding: 0,
 
@@ -5359,8 +5310,7 @@ require.define("/mixins/BackboneCardView.js",function(require,module,exports,__d
 
         });
 
-        return Backbone;
-    });
+     
 });
 
 require.define("/GeneratorEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -6160,13 +6110,7 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
     exports.WidgetContentEditorView = WidgetContentEditorView;
 });
 
-require.define("/mixins/SelectView.js",function(require,module,exports,__dirname,__filename,process,global){define([
-  'backbone'
-],
-
-function(Backbone) {
-
-  SelectView = Backbone.View.extend({
+require.define("/mixins/SelectView.js",function(require,module,exports,__dirname,__filename,process,global){  SelectView = Backbone.View.extend({
     tagName: 'div',
     className : 'select-view',
     expanded: false,
@@ -6258,16 +6202,12 @@ function(Backbone) {
 
   });
 
-  return SelectView;
+  exports.SelectView = SelectView;
 
 });
 
-});
-
-require.define("/template_editor/WidgetLayoutEditorView.js",function(require,module,exports,__dirname,__filename,process,global){define([
-        'editor/WidgetClassPickerView'
-    ],
-    function(WidgetClassPickerView) {
+require.define("/template_editor/WidgetLayoutEditorView.js",function(require,module,exports,__dirname,__filename,process,global){
+    var WidgetClassPickerView = require('./WidgetClassPickerView').WidgetClassPickerView;
 
         var ToolTipHints = {
             "a-left": "Align left",
@@ -6392,8 +6332,7 @@ require.define("/template_editor/WidgetLayoutEditorView.js",function(require,mod
             }
         });
 
-        return WidgetLayoutEditorView;
-    });
+        exports.WidgetLayoutEditorView = WidgetLayoutEditorView;
 });
 
 require.define("/template_editor/WidgetClassPickerView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -9853,14 +9792,7 @@ require.define("/plugins_view/PluginsView.js",function(require,module,exports,__
 
 });
 
-require.define("/mixins/BackboneDropdownView.js",function(require,module,exports,__dirname,__filename,process,global){define([
-        'backbone',
-        'jquery-ui'
-    ],
-
-    function() {
-
-        Backbone.DropdownView = Backbone.View.extend({
+require.define("/mixins/BackboneDropdownView.js",function(require,module,exports,__dirname,__filename,process,global){        Backbone.DropdownView = Backbone.View.extend({
 
             toggleElement: null,
             events: {
@@ -9930,9 +9862,6 @@ require.define("/mixins/BackboneDropdownView.js",function(require,module,exports
             }
 
         });
-
-        return Backbone;
-    });
 
 });
 

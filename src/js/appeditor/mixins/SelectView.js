@@ -1,9 +1,3 @@
-define([
-  'backbone'
-],
-
-function(Backbone) {
-
   SelectView = Backbone.View.extend({
     tagName: 'div',
     className : 'select-view',
@@ -96,6 +90,4 @@ function(Backbone) {
 
   });
 
-  return SelectView;
-
-});
+  exports.SelectView = SelectView;

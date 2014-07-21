@@ -1,10 +1,3 @@
-define([
-  'backbone',
-  'jquery-ui'
-],
-
-function(Backbone) {
-
   Backbone.NameBox = Backbone.View.extend({
     el: null,
     tagName: 'div',
@@ -68,5 +61,3 @@ function(Backbone) {
   });
 
   return Backbone;
-
-});

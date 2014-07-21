@@ -1,10 +1,3 @@
-define([
-  'backbone',
-  'jquery-ui'
-],
-
-function(Backbone) {
-
   Backbone.UIView = Backbone.View.extend({
 
     resizableAndDraggable: function() {
@@ -95,7 +88,3 @@ function(Backbone) {
     }
 
   });
-
-  return Backbone;
-
-});

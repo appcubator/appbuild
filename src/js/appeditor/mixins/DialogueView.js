@@ -1,9 +1,5 @@
-define([
-  'backbone',
-  'mixins/BackboneDialogue',
-  'util'
-],
-function(Backbone) {
+
+  require('./BackboneDialogue');
 
   var SimpleDialogueView = Backbone.DialogueView.extend({
     tagName: 'div',
@@ -42,5 +38,4 @@ function(Backbone) {
 
   });
 
-  return SimpleDialogueView;
-});
+  exports.SimpleDialogueView = SimpleDialogueView;
