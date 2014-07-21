@@ -63,4 +63,4 @@
         }
     });
 
-    exports.AppModel = AppModel;
+    module.exports = AppModel;

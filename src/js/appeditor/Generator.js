@@ -58,4 +58,4 @@
         return this.expander.findGenData(plugins, this.expander.parseGenID(generatorPath));
     };
 
-    exports.Generator = Generator;
+   module.exports = Generator;

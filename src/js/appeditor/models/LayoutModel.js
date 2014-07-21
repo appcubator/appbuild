@@ -1,5 +1,4 @@
-define(['backbone'], function(Backbone) {
-    
+
     var LayoutModel = Backbone.Model.extend({
         
         defaults: {
@@ -8,5 +7,4 @@ define(['backbone'], function(Backbone) {
 
     });
 
-    return LayoutModel;
-});
+    exports.LayoutModel = LayoutModel;

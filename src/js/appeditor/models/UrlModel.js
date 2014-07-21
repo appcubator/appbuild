@@ -1,4 +1,4 @@
-define(['backbone'], function(Backbone) {
+
   var UrlModel = Backbone.Model.extend({
     defaults : {
     },
@@ -38,5 +38,4 @@ define(['backbone'], function(Backbone) {
     }
   });
 
-  return UrlModel;
-});
+  exports.UrlModel = UrlModel;

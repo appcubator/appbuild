@@ -1,8 +1,3 @@
-define([
-        'backbone'
-    ],
-    function() {
-
         var FormFieldModel = Backbone.Model.extend({
             initialize: function(bone) {
                 this.set('field_name', bone.field_name);
@@ -28,6 +23,4 @@ define([
             }
         });
 
-        return FormFieldModel;
-
-    });
+        exports.FormFieldModel = FormFieldModel;

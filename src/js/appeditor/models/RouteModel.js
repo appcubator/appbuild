@@ -1,8 +1,4 @@
-define([
-        'models/UrlModel'
-        ],
-    function(UrlModel) {
-
+        var UrlModel = require('./UrlModel');
         var RouteModel = Backbone.Model.extend({
 
             defaults: {
@@ -153,5 +149,4 @@ define([
             }
         });
 
-        return RouteModel;
-    });
+        exports.RouteModel = RouteModel;

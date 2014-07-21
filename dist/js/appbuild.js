@@ -492,7 +492,7 @@ require.define("/Generator.js",function(require,module,exports,__dirname,__filen
         return this.expander.findGenData(plugins, this.expander.parseGenID(generatorPath));
     };
 
-    exports.Generator = Generator;
+   module.exports = Generator;
 
 });
 
@@ -561,7 +561,7 @@ require.define("/models/AppModel.js",function(require,module,exports,__dirname,_
         }
     });
 
-    exports.AppModel = AppModel;
+    module.exports = AppModel;
 
 });
 
@@ -1437,8 +1437,7 @@ require.define("/models/WidgetModel.js",function(require,module,exports,__dirnam
 
 });
 
-require.define("/models/LayoutModel.js",function(require,module,exports,__dirname,__filename,process,global){define(['backbone'], function(Backbone) {
-    
+require.define("/models/LayoutModel.js",function(require,module,exports,__dirname,__filename,process,global){
     var LayoutModel = Backbone.Model.extend({
         
         defaults: {
@@ -1447,8 +1446,7 @@ require.define("/models/LayoutModel.js",function(require,module,exports,__dirnam
 
     });
 
-    return LayoutModel;
-});
+    exports.LayoutModel = LayoutModel;
 });
 
 require.define("/collections/FormFieldCollection.js",function(require,module,exports,__dirname,__filename,process,global){var FormFieldModel = require('../models/FormFieldModel');
@@ -1461,12 +1459,7 @@ require.define("/collections/FormFieldCollection.js",function(require,module,exp
     exports.FormFieldCollection = FormFieldCollection;
 });
 
-require.define("/models/FormFieldModel.js",function(require,module,exports,__dirname,__filename,process,global){define([
-        'backbone'
-    ],
-    function() {
-
-        var FormFieldModel = Backbone.Model.extend({
+require.define("/models/FormFieldModel.js",function(require,module,exports,__dirname,__filename,process,global){        var FormFieldModel = Backbone.Model.extend({
             initialize: function(bone) {
                 this.set('field_name', bone.field_name);
                 if (bone.type) {
@@ -1491,9 +1484,7 @@ require.define("/models/FormFieldModel.js",function(require,module,exports,__dir
             }
         });
 
-        return FormFieldModel;
-
-    });
+        exports.FormFieldModel = FormFieldModel;
 
 });
 
@@ -1868,11 +1859,7 @@ require.define("/collections/RouteCollection.js",function(require,module,exports
 
 });
 
-require.define("/models/RouteModel.js",function(require,module,exports,__dirname,__filename,process,global){define([
-        'models/UrlModel'
-        ],
-    function(UrlModel) {
-
+require.define("/models/RouteModel.js",function(require,module,exports,__dirname,__filename,process,global){        var UrlModel = require('./UrlModel');
         var RouteModel = Backbone.Model.extend({
 
             defaults: {
@@ -2023,8 +2010,51 @@ require.define("/models/RouteModel.js",function(require,module,exports,__dirname
             }
         });
 
-        return RouteModel;
-    });
+        exports.RouteModel = RouteModel;
+
+});
+
+require.define("/models/UrlModel.js",function(require,module,exports,__dirname,__filename,process,global){
+  var UrlModel = Backbone.Model.extend({
+    defaults : {
+    },
+
+    initialize: function(bone) {
+      var urlparts = [];
+
+      if(bone) {
+        urlparts = _(bone).map(function(value) {
+          return {
+            value: value
+          };
+        });
+      }
+      this.set('urlparts', new Backbone.Collection(urlparts));
+    },
+
+    getAppendixString: function() {
+      return this.get('urlparts').pluck('value').join('/');
+    },
+
+    getUrlString: function(appSubdomain) {
+      return (appUrl||'http://yourapp.com') + this.getAppendixString();
+    },
+
+    addUrlPart: function(value) {
+      this.get('urlparts').push(value);
+    },
+
+    removeUrlPart: function(value) {
+      var value = this.get('urlparts').remove(value);
+    },
+
+    toJSON: function() {
+      var json = this.get('urlparts').pluck('value');
+      return json;
+    }
+  });
+
+  exports.UrlModel = UrlModel;
 
 });
 
