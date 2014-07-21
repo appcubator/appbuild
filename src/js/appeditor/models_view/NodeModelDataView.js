@@ -1,11 +1,9 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var SoftErrorView = require('app/SoftErrorView');
-    var DialogueView = require('mixins/DialogueView');
+    var SoftErrorView = require('../SoftErrorView').SoftErrorView;
+    var DialogueView = require('../mixins/DialogueView').DialogueViews;
 
-    var TableDataView = Backbone.View.extend({
+    var NodeModelDataView = Backbone.View.extend({
         el: null,
         tagName: 'div',
         collection: null,
@@ -30,5 +28,4 @@ define(function(require, exports, module) {
 
     });
 
-    return TableDataView;
-});
+    exports.NodeModelDataView = NodeModelDataView;

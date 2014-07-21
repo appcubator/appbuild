@@ -1,4 +1,4 @@
-  require('./ModalView');
+  require('./BackboneModal');
   var ErrorModalView = Backbone.ModalView.extend({
     tagName: 'div',
     className: 'deployed',

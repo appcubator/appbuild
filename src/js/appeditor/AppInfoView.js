@@ -1,9 +1,7 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var Striper = require('app/Striper');
-    var ErrorDialogueView = require('mixins/ErrorDialogueView');
+    var ErrorDialogueView = require('./mixins/ErrorDialogueView');
+
     var app_info_view_temp = [
             '<div class="span40 domains w-pane pb2 hoff4" id="domain-settings">',
               '<h3 class="span36 offset2 hoff1">Domain Settings</h3>',
@@ -206,5 +204,4 @@ define(function(require, exports, module) {
         }
     });
 
-    return AppInfoView;
-});
+    exports.AppInfoView = AppInfoView;

@@ -1,7 +1,4 @@
-define(function(require, exports, module) {
     'use strict';
-
-    require('backbone');
 
     var UIElementListView = require('./UIElementListView');
     var StaticsEditorView = require('./StaticsEditorView');
@@ -352,5 +349,4 @@ define(function(require, exports, module) {
 
     });
 
-    return CSSEditorView;
-});
+    exports.CSSEditorView = CSSEditorView;

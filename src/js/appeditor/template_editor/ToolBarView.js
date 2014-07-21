@@ -1,7 +1,7 @@
     'use strict';
 
-    var RouteModel = require('../models/RouteModel');
-    var TemplateModel = require('../models/TemplateModel');
+    var RouteModel = require('../models/RouteModel').RouteModel;
+    var TemplateModel = require('../models/TemplateModel').TemplateModel;
 
     require('../mixins/BackboneNameBox');
 
@@ -125,4 +125,4 @@
 
     });
 
-    return ToolBarView;
+    exports.ToolBarView = ToolBarView;

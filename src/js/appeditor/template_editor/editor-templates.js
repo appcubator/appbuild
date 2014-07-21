@@ -330,3 +330,5 @@ Templates.searchboxTemp = [
 '<input type="submit" class="btn" value="Search">',
 '</form>'
 ].join('\n');
+
+exports.EditorTemplates = Templates;

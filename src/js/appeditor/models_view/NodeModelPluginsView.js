@@ -1,9 +1,6 @@
-define(function(require, exports, module) {
-
     'use strict';
-    require('backbone');
 
-    var NodeModelMethodModel = require('models/NodeModelMethodModel');
+    var NodeModelMethodModel = require('../models/NodeModelMethodModel');
 
     var pluginAttribsTemplate = [
     '<div class="plugins-list">',
@@ -122,6 +119,4 @@ define(function(require, exports, module) {
 
     });
 
-    return NodeModelPluginsView;
-
-});
+    exports.NodeModelMethodModel = NodeModelMethodModel;

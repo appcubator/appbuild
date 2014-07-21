@@ -113,13 +113,12 @@
 
         info: function(appId, tutorial) {
             var self = this;
-            require(['app/AppInfoView'], function(InfoView) {
+            var AppInfoView = require('./AppInfoView');
                 self.tutorialPage = "Application Settings";
-                self.changePage(InfoView, {}, tutorial, function() {
+                self.changePage(AppInfoView, {}, tutorial, function() {
                     $('.menu-app-info').addClass('active');
                 });
                 olark('api.box.show');
-            });
         },
 
         tables: function(tutorial) {
@@ -130,14 +129,14 @@
         pages: function(appId, tutorial) {
             var self = this;
             self.tutorialPage = "Pages";
-            require(['app/pages/PagesView'], function(PagesView) {
+            var PagesView = require('./pages/PagesView').PagesView;
+
                 $('#page').fadeIn();
                 self.changePage(PagesView, {}, tutorial, function() {
                     self.trigger('pages-loaded');
                     $('.menu-app-pages').addClass('active');
                 });
                 olark('api.box.show');
-            });
         },
 
         pageWithName: function(pageName) {

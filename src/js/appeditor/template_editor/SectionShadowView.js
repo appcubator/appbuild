@@ -1,12 +1,6 @@
-define(function(require, exports, module) {
-
     'use strict';
 
     // var SectionEditorView = require('editor/SectionEditorView');
-
-    require('backbone');
-    require('util');
-
 
     var SectionShadowView = Backbone.View.extend({
 
@@ -137,5 +131,4 @@ define(function(require, exports, module) {
 
     });
 
-    return SectionShadowView;
-});
+    exports.SectionShadowView = SectionShadowView;

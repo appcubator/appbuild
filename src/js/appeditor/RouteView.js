@@ -1,11 +1,7 @@
-define(function(require, exports, module) {
-
     'use strict';
+    require('./mixins/BackboneDropdownView');
 
-    require('util');
-    require('mixins/BackboneDropdownView');
-
-    var WidgetSettingsView = require('editor/WidgetSettingsView');
+    var WidgetSettingsView = require('./template_editor/WidgetSettingsView');
 
     var template = [ 
         '<small class="url-name"><%= url %></small>',
@@ -81,6 +77,4 @@ define(function(require, exports, module) {
 
     });
 
-    return RouteView;
-
-});
+    exports.RouteView = RouteView;

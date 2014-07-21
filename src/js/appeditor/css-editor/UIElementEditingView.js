@@ -1,7 +1,6 @@
-define(function(require, exports, module) {
     'use strict';
 
-    require('mixins/BackboneModal');
+    require('../mixins/BackboneModal');
 
     var UIElementEditingView = Backbone.View.extend({
         
@@ -97,5 +96,4 @@ define(function(require, exports, module) {
 
     });
 
-    return UIElementEditingView;
-});
+    exports.UIElementEditingView = UIElementEditingView;

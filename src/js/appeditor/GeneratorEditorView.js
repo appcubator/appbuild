@@ -1,10 +1,6 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var Generator = require('app/Generator');
-    require('backbone');
-    require('bootstrap');
+    var Generator = require('./Generator');
 
     var GeneratorEditorView = Backbone.View.extend({
         el: null,
@@ -161,5 +157,4 @@ define(function(require, exports, module) {
 
     });
 
-    return GeneratorEditorView;
-});
+    exports.GeneratorEditorView = GeneratorEditorView;

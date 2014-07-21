@@ -1,11 +1,8 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    require('mixins/BackboneModal');
-    require('util');
+    require('../mixins/BackboneModal');
 
-    var PluginModel = require('models/PluginModel');
+    var PluginModel = require('../models/PluginModel').PluginModel;
 
     var PluginBrowserView = Backbone.ModalView.extend({
         className: "plugin-browser-panel",
@@ -60,5 +57,4 @@ define(function(require, exports, module) {
 
     });
 
-    return PluginBrowserView;
-});
+    exports.PluginBrowserView = PluginBrowserView;

@@ -1,9 +1,7 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var DialogueView = require('mixins/DialogueView');
-    require('mixins/BackboneModal');
+    var DialogueView = require('../mixins/DialogueView');
+    require('../mixins/BackboneModal');
 
     var UrlTemplate = {};
 
@@ -219,5 +217,4 @@ define(function(require, exports, module) {
         }
     });
 
-    return UrlView;
-});
+    exports.UrlView = UrlView;

@@ -1,9 +1,4 @@
-define(function(require, exports, module) {
     'use strict';
-
-    require('backbone');
-    require('fontselect');
-    require('util.filepicker');
 
     var StaticsEditorView = Backbone.View.extend({
 
@@ -81,5 +76,4 @@ define(function(require, exports, module) {
 
     });
 
-    return StaticsEditorView;
-});
+    exports.StaticsEditorView = StaticsEditorView;

@@ -1,10 +1,7 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var WidgetContainerModel = require('models/WidgetContainerModel');
-    var WidgetModel = require('models/WidgetModel');
-    require('jquery-ui');
+    var WidgetContainerModel = require('../models/WidgetContainerModel');
+    var WidgetModel = require('../models/WidgetModel');
 
     var EditorGallerySectionView = Backbone.View.extend({
 
@@ -139,5 +136,4 @@ define(function(require, exports, module) {
     });
 
 
-    return EditorGallerySectionView;
-});
+    exports.EditorGallerySectionView = EditorGallerySectionView;

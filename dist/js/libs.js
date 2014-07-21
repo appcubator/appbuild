@@ -28578,6 +28578,7 @@ require.define("/libs.js",function(require,module,exports,__dirname,__filename,p
 window.$ = window.jQuery;
 require('./jquery.hotkeys');
 require('./node_modules/jquery-ui-browserify/dist/jquery-ui');
+// Prettycheckable
 
 window._ = require('./node_modules/underscore/underscore');
 window.Backbone = require('./node_modules/backbone/backbone');

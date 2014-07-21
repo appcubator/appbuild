@@ -1,13 +1,10 @@
-define([
-        'models/RouteModel',
-        'models/UrlModel',
-        'collections/RouteCollection',
-        'app/pages/PageView',
-        'mixins/ErrorDialogueView',
-        'mixins/BackboneNameBox',
-        'jquery-ui'
-    ],
-    function(RouteModel, UrlModel, RouteCollection, PageView, ErrorDialogueView) {
+    var RouteModel = require('../models/RouteModel').RouteModel;
+        // 'models/UrlModel',
+        // 'collections/RouteCollection',
+        // 'app/pages/PageView',
+        // 'mixins/ErrorDialogueView',
+        // 'mixins/BackboneNameBox',
+
 
         var PagesView = Backbone.View.extend({
 
@@ -160,5 +157,4 @@ define([
 
         });
 
-        return PagesView;
-    });
+        exports.PagesView = PagesView;

@@ -1,12 +1,10 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var EditorGallerySectionView = require('editor/EditorGallerySectionView');
-    var SearchGallerySectionView = require('editor/SearchGallerySectionView');
-    var WidgetModel = require('models/WidgetModel');
-    var Searcher = require('editor/Searcher');
-    var AutoFillHelper = require('app/AutoFillHelper');
+    var EditorGallerySectionView = require('./EditorGallerySectionView');
+    var SearchGallerySectionView = require('./SearchGallerySectionView');
+    var WidgetModel = require('../models/WidgetModel');
+    var Searcher = require('./Searcher');
+    var AutoFillHelper = require('../AutoFillHelper');
 
     /* uielement.displayProps is an an optional object with keys:
         name, (display name)
@@ -307,5 +305,4 @@ define(function(require, exports, module) {
     });
 
 
-    return EditorGalleryView;
-});
+    exports.EditorGalleryView = EditorGalleryView;

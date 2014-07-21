@@ -1,8 +1,6 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var SelectView = require('mixins/SelectView');
+    var SelectView = require('../mixins/SelectView').SelectView;
 
     var WidgetClassPickerView = SelectView.extend({
         className: 'class-picker select-view',
@@ -80,5 +78,4 @@ define(function(require, exports, module) {
         }
     });
 
-    return WidgetClassPickerView;
-});
+    exports.WidgetClassPickerView = WidgetClassPickerView;

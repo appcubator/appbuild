@@ -1,9 +1,6 @@
-define(function(require, exports, module) {
     'use strict';
     
-    var UIElementEditingView = require('./UIElementEditingView');
-    require('backbone');
-    
+    var UIElementEditingView = require('./UIElementEditingView');    
 
     var UIElementView = Backbone.View.extend({
         el: null,
@@ -151,5 +148,4 @@ define(function(require, exports, module) {
 
     });
 
-    return UIElementView;
-});
+    exports.UIElementView = UIElementView;

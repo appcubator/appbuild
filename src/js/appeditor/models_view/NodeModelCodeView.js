@@ -1,13 +1,9 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var SoftErrorView = require('app/SoftErrorView');
-    var DialogueView = require('mixins/DialogueView');
-    var NodeModelMethodModel = require('models/NodeModelMethodModel');
-    var WidgetSettingsView = require('editor/WidgetSettingsView');
-
-    require('prettyCheckable');
+    var SoftErrorView = require('../SoftErrorView').SoftErrorView;
+    var DialogueView = require('../mixins/DialogueView').DialogueView;
+    var NodeModelMethodModel = require('../models/NodeModelMethodModel').NodeModelMethodModel;
+    var WidgetSettingsView = require('../template_editor/WidgetSettingsView').WidgetSettingsView;
 
     var funcTemplate = [
         '<div class="code-chunk" id="func-chunk-<%= cid %>">',
@@ -44,7 +40,7 @@ define(function(require, exports, module) {
         },
     });
 
-    var TableCodeView = Backbone.View.extend({
+    var NodeModelCodeView = Backbone.View.extend({
 
         tagName: 'div',
         parentName: "",
@@ -164,5 +160,4 @@ define(function(require, exports, module) {
 
     });
 
-    return TableCodeView;
-});
+    exports.NodeModelCodeView = NodeModelCodeView;

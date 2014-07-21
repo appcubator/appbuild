@@ -1,8 +1,4 @@
-define(function(require, exports, module) {
-
     'use strict';
-
-    require("backbone");
 
     var AutoFiller = {
 
@@ -58,6 +54,4 @@ define(function(require, exports, module) {
         }
     }
 
-    return AutoFiller;
-
-});
+    exports.AutoFiller = AutoFiller;

@@ -1,11 +1,7 @@
-define(function(require, exports, module) {
 
     'use strict';
 
-    require('backbone');
-    require('util');
-    var ThemeDisplayView = require('app/css-editor/ThemeDisplayView');
-
+    var ThemeDisplayView = require('./ThemeDisplayView');
 
     var ThemesGalleryView = Backbone.View.extend({
         css: 'gallery',
@@ -121,5 +117,4 @@ define(function(require, exports, module) {
 
     });
 
-    return ThemesGalleryView;
-});
+    exports.ThemesGalleryView = ThemesGalleryView;

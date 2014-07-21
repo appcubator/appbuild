@@ -1,14 +1,9 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var UrlView = require('app/pages/UrlView');
-    var SimpleModalView = require('mixins/SimpleModalView');
-    var DialogueView = require('mixins/DialogueView');
-    var HeaderEditorView = require('app/pages/HeaderEditorView');
-
-    require('util');
-    require('backbone');
+    var UrlView = require('../pages/UrlView');
+    var SimpleModalView = require('../mixins/SimpleModalView');
+    var DialogueView = require('../mixins/DialogueView');
+    var HeaderEditorView = require('../pages/HeaderEditorView');
 
     var tempPage = [
         '<div class="top-row">',
@@ -194,5 +189,4 @@ define(function(require, exports, module) {
         }
     });
 
-    return PageView;
-});
+   exports.PageView = PageView;

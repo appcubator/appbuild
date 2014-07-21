@@ -1,9 +1,6 @@
-define(function(require, exports, module) {
-
     'use strict';
-    require('util');
-    require('mixins/BackboneDropdownView');
-    var PluginBrowserView = require('app/plugins_view/PluginBrowserView');
+    require('../mixins/BackboneDropdownView');
+    var PluginBrowserView = require('./PluginBrowserView');
 
     var tempPluginsView = 
     [
@@ -78,6 +75,4 @@ define(function(require, exports, module) {
         }
     });
 
-    return PluginsView;
-
-});
+    exports.PluginsView = PluginsView;

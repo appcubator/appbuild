@@ -1,8 +1,6 @@
-define(function(require, exports, module) {
     'use strict';
 
-    require('mixins/BackboneModal');
-    require('util');
+    require('../mixins/BackboneModal');
 
     var ThemeDisplayView = Backbone.ModalView.extend({
             el: null,
@@ -83,5 +81,4 @@ define(function(require, exports, module) {
 
     );
 
-    return ThemeDisplayView;
-});
+    exports.ThemeDisplayView = ThemeDisplayView;

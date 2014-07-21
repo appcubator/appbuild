@@ -1,9 +1,5 @@
-define(function(require, exports, module) {
-
     'use strict';
-    require('backbone');
-    require('util');
-    require('mixins/BackboneDropdownView');
+    require('./mixins/BackboneDropdownView');
 
     var SettingsView = Backbone.DropdownView.extend({
         title: 'Plugins',
@@ -53,5 +49,4 @@ define(function(require, exports, module) {
 
     });
 
-    return SettingsView;
-});
+    exports.SettingsView = SettingsView;

@@ -1,13 +1,9 @@
-define(function(require, exports, module) {
-
     'use strict';
+    require('../mixins/BackboneCardView');
 
-    require('backbone');
-    require('mixins/BackboneCardView');
-
-    var GeneratorEditorView = require('app/GeneratorEditorView');
-    var TemplatesEditorView = require('app/TemplatesEditorView');
-    var WidgetModelEditorView = require('editor/WidgetModelEditorView');
+    var GeneratorEditorView = require('../GeneratorEditorView').GeneratorEditorView;
+    var TemplatesEditorView = require('../TemplatesEditorView').TemplatesEditorView;
+    var WidgetModelEditorView = require('./WidgetModelEditorView').WidgetModelEditorView;
 
     var tableTemplate = [
             '<div class="header">',
@@ -29,7 +25,7 @@ define(function(require, exports, module) {
             '</div>',
     ].join('\n');
 
-    var TableView = Backbone.CardView.extend({
+    var WidgetSettingsView = Backbone.CardView.extend({
 
         className: 'widget-settings-pane',
         subviews: [],
@@ -104,5 +100,4 @@ define(function(require, exports, module) {
 
     });
 
-    return TableView;
-});
+    exports.WidgetSettingsView = WidgetSettingsView;

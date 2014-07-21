@@ -1,12 +1,8 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var NodeModelModel = require('models/NodeModelModel');
-    var NodeModelView = require('app/models_view/NodeModelView');
-
-    require('util');
-    require('mixins/BackboneDropdownView');
+    var NodeModelModel = require('../models/NodeModelModel');
+    var NodeModelView = require('./NodeModelView');
+    require('../mixins/BackboneDropdownView');
 
     var template = [ '<div class="arrow_box"></div>',
     '<div class="" id="entities-page">',
@@ -124,6 +120,4 @@ define(function(require, exports, module) {
         }
     });
 
-    return NodeModelsView;
-
-});
+    exports.NodeModelsView = NodeModelsView;

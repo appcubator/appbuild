@@ -1,15 +1,12 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    require('mixins/BackboneUI');
-    require('util');
+    require('../mixins/BackboneUI');
 
-    var WidgetSettingsView = require('editor/WidgetSettingsView');
-    var WidgetContentEditorView = require('editor/WidgetContentEditorView');
-    var WidgetLayoutEditorView = require('editor/WidgetLayoutEditorView');
-    var WidgetClassPickerView = require('editor/WidgetClassPickerView');
-    var CustomWidgetEditorModal = require('editor/CustomWidgetEditorModal');
+    var WidgetSettingsView = require('./WidgetSettingsView');
+    var WidgetContentEditorView = require('./WidgetContentEditorView');
+    var WidgetLayoutEditorView = require('./WidgetLayoutEditorView');
+    var WidgetClassPickerView = require('./WidgetClassPickerView');
+    var CustomWidgetEditorModal = require('./CustomWidgetEditorModal');
 
     var WidgetEditorView = Backbone.UIView.extend({
 
@@ -369,6 +366,4 @@ define(function(require, exports, module) {
 
     });
 
-    return WidgetEditorView;
-
-});
+    exports.WidgetEditorView = WidgetEditorView;

@@ -1,6 +1,4 @@
-define(function(require, exports, module) {
     'use strict';
-    require('backbone');
 
     var BaseCSSEditorView = Backbone.View.extend({
 
@@ -43,5 +41,4 @@ define(function(require, exports, module) {
 
     });
 
-    return BaseCSSEditorView;
-});
+    exports.BaseCSSEditorView = BaseCSSEditorView;

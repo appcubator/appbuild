@@ -1,21 +1,17 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var FieldModel = require('models/FieldModel');
-    var AdminPanelView = require('app/AdminPanelView');
+    var FieldModel = require('../models/FieldModel').FieldModel;
+    var AdminPanelView = require('../AdminPanelView').AdminPanelView;
 
-    var NodeModelPluginsView     = require('app/models_view/NodeModelPluginsView');
-    var NodeModelDescriptionView = require('app/models_view/NodeModelDescriptionView');
-    var TableDataView        = require('app/models_view/NodeModelDataView');
-    var TableCodeView        = require('app/models_view/NodeModelCodeView');
+    var NodeModelPluginsView     = require('./NodeModelPluginsView').NodeModelPluginsView;
+    var NodeModelDescriptionView = require('./NodeModelDescriptionView').NodeModelDescriptionView;
+    var TableDataView        = require('./NodeModelDataView').NodeModelDataView;
+    var TableCodeView        = require('./NodeModelCodeView').NodeModelCodeView;
 
 
-    var SoftErrorView = require('app/SoftErrorView');
-    var DialogueView = require('mixins/DialogueView');
-    require('mixins/BackboneCardView');
-    require('prettyCheckable');
-
+    var SoftErrorView = require('../SoftErrorView');
+    var DialogueView = require('../mixins/DialogueView');
+    require('../mixins/BackboneCardView');
 
     var tableTemplate = [
             '<div class="header">',
@@ -36,7 +32,7 @@ define(function(require, exports, module) {
             '<div class="current-content"></div>',
     ].join('\n');
 
-    var TableView = Backbone.CardView.extend({
+    var NodeModelView = Backbone.CardView.extend({
         el: null,
         tagName: 'div',
         collection: null,
@@ -150,5 +146,4 @@ define(function(require, exports, module) {
 
     });
 
-    return TableView;
-});
+    exports.NodeModelView = NodeModelView;

@@ -1,13 +1,10 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var FieldModel = require('models/FieldModel');
-    var AdminPanelView = require('app/AdminPanelView');
-    var SoftErrorView = require('app/SoftErrorView');
-    var DialogueView = require('mixins/DialogueView');
-    require('mixins/BackboneCardView');
-    require('prettyCheckable');
+    var FieldModel = require('../models/FieldModel');
+    var AdminPanelView = require('../AdminPanelView');
+    var SoftErrorView = require('../SoftErrorView');
+    var DialogueView = require('../mixins/DialogueView');
+    require('../mixins/BackboneCardView');
 
     var descriptionTemplate = [
     '<div class="description">',
@@ -56,7 +53,7 @@ define(function(require, exports, module) {
         'Buffer'
     ];
 
-    var TableDescriptionView = Backbone.View.extend({
+    var NodeModelDescriptionView = Backbone.View.extend({
         el: null,
         tagName: 'div',
         collection: null,
@@ -281,5 +278,4 @@ define(function(require, exports, module) {
 
     });
 
-    return TableDescriptionView;
-});
+    exports.NodeModelDescriptionView = NodeModelDescriptionView;

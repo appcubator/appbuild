@@ -1,7 +1,4 @@
-define(function(require, exports, module) {
-
-    require('ace');
-    require('mixins/BackboneCardView');
+    require('../mixins/BackboneCardView');
 
 
     var CustomWidgetEditorModal = Backbone.CardView.extend({
@@ -73,5 +70,4 @@ define(function(require, exports, module) {
 
     });
 
-    return CustomWidgetEditorModal;
-});
+    exports.CustomWidgetEditorModal = CustomWidgetEditorModal;

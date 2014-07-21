@@ -1,6 +1,4 @@
-define(function(require, exports, module) {
     'use strict';
-    require('backbone');
 
     var UIElementView = require('./UIElementView');
     var baseTags = {
@@ -177,5 +175,4 @@ define(function(require, exports, module) {
 
     });
 
-    return UIElementListView;
-});
+    exports.UIElementListView = UIElementListView;

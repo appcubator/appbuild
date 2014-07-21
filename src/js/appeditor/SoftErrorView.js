@@ -1,7 +1,6 @@
-define(function(require, exports, module) {
     'use strict';
 
-    require('mixins/BackboneModal');
+    require('./mixins/BackboneModal');
 
     var SoftErrorView = Backbone.View.extend({
         className: 'soft-error-modal',
@@ -102,5 +101,4 @@ define(function(require, exports, module) {
 
     });
 
-    return SoftErrorView;
-});
+    exports.SoftErrorView = SoftErrorView;

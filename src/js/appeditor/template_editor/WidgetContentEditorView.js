@@ -1,10 +1,6 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var SelectView = require('mixins/SelectView');
-    require('util');
-    require('util.filepicker');
+    var SelectView = require('../mixins/SelectView');
 
     var WidgetContentEditorView = Backbone.View.extend({
         el: document.getElementById('content-editor'),
@@ -236,5 +232,4 @@ define(function(require, exports, module) {
         }
     });
 
-    return WidgetContentEditorView;
-});
+    exports.WidgetContentEditorView = WidgetContentEditorView;

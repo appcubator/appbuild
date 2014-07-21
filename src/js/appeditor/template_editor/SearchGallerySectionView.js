@@ -1,8 +1,6 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var EditorGallerySectionView = require('editor/EditorGallerySectionView');
+    var EditorGallerySectionView = require('./EditorGallerySectionView');
 
     var SearchGallerySectionView = EditorGallerySectionView.extend({
 
@@ -38,5 +36,4 @@ define(function(require, exports, module) {
     });
 
 
-    return SearchGallerySectionView;
-});
+    exports.SearchGallerySectionView = SearchGallerySectionView;

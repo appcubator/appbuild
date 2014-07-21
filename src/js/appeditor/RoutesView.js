@@ -1,11 +1,7 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    require('util');
-    require('mixins/BackboneDropdownView');
-
-    var RouteView = require('RouteView');
+    require('./mixins/BackboneDropdownView');
+    var RouteView = require('./RouteView');
 
     var template = [ '<div class="arrow_box"></div>',
     '<div class="" id="entities-page">',
@@ -84,6 +80,4 @@ define(function(require, exports, module) {
 
     });
 
-    return RoutesView;
-
-});
+    exports.RoutesView = RoutesView;

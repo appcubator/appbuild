@@ -1,8 +1,4 @@
-define(function(require, exports, module) {
     'use strict';
-    
-    require('backbone');
-    require('fontselect');
 
     var FontEditorView = Backbone.View.extend({
 
@@ -85,5 +81,4 @@ define(function(require, exports, module) {
 
     });
 
-    return FontEditorView;
-});
+    exports.FontEditorView = FontEditorView;

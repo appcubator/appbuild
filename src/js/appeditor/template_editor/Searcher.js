@@ -1,7 +1,4 @@
-define(function(require, exports, module) {
-
     'use strict';
-    require('backbone');
 
     function Searcher() {
 
@@ -31,5 +28,4 @@ define(function(require, exports, module) {
 
     }
 
-    return Searcher;
-});
+    exports.Searcher = Searcher;

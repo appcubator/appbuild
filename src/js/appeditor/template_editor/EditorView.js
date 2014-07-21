@@ -1,25 +1,21 @@
     'use strict';
 
-    var UrlView = require('app/pages/UrlView');
-    var SimpleModalView = require('mixins/SimpleModalView');
-    var ErrorModalView = require('mixins/ErrorModalView');
-    var DebugOverlay = require('mixins/DebugOverlay');
-    var WidgetEditorView = require('editor/WidgetEditorView');
-    var EditorGalleryView = require('editor/EditorGalleryView');
-    var PageView = require('app/pages/PageView');
+    var UrlView = require('../pages/UrlView');
+    var SimpleModalView = require('../mixins/SimpleModalView');
+    var ErrorModalView = require('../mixins/ErrorModalView');
+    var DebugOverlay = require('../mixins/DebugOverlay');
+    var WidgetEditorView = require('./WidgetEditorView');
+    var EditorGalleryView = require('./EditorGalleryView');
+    var PageView = require('../pages/PageView');
 
-    var PageTemplatePicker = require('editor/PageTemplatePicker');
-    var GuideView = require('editor/GuideView');
-    var TutorialView = require('tutorial/TutorialView');
-    var DeployView = require('app/DeployView');
-    var RedoController = require('app/RedoController');
-    var CSSEditorView = require('app/css-editor/CSSEditorView');
-    var SectionShadowView = require('editor/SectionShadowView');
-    var SectionEditorsView = require('editor/SectionEditorsView');
+    var PageTemplatePicker = require('./PageTemplatePicker');
+    var GuideView = require('./GuideView');
+    var RedoController = require('../RedoController');
+    var CSSEditorView = require('../css-editor/CSSEditorView');
+    var SectionShadowView = require('./SectionShadowView');
+    var SectionEditorsView = require('./SectionEditorsView');
 
-    require('jquery-ui');
-    require('mixins/BackboneConvenience');
-    require('editor/editor-templates');
+    require('./editor-templates').EditorTemplate;
 
     /* An EditorView belongs to a TemplateModel */
     var EditorView = Backbone.View.extend({
@@ -349,4 +345,4 @@
 
     });
 
-    return EditorView;
+    exports.EditorView = EditorView;

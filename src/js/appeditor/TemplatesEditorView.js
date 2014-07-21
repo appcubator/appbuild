@@ -1,10 +1,7 @@
-define(function(require, exports, module) {
 
     'use strict';
 
-    var Generator = require('app/Generator');
-    require('backbone');
-    require('bootstrap');
+    var Generator = require('./Generator');
 
     var funcTemplate = [
         '<div class="code-chunk">',
@@ -200,5 +197,4 @@ define(function(require, exports, module) {
 
     });
 
-    return TemplatesEditorView;
-});
+    exports.TemplatesEditorView = TemplatesEditorView;
