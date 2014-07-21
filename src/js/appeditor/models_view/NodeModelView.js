@@ -1,7 +1,7 @@
     'use strict';
 
     var FieldModel = require('../models/FieldModel').FieldModel;
-    var AdminPanelView = require('../AdminPanelView').AdminPanelView;
+    //var AdminPanelView = require('../AdminPanelView').AdminPanelView;
 
     var NodeModelPluginsView     = require('./NodeModelPluginsView').NodeModelPluginsView;
     var NodeModelDescriptionView = require('./NodeModelDescriptionView').NodeModelDescriptionView;

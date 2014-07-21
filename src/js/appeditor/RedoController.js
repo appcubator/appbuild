@@ -1,8 +1,3 @@
-define([
-  'mixins/BackboneModal',
-  'util'
-],
-function() {
 
   var RedoController = Backbone.View.extend({
     redoStack: [],
@@ -134,5 +129,4 @@ function() {
     }
   });
 
-  return RedoController;
-});
+  exports.RedoController = RedoController;

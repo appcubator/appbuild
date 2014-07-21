@@ -16,8 +16,8 @@
             "app/:appid/plugins/*tutorial" : "plugins",
             "app/:appid/mobile-editor/:pageid/": "mobileEditor",
             "app/:appid/emails/*tutorial"  : "emails",
-            "app/:appid/*tutorial"         : "appmain",
-            "app/:appid/*anything/"        : "appmain",
+            "/"                            : "appmain",
+            "*anything"                    : "appmain",
             "account"                      : "accountPage",
         },
 
@@ -26,19 +26,6 @@
         initialize: function() {
             var self = this;
             v1.view = null;
-
-            _.bindAll(this);
-
-            this.route(username +"/", "dashboard", v1.dashboard);
-
-            $('#tutorial').on('click', function(e) {
-                self.showTutorial();
-                window.history.pushState(null, null, window.location.href.concat("tutorial/"));
-            });
-
-            var accountDropdownView = new AccountDropdownView();
-            accountDropdownView.setElement($('.account-dropdown-menu')).render();
-            accountDropdownView.setToggleEl($('.account-menu-toggle'));
 
             this.currentApp = null;
         },

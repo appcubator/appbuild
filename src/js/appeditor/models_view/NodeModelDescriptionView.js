@@ -1,7 +1,7 @@
     'use strict';
 
     var FieldModel = require('../models/FieldModel');
-    var AdminPanelView = require('../AdminPanelView');
+    // var AdminPanelView = require('../AdminPanelView');
     var SoftErrorView = require('../SoftErrorView');
     var DialogueView = require('../mixins/DialogueView');
     require('../mixins/BackboneCardView');

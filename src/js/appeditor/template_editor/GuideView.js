@@ -1,8 +1,3 @@
-define([
-        'models/WidgetModel'
-    ],
-    function(WidgetModel) {
-
         var GuideView = Backbone.View.extend({
             events: {
 
@@ -204,5 +199,4 @@ define([
 
         });
 
-        return GuideView;
-    });
+        exports.GuideView = GuideView;

@@ -21,7 +21,7 @@
         getUIElements: function() {
             if(this.widgetsCollection) return this.widgetsCollection;
 
-            var WidgetCollection = require('../collections/WidgetCollection');
+            var WidgetCollection = require('../collections/WidgetCollection').WidgetCollection;
             var sections = this.getSections();
             this.widgetsCollection = new WidgetCollection();
 

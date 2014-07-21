@@ -1,21 +1,21 @@
     'use strict';
 
-    var UrlView = require('../pages/UrlView');
-    var SimpleModalView = require('../mixins/SimpleModalView');
-    var ErrorModalView = require('../mixins/ErrorModalView');
-    var DebugOverlay = require('../mixins/DebugOverlay');
-    var WidgetEditorView = require('./WidgetEditorView');
-    var EditorGalleryView = require('./EditorGalleryView');
-    var PageView = require('../pages/PageView');
+    var UrlView = require('../pages/UrlView').UrlViews;
+    var SimpleModalView = require('../mixins/SimpleModalView').SimpleModalView;
+    var ErrorModalView = require('../mixins/ErrorModalView').ErrorModalView;
+    var DebugOverlay = require('../mixins/DebugOverlay').DebugOverlay;
+    var WidgetEditorView = require('./WidgetEditorView').WidgetEditorView;
+    var EditorGalleryView = require('./EditorGalleryView').EditorGalleryView;
+    var PageView = require('../pages/PageView').PageView;
 
-    var PageTemplatePicker = require('./PageTemplatePicker');
-    var GuideView = require('./GuideView');
-    var RedoController = require('../RedoController');
-    var CSSEditorView = require('../css-editor/CSSEditorView');
-    var SectionShadowView = require('./SectionShadowView');
-    var SectionEditorsView = require('./SectionEditorsView');
+    var PageTemplatePicker = require('./PageTemplatePicker').PageTemplatePicker;
+    var GuideView = require('./GuideView').GuideView;
+    var RedoController = require('../RedoController').RedoController;
+    var CSSEditorView = require('../css-editor/CSSEditorView').CSSEditorView;
+    var SectionShadowView = require('./SectionShadowView').SectionShadowView;
+    var SectionEditorsView = require('./SectionEditorsView').SectionEditorsView;
 
-    require('./editor-templates').EditorTemplate;
+    var EditorTemplate = require('./editor-templates').EditorTemplate;
 
     /* An EditorView belongs to a TemplateModel */
     var EditorView = Backbone.View.extend({

@@ -1,20 +1,5 @@
-define([
-  "models/AppModel",
-  "models/AppInfoModel",
-  "models/RouteModel",
-  "models/WidgetModel",
-  "models/WidgetContainerModel",
-  "collections/WidgetCollection",
-  "collections/RouteCollection",
-  "backbone"
-],
-function(AppModel,
-         AppInfoModel,
-         RouteModel,
-         WidgetModel,
-         WidgetContainerModel,
-         WidgetCollection,
-         RouteCollection) {
+
+  var WidgetCollection = require("./collections/WidgetCollection");
 
   var AppGenerator = Backbone.View.extend({
     answersDict : {},
@@ -149,9 +134,7 @@ function(AppModel,
 
   });
 
-  return AppGenerator;
-
-});
+  exports.AppGenerator = AppGenerator;
 
 
 /* EXAMPLE */

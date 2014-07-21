@@ -49,9 +49,7 @@
             this.settingsView.setToggleEl($('.menu-app-settings'));
             this.settingsView.setPointerPosition("30px");
 
-            this.deployManager = new DeployManagerModel(this.appId);
             this.listenTo(v1State.get('plugins'), 'fork', this.save);
-
             //var autoSave = setInterval(this.save, 30000);
             this.render();
 
@@ -118,7 +116,6 @@
                 self.changePage(AppInfoView, {}, tutorial, function() {
                     $('.menu-app-info').addClass('active');
                 });
-                olark('api.box.show');
         },
 
         tables: function(tutorial) {
@@ -136,7 +133,6 @@
                     self.trigger('pages-loaded');
                     $('.menu-app-pages').addClass('active');
                 });
-                olark('api.box.show');
         },
 
         pageWithName: function(pageName) {
@@ -162,7 +158,6 @@
             this.$leftMenu = this.$el.find('.left-menu-panel-l1 ');
             this.setupMenuHeight();
             this.trigger('editor-loaded');
-            olark('api.box.hide');
         },
 
         plugins: function(tutorial) {

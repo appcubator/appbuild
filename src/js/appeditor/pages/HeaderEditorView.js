@@ -1,8 +1,6 @@
-define([
-        'mixins/DialogueView',
-        'mixins/BackboneModal',
-    ],
-    function(DialogueView) {
+    var DialogueView = require('../mixins/DialogueView').DialogueView;
+    require('../mixins/BackboneModal');
+
 
         var HeaderEditorView = Backbone.ModalView.extend({
             padding: 0,
@@ -33,5 +31,4 @@ define([
 
         });
 
-        return HeaderEditorView;
-    });
+        exports.HeaderEditorView = HeaderEditorView;

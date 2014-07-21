@@ -881,7 +881,7 @@ require.define("/models/TemplateModel.js",function(require,module,exports,__dirn
         getUIElements: function() {
             if(this.widgetsCollection) return this.widgetsCollection;
 
-            var WidgetCollection = require('../collections/WidgetCollection');
+            var WidgetCollection = require('../collections/WidgetCollection').WidgetCollection;
             var sections = this.getSections();
             this.widgetsCollection = new WidgetCollection();
 
@@ -1560,8 +1560,8 @@ require.define("/models/ColumnModel.js",function(require,module,exports,__dirnam
 
 require.define("/models/PluginsModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var PluginModel = require('./PluginModel');
-    var NodeModelMethodModel = require('./NodeModelMethodModel');
+    var PluginModel = require('./PluginModel').PluginModel;
+    var NodeModelMethodModel = require('./NodeModelMethodModel').NodeModelMethodModel;
 
     /* Contains metadata and convenience methods for Plugins */
     var PluginsModel = Backbone.Model.extend({
@@ -2557,8 +2557,8 @@ require.define("/AppRouter.js",function(require,module,exports,__dirname,__filen
             "app/:appid/plugins/*tutorial" : "plugins",
             "app/:appid/mobile-editor/:pageid/": "mobileEditor",
             "app/:appid/emails/*tutorial"  : "emails",
-            "app/:appid/*tutorial"         : "appmain",
-            "app/:appid/*anything/"        : "appmain",
+            "/"                            : "appmain",
+            "*anything"                    : "appmain",
             "account"                      : "accountPage",
         },
 
@@ -2567,19 +2567,6 @@ require.define("/AppRouter.js",function(require,module,exports,__dirname,__filen
         initialize: function() {
             var self = this;
             v1.view = null;
-
-            _.bindAll(this);
-
-            this.route(username +"/", "dashboard", v1.dashboard);
-
-            $('#tutorial').on('click', function(e) {
-                self.showTutorial();
-                window.history.pushState(null, null, window.location.href.concat("tutorial/"));
-            });
-
-            var accountDropdownView = new AccountDropdownView();
-            accountDropdownView.setElement($('.account-dropdown-menu')).render();
-            accountDropdownView.setToggleEl($('.account-menu-toggle'));
 
             this.currentApp = null;
         },
@@ -3196,9 +3183,7 @@ require.define("/AppView.js",function(require,module,exports,__dirname,__filenam
             this.settingsView.setToggleEl($('.menu-app-settings'));
             this.settingsView.setPointerPosition("30px");
 
-            this.deployManager = new DeployManagerModel(this.appId);
             this.listenTo(v1State.get('plugins'), 'fork', this.save);
-
             //var autoSave = setInterval(this.save, 30000);
             this.render();
 
@@ -3265,7 +3250,6 @@ require.define("/AppView.js",function(require,module,exports,__dirname,__filenam
                 self.changePage(AppInfoView, {}, tutorial, function() {
                     $('.menu-app-info').addClass('active');
                 });
-                olark('api.box.show');
         },
 
         tables: function(tutorial) {
@@ -3283,7 +3267,6 @@ require.define("/AppView.js",function(require,module,exports,__dirname,__filenam
                     self.trigger('pages-loaded');
                     $('.menu-app-pages').addClass('active');
                 });
-                olark('api.box.show');
         },
 
         pageWithName: function(pageName) {
@@ -3309,7 +3292,6 @@ require.define("/AppView.js",function(require,module,exports,__dirname,__filenam
             this.$leftMenu = this.$el.find('.left-menu-panel-l1 ');
             this.setupMenuHeight();
             this.trigger('editor-loaded');
-            olark('api.box.hide');
         },
 
         plugins: function(tutorial) {
@@ -3817,22 +3799,22 @@ require.define("/mixins/BackboneNameBox.js",function(require,module,exports,__di
 
 require.define("/template_editor/EditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var UrlView = require('../pages/UrlView');
-    var SimpleModalView = require('../mixins/SimpleModalView');
-    var ErrorModalView = require('../mixins/ErrorModalView');
-    var DebugOverlay = require('../mixins/DebugOverlay');
-    var WidgetEditorView = require('./WidgetEditorView');
-    var EditorGalleryView = require('./EditorGalleryView');
-    var PageView = require('../pages/PageView');
+    var UrlView = require('../pages/UrlView').UrlViews;
+    var SimpleModalView = require('../mixins/SimpleModalView').SimpleModalView;
+    var ErrorModalView = require('../mixins/ErrorModalView').ErrorModalView;
+    var DebugOverlay = require('../mixins/DebugOverlay').DebugOverlay;
+    var WidgetEditorView = require('./WidgetEditorView').WidgetEditorView;
+    var EditorGalleryView = require('./EditorGalleryView').EditorGalleryView;
+    var PageView = require('../pages/PageView').PageView;
 
-    var PageTemplatePicker = require('./PageTemplatePicker');
-    var GuideView = require('./GuideView');
-    var RedoController = require('../RedoController');
-    var CSSEditorView = require('../css-editor/CSSEditorView');
-    var SectionShadowView = require('./SectionShadowView');
-    var SectionEditorsView = require('./SectionEditorsView');
+    var PageTemplatePicker = require('./PageTemplatePicker').PageTemplatePicker;
+    var GuideView = require('./GuideView').GuideView;
+    var RedoController = require('../RedoController').RedoController;
+    var CSSEditorView = require('../css-editor/CSSEditorView').CSSEditorView;
+    var SectionShadowView = require('./SectionShadowView').SectionShadowView;
+    var SectionEditorsView = require('./SectionEditorsView').SectionEditorsView;
 
-    require('./editor-templates').EditorTemplate;
+    var EditorTemplate = require('./editor-templates').EditorTemplate;
 
     /* An EditorView belongs to a TemplateModel */
     var EditorView = Backbone.View.extend({
@@ -6496,11 +6478,11 @@ require.define("/template_editor/CustomWidgetEditorModal.js",function(require,mo
 
 require.define("/template_editor/EditorGalleryView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var EditorGallerySectionView = require('./EditorGallerySectionView');
-    var SearchGallerySectionView = require('./SearchGallerySectionView');
-    var WidgetModel = require('../models/WidgetModel');
-    var Searcher = require('./Searcher');
-    var AutoFillHelper = require('../AutoFillHelper');
+    var EditorGallerySectionView = require('./EditorGallerySectionView').EditorGallerySectionView;
+    var SearchGallerySectionView = require('./SearchGallerySectionView').SearchGallerySectionView;
+    var WidgetModel = require('../models/WidgetModel').WidgetModel;
+    var Searcher = require('./Searcher').Searcher;
+    var AutoFillHelper = require('../AutoFillHelper').AutoFillHelper;
 
     /* uielement.displayProps is an an optional object with keys:
         name, (display name)
@@ -6945,12 +6927,9 @@ require.define("/template_editor/EditorGallerySectionView.js",function(require,m
     exports.EditorGallerySectionView = EditorGallerySectionView;
 });
 
-require.define("/models/WidgetContainerModel.js",function(require,module,exports,__dirname,__filename,process,global){define([
-        'models/WidgetModel',
-        'collections/LoginRouteCollection'
-    ],
-    function(WidgetModel,
-        LoginRouteCollection) {
+require.define("/models/WidgetContainerModel.js",function(require,module,exports,__dirname,__filename,process,global){    var WidgetModel = require('./WidgetModel').WidgetModel;
+    var LoginRouteCollection = require('../collections/LoginRouteCollection').LoginRouteCollection;
+
 
         var WidgetContainerModel = WidgetModel.extend({
 
@@ -6988,13 +6967,47 @@ require.define("/models/WidgetContainerModel.js",function(require,module,exports
             }
         });
 
-        return WidgetContainerModel;
-    });
+        exports.WidgetContainerModel = WidgetContainerModel;
+});
+
+require.define("/collections/LoginRouteCollection.js",function(require,module,exports,__dirname,__filename,process,global){  var LoginRouteCollection = Backbone.Collection.extend({
+
+    initialize: function() {
+      v1State.get('users').bind('change add remove', this.reorganize, this);
+    },
+
+    findRouteWithRole: function(roleStr) {
+      var val = null;
+      this.each(function(userRole) {
+        if(userRole.get('role') == roleStr) {
+          val = userRole.get('redirect');
+          return val;
+        }
+      }, this);
+      return "internal://Homepage";
+    },
+
+    reorganize: function() {
+      var newContent = [];
+      v1State.get('users').each(function(user) {
+        var val = this.findRouteWithRole(user.get('name'));
+        newContent.push({
+          role: user.get('name'),
+          redirect: val
+        });
+      }, this);
+
+      this.reset(newContent);
+    }
+
+  });
+
+  exports.LoginRouteCollection = LoginRouteCollection;
 });
 
 require.define("/template_editor/SearchGallerySectionView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var EditorGallerySectionView = require('./EditorGallerySectionView');
+    var EditorGallerySectionView = require('./EditorGallerySectionView').EditorGallerySectionView;
 
     var SearchGallerySectionView = EditorGallerySectionView.extend({
 
@@ -7320,11 +7333,9 @@ require.define("/pages/PageView.js",function(require,module,exports,__dirname,__
    exports.PageView = PageView;
 });
 
-require.define("/pages/HeaderEditorView.js",function(require,module,exports,__dirname,__filename,process,global){define([
-        'mixins/DialogueView',
-        'mixins/BackboneModal',
-    ],
-    function(DialogueView) {
+require.define("/pages/HeaderEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    var DialogueView = require('../mixins/DialogueView').DialogueView;
+    require('../mixins/BackboneModal');
+
 
         var HeaderEditorView = Backbone.ModalView.extend({
             padding: 0,
@@ -7355,15 +7366,11 @@ require.define("/pages/HeaderEditorView.js",function(require,module,exports,__di
 
         });
 
-        return HeaderEditorView;
-    });
+        exports.HeaderEditorView = HeaderEditorView;
 });
 
-require.define("/template_editor/PageTemplatePicker.js",function(require,module,exports,__dirname,__filename,process,global){define([
-        'TemplateGenerator',
-        'mixins/BackboneModal'
-    ],
-    function(TemplateGenerator) {
+require.define("/template_editor/PageTemplatePicker.js",function(require,module,exports,__dirname,__filename,process,global){        var TemplateGenerator = require('../TemplateGenerator').TemplateGenerator;
+        require('../mixins/BackboneModal');
 
         var page_templates = [];
 
@@ -7444,17 +7451,198 @@ require.define("/template_editor/PageTemplatePicker.js",function(require,module,
             }
         });
 
-        return PageTemplatePicker;
-    });
+        exports.PageTemplatePicker = PageTemplatePicker;
 
 });
 
-require.define("/template_editor/GuideView.js",function(require,module,exports,__dirname,__filename,process,global){define([
-        'models/WidgetModel'
-    ],
-    function(WidgetModel) {
+require.define("/TemplateGenerator.js",function(require,module,exports,__dirname,__filename,process,global){
+  var WidgetCollection = require("./collections/WidgetCollection");
 
-        var GuideView = Backbone.View.extend({
+  var AppGenerator = Backbone.View.extend({
+    answersDict : {},
+
+    initialize: function(answers) {
+      _.bindAll(this);
+    },
+
+    generateUsers: function() {
+      var usersCollection = new UserRolesCollection();
+      if(this.answersDict.multiple_users[0][0] == "yes") {
+        _(this.answersDict.types_of_users[0]).each(function(user_role, ind) {
+          var user = usersCollection.createUserWithName(user_role);
+          user.addFieldsWithNames(this.answersDict.X_user_info[ind]);
+        }, this);
+      }
+      else {
+        var user = usersCollection.createUserWithName("User");
+        user.addFieldsWithNames(this.answersDict.user_info[0]);
+      }
+
+      return usersCollection;
+    },
+
+    generateTables: function() {
+      var tablesColl = new TableCollection();
+      _(this.answersDict.other_info[0]).each(function(table_name, ind) {
+        var table = tablesColl.createTableWithName(table_name);
+        table.addFieldsWithNames(this.answersDict.X_info[ind]);
+      }, this);
+
+      return tablesColl;
+    },
+
+    generatePages: function() {
+      var pageColl = new PageCollection();
+      pageColl.push(this.generateHomepage());
+      pageColl.push(this.generateRegistrationPage());
+
+      return pageColl;
+    },
+
+    generateHomepage: function() {
+      var homepage = _.clone(HomepageTemp);
+      homepage.uielements[0].data.content = appName;
+      if(this.answersDict.intro_text) homepage.uielements[1].data.content = this.answersDict.intro_text[0][0];
+
+      if(this.answersDict.logo[0]) {
+        homepage.uielements[2].data.content_attribs.src = this.answersDict.logo[0];
+      }
+      return homepage;
+    },
+
+    generateRegistrationPage: function() {
+
+    },
+
+    generateProfilePage: function() {
+
+    },
+
+    generateInfoPage: function(tableM) {
+      var arr = [];
+
+      var nmrElements = 0;
+      var nmrImageElements = 0;
+      var hasImageElements = 0;
+      var widgetCollection = new WidgetCollection();
+      if(tableM.get('fields').getImageFields()) hasImageElements = 1;
+      tableM.getFieldsColl().each(function(fieldModel) {
+
+        var type = fieldModel.get('type');
+        if(type == "fk"||type == "m2m"||type == "o2o") { return; }
+
+        var displayType = util.getDisplayType(type);
+        var formFieldModel = { field_name: fieldModel.get('name'),
+                               displayType: "single-line-text",
+                               type: type,
+                               label: fieldModel.get('name'),
+                               placeholder: fieldModel.get('name') };
+
+        var layout = {left : hasImageElements*3 + 2, top: nmrElements*3 + 12, height: 3, width: 5};
+        var content_ops = {};
+        content_ops.content =  '{{Page.'+ tableM.get('name') +'.'+fieldModel.get('name')+'}}';
+
+        if(displayType == "links") {
+          content_ops.content = 'Download '+fieldModel.get('name');
+          content_ops.href = '{{Page.'+ tableM.get('name') +'.'+fieldModel.get('name')+'}}';
+        }
+
+        if(displayType == "images") {
+          layout = {left : 2, top: nmrImageElements*9 + 12, height: 9, width: 2};
+          content_ops.src_content = '{{Page.'+ tableM.get('name') +'.'+fieldModel.get('name')+'}}';
+          nmrImageElements++;
+        }
+        else {
+          nmrElements++;
+        }
+
+        var newElement = widgetCollection.createNodeWithFieldTypeAndContent(layout, displayType, content_ops);
+        arr.push(newElement);
+      });
+
+      var headerModel = widgetCollection.createNodeWithFieldTypeAndContent({ left:3, height:3, width: 6, top: 3, alignment: "center"},
+                                                                             "headerTexts",
+                                                                             {content: tableM.get('name') + " Info" });
+
+      arr.push(headerModel);
+
+      return arr;
+    },
+
+    generateListPage: function(tableM) {
+      var widgetCollection = new WidgetCollection();
+      var headerModel = widgetCollection.createNodeWithFieldTypeAndContent({ left:3, height:3, width: 6, top: 3, alignment: "center"},
+                                                                             "headerTexts",
+                                                                             {content: "List of " + tableM.get('name') });
+      var listModel   = widgetCollection.createList({ left:3, height:3, width: 6, top: 11}, tableM);
+      var createFormModel   = widgetCollection.createCreateForm({ left:0, height:3, width: 3, top: 11, l_padding: 15, r_padding: 15}, tableM);
+
+      var arr = [];
+      arr.push(listModel);
+      arr.push(headerModel);
+      arr.push(createFormModel);
+
+      return arr;
+    },
+
+    getJSON: function() {
+      return this.state.serialize();
+    }
+
+  });
+
+  exports.AppGenerator = AppGenerator;
+
+
+/* EXAMPLE */
+/*
+{
+    "category": [
+        [
+            "social_network"
+        ]
+    ],
+    "multiple_users": [
+        [
+            "yes"
+        ]
+    ],
+    "types_of_users": [
+        [
+            "Student",
+            "Company"
+        ]
+    ],
+    "X_user_info": [
+        [
+            "Name",
+            "Address"
+        ],
+        [
+            "Name",
+            "School"
+        ]
+    ],
+    "other_info": [
+        [
+            "Offer"
+        ]
+    ],
+    "X_info": [
+        [
+            "Position",
+            "Date"
+        ]
+    ],
+    "logo": [
+        []
+    ]
+}
+*/
+
+});
+
+require.define("/template_editor/GuideView.js",function(require,module,exports,__dirname,__filename,process,global){        var GuideView = Backbone.View.extend({
             events: {
 
             },
@@ -7655,16 +7843,10 @@ require.define("/template_editor/GuideView.js",function(require,module,exports,_
 
         });
 
-        return GuideView;
-    });
+        exports.GuideView = GuideView;
 });
 
-require.define("/RedoController.js",function(require,module,exports,__dirname,__filename,process,global){define([
-  'mixins/BackboneModal',
-  'util'
-],
-function() {
-
+require.define("/RedoController.js",function(require,module,exports,__dirname,__filename,process,global){
   var RedoController = Backbone.View.extend({
     redoStack: [],
     undoStack: [],
@@ -7795,20 +7977,18 @@ function() {
     }
   });
 
-  return RedoController;
-});
-
+  exports.RedoController = RedoController;
 });
 
 require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var UIElementListView = require('./UIElementListView');
-    var StaticsEditorView = require('./StaticsEditorView');
-    var BaseCSSEditorView = require('./BaseCSSEditorView');
-    var FontEditorView    = require('./FontEditorView');
+    var UIElementListView = require('./UIElementListView').UIElementListView;
+    var StaticsEditorView = require('./StaticsEditorView').StaticsEditorView;
+    var BaseCSSEditorView = require('./BaseCSSEditorView').BaseCSSEditorView;
+    var FontEditorView    = require('./FontEditorView').FontEditorView;
 
-    var UIElementEditingView = require('./UIElementEditingView');
-    var ThemesGalleryView    = require('./ThemesGalleryView');
+    var UIElementEditingView = require('./UIElementEditingView').UIElementEditingView;
+    var ThemesGalleryView    = require('./ThemesGalleryView').ThemesGalleryView;
 
 
     var CSSEditorView = Backbone.View.extend({
@@ -9985,7 +10165,7 @@ require.define("/SettingsView.js",function(require,module,exports,__dirname,__fi
 require.define("/RoutesView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
     require('./mixins/BackboneDropdownView');
-    var RouteView = require('./RouteView');
+    var RouteView = require('./RouteView').RouteView;
 
     var template = [ '<div class="arrow_box"></div>',
     '<div class="" id="entities-page">',
@@ -10070,7 +10250,7 @@ require.define("/RoutesView.js",function(require,module,exports,__dirname,__file
 require.define("/RouteView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
     require('./mixins/BackboneDropdownView');
 
-    var WidgetSettingsView = require('./template_editor/WidgetSettingsView');
+    var WidgetSettingsView = require('./template_editor/WidgetSettingsView').WidgetSettingsView;
 
     var template = [ 
         '<small class="url-name"><%= url %></small>',
@@ -10384,7 +10564,7 @@ require.define("/models_view/NodeModelsView.js",function(require,module,exports,
 require.define("/models_view/NodeModelView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
     var FieldModel = require('../models/FieldModel').FieldModel;
-    var AdminPanelView = require('../AdminPanelView').AdminPanelView;
+    //var AdminPanelView = require('../AdminPanelView').AdminPanelView;
 
     var NodeModelPluginsView     = require('./NodeModelPluginsView').NodeModelPluginsView;
     var NodeModelDescriptionView = require('./NodeModelDescriptionView').NodeModelDescriptionView;
@@ -10612,47 +10792,6 @@ require.define("/models/FieldModel.js",function(require,module,exports,__dirname
     exports.FieldModel = FieldModel;
 });
 
-require.define("/AdminPanelView.js",function(require,module,exports,__dirname,__filename,process,global){define([
-  'mixins/BackboneModal',
-  'util'
-],
-function() {
-
-  var AdminPanelView = Backbone.ModalView.extend({
-    el: null,
-    width: 520,
-    height: 340,
-    padding: 0,
-    events: {
-
-    },
-    theme: null,
-
-    initialize: function() {
-      _.bindAll(this);
-      this.render();
-    },
-
-    render: function() {
-      var template = util.getHTML('admin-panel');
-      if(!appUrl) {
-        this.el.innerHTML = '<div style="padding:40px">You app needs to be deployed first.</div>';
-        return;
-      }
-      this.el.innerHTML = _.template(template, { username:"admin", pwd: "password", url: appUrl + 'admin/'});
-      return this;
-    },
-
-    logAdminPanel: function() {
-      util.log_to_server('admin panel accessed', {}, appId);
-    }
-  });
-
-  return AdminPanelView;
-});
-
-});
-
 require.define("/models_view/NodeModelPluginsView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
     var NodeModelMethodModel = require('../models/NodeModelMethodModel');
@@ -10781,7 +10920,7 @@ require.define("/models_view/NodeModelPluginsView.js",function(require,module,ex
 require.define("/models_view/NodeModelDescriptionView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
     var FieldModel = require('../models/FieldModel');
-    var AdminPanelView = require('../AdminPanelView');
+    // var AdminPanelView = require('../AdminPanelView');
     var SoftErrorView = require('../SoftErrorView');
     var DialogueView = require('../mixins/DialogueView');
     require('../mixins/BackboneCardView');
@@ -11674,16 +11813,10 @@ if (window) {
 
     v1 = {};
     v1 = new AppRouter();
-
-    routeLogger = new RouteLogger({
-        router: v1
-    });
-
-    // on appstate saves, synchronize version ids
-
-    Backbone.history.start({
-        pushState: true
-    });
+    v1.appmain(0,0);
+    // Backbone.history.start({
+    //     pushState: true
+    // });
 
     // handle all click events for routing
     $(document).on('click', 'a[rel!="external"]', function(e) {

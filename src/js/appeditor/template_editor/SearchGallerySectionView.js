@@ -1,6 +1,6 @@
     'use strict';
 
-    var EditorGallerySectionView = require('./EditorGallerySectionView');
+    var EditorGallerySectionView = require('./EditorGallerySectionView').EditorGallerySectionView;
 
     var SearchGallerySectionView = EditorGallerySectionView.extend({
 

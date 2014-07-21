@@ -1,8 +1,5 @@
-define([
-        'TemplateGenerator',
-        'mixins/BackboneModal'
-    ],
-    function(TemplateGenerator) {
+        var TemplateGenerator = require('../TemplateGenerator').TemplateGenerator;
+        require('../mixins/BackboneModal');
 
         var page_templates = [];
 
@@ -83,5 +80,4 @@ define([
             }
         });
 
-        return PageTemplatePicker;
-    });
+        exports.PageTemplatePicker = PageTemplatePicker;

@@ -1,7 +1,7 @@
     'use strict';
 
-    var PluginModel = require('./PluginModel');
-    var NodeModelMethodModel = require('./NodeModelMethodModel');
+    var PluginModel = require('./PluginModel').PluginModel;
+    var NodeModelMethodModel = require('./NodeModelMethodModel').NodeModelMethodModel;
 
     /* Contains metadata and convenience methods for Plugins */
     var PluginsModel = Backbone.Model.extend({

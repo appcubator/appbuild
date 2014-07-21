@@ -35,6 +35,50 @@
     var appState = null;
   </script>
   <div class="page">
+    <!-- Top Menu -->
+    <div class="section-select" id="tool-bar">
+        <div class="main-menu-btn" id="left-menu-toggle"><div></div></div>
+        <div class="save-run-group">
+            <div class="menu-button run" id="deploy">
+                <span class="play-btn">
+                    <span class="play-btn-icon">
+                    </span>
+                </span>
+                <span class="deploy-text">
+                    Publish
+                </span>
+            </div>
+            <div class="menu-button undo" id="">
+                <span class="icon"></span>
+            </div>
+            <div class="menu-button redo" id="">
+                <span class="icon"></span>
+            </div>
+            <div class="menu-button save" id="save">
+                <span class="icon">
+                </span><span>
+                    Save
+                </span>
+            </div>
+        </div>
+        <div class="right-group">
+            <div class="menu-button pages" id="menu-pages">
+                <span class="pages-icon"></span><div id="current-page" class="page-item"></div><ul id="page-list"></ul><div id="create-page" class="page-item"></div>
+            </div>
+            <ul class="navigation-menu">
+                <li class="menu-app-routes">
+                    <a id="routes-menu" href="#"><span class="routes-icon"></span><span>Routes</span></a>
+                </li><li class="menu-app-entities">
+                    <a id="entities-menu" href="#"><span class="entities-icon"></span><span>Data</span></a>
+                </li><li class="menu-app-plugins">
+                    <a id="plugins-menu" href="#"><span class="plugins-icon"></span><span>Plugins</span></a>
+                </li><li class="menu-app-settings">
+                    <a></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
     <div id="main-container">
       <div class="loading-gif" id="loading-gif"></div>
       <!-- CSS Editor -->
@@ -116,6 +160,84 @@
     </div>
   </div>
 
+  <script type="text/template" id="editor-page">
+    <div class="loading-gif" id="loading-gif"></div>
+    <!-- CSS Editor -->
+    <div class="left-menu-panel-l1 css-editor" id="css-editor-panel">
+        <div class="top-row">
+            <div class="navback" id="navigate-back">
+                ‹
+            </div>
+            <div class="cross" id="close-css-editor">
+                ×
+            </div>
+        </div>
+    </div>
+    <!-- CSS Editor -->
+    <div class="left-menu-panel-l1 animated css-editor" id="page-view-panel">
+    </div>
+    <!-- Left Menu -->
+    <div class="left-buttons">
+
+        <div class="button-group">
+          <div class="btn info" id="page-info" title="Page Info"></div>
+        </div>
+
+        <div class="button-group">
+          <div class="btn active build-mode" title="Build Mode">
+          </div>
+          <div class="btn design-mode" id="design-mode-button" title="Design Mode">
+          </div>
+        </div>
+
+        <div class="button-group">
+          <div class="btn mobile-preview" title="Mobile Preview">
+          </div>
+        </div>
+    </div>
+    <!-- Inside-Page -->
+    <div class="page-container">
+        <div class="options-area"></div>
+        <div class="loader" style="margin-top: 80px;">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="page-wrapper" id="page-wrapper">
+            <div class="url-bar">
+                <div class="url-field">(This template has no route)</div>
+                <div class="refresh-page"><img src="{{ STATIC_URL }}img/refresh-icon.png"></div>
+            </div>
+            <iframe class="page full" id="page" src="/app/{{ app.id }}/editor/3/">
+            </iframe>
+            <div class="page full" id="shadow-frame"></div>
+        </div>
+    </div>
+    <!-- Right Gallery Panel -->
+    <div id="top-panel-bb" class="right-panel">
+        <div class="top-panel-title">
+            <span>
+                UI Elements
+            </span>
+        </div>
+        <div class="search-panel">
+            <span class="search-bg">
+                <span class="search-arrow">
+                    <span class="search-cancel">×</span>
+                    <input type="text" class="search" placeholder="Search Elements...">
+                </span>
+            </span>
+            <span class="search-icon">
+            </span>
+        </div>
+        <div class="item-gallery section" id="item-gallery">
+            <div class="elements-list" id="elements-list">
+                <ul id='all-list' class="list">
+                </ul>
+            </div>
+        </div>
+    </div>
+  </script>
   <script type="text/javascript">
     var appId = 0;
     // var appUrl = "{{ app.url }}";
@@ -359,6 +481,7 @@
     "description": ""
   }
 };
+    var STATIC_URL = '.';
     var uieState = {};
     var statics = {};
     var themes = {};

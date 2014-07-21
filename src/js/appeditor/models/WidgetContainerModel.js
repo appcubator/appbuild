@@ -1,9 +1,6 @@
-define([
-        'models/WidgetModel',
-        'collections/LoginRouteCollection'
-    ],
-    function(WidgetModel,
-        LoginRouteCollection) {
+    var WidgetModel = require('./WidgetModel').WidgetModel;
+    var LoginRouteCollection = require('../collections/LoginRouteCollection').LoginRouteCollection;
+
 
         var WidgetContainerModel = WidgetModel.extend({
 
@@ -41,5 +38,4 @@ define([
             }
         });
 
-        return WidgetContainerModel;
-    });
+        exports.WidgetContainerModel = WidgetContainerModel;

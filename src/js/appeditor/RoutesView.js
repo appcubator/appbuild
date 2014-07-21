@@ -1,7 +1,7 @@
     'use strict';
 
     require('./mixins/BackboneDropdownView');
-    var RouteView = require('./RouteView');
+    var RouteView = require('./RouteView').RouteView;
 
     var template = [ '<div class="arrow_box"></div>',
     '<div class="" id="entities-page">',

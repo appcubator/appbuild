@@ -1,10 +1,10 @@
     'use strict';
 
-    var EditorGallerySectionView = require('./EditorGallerySectionView');
-    var SearchGallerySectionView = require('./SearchGallerySectionView');
-    var WidgetModel = require('../models/WidgetModel');
-    var Searcher = require('./Searcher');
-    var AutoFillHelper = require('../AutoFillHelper');
+    var EditorGallerySectionView = require('./EditorGallerySectionView').EditorGallerySectionView;
+    var SearchGallerySectionView = require('./SearchGallerySectionView').SearchGallerySectionView;
+    var WidgetModel = require('../models/WidgetModel').WidgetModel;
+    var Searcher = require('./Searcher').Searcher;
+    var AutoFillHelper = require('../AutoFillHelper').AutoFillHelper;
 
     /* uielement.displayProps is an an optional object with keys:
         name, (display name)

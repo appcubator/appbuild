@@ -40,16 +40,10 @@ if (window) {
 
     v1 = {};
     v1 = new AppRouter();
-
-    routeLogger = new RouteLogger({
-        router: v1
-    });
-
-    // on appstate saves, synchronize version ids
-
-    Backbone.history.start({
-        pushState: true
-    });
+    v1.appmain(0,0);
+    // Backbone.history.start({
+    //     pushState: true
+    // });
 
     // handle all click events for routing
     $(document).on('click', 'a[rel!="external"]', function(e) {

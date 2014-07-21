@@ -1,12 +1,12 @@
     'use strict';
 
-    var UIElementListView = require('./UIElementListView');
-    var StaticsEditorView = require('./StaticsEditorView');
-    var BaseCSSEditorView = require('./BaseCSSEditorView');
-    var FontEditorView    = require('./FontEditorView');
+    var UIElementListView = require('./UIElementListView').UIElementListView;
+    var StaticsEditorView = require('./StaticsEditorView').StaticsEditorView;
+    var BaseCSSEditorView = require('./BaseCSSEditorView').BaseCSSEditorView;
+    var FontEditorView    = require('./FontEditorView').FontEditorView;
 
-    var UIElementEditingView = require('./UIElementEditingView');
-    var ThemesGalleryView    = require('./ThemesGalleryView');
+    var UIElementEditingView = require('./UIElementEditingView').UIElementEditingView;
+    var ThemesGalleryView    = require('./ThemesGalleryView').ThemesGalleryView;
 
 
     var CSSEditorView = Backbone.View.extend({

@@ -1,7 +1,7 @@
     'use strict';
     require('./mixins/BackboneDropdownView');
 
-    var WidgetSettingsView = require('./template_editor/WidgetSettingsView');
+    var WidgetSettingsView = require('./template_editor/WidgetSettingsView').WidgetSettingsView;
 
     var template = [ 
         '<small class="url-name"><%= url %></small>',

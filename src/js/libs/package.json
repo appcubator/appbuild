@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "backbone" : "1.0.0",
-    "underscore": "1.x",
+    "underscore": "1.4.4",
     "jquery": "*",
     "jquery-ui": "*"
   }
