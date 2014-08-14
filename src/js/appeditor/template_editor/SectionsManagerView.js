@@ -1,15 +1,8 @@
-define(function(require, exports, module) {
-
     'use strict';
+    require('../mixins/BackboneConvenience');
 
-    require('backbone');
-    require('mixins/BackboneConvenience');
-    require('util');
-
-    var SectionView = require('editor/SectionView');
-    var WidgetSelectorView = require('editor/WidgetSelectorView');
-
-
+    var SectionView = require('./SectionView');
+    var WidgetSelectorView = require('./WidgetSelectorView');
 
     var SectionManagerView = Backbone.View.extend({
 
@@ -187,5 +180,4 @@ define(function(require, exports, module) {
 
     });
 
-    return SectionManagerView;
-});
+    exports.SectionManagerView = SectionManagerView;

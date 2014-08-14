@@ -1,11 +1,7 @@
-define(function(require, exports, module) {
-
     'use strict';
 
 
-    require('mixins/BackboneUI');
-    require('jquery-ui');
-    require('util');
+    require('../mixins/BackboneUI');
 
     var PADDING = 2;
     var ALIGNMENT = 1;
@@ -480,6 +476,4 @@ define(function(require, exports, module) {
 
     });
 
-    return WidgetSelectorView;
-
-});
+    exports.WidgetSelectorView = WidgetSelectorView;

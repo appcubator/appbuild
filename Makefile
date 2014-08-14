@@ -20,6 +20,12 @@ build:
 	./node_modules/browserify/bin/cmd.js ./src/js/appeditor/main.js >> ./dist/js/appbuild.js
 	# cp ./src/js/appbuild.js ./dist/js/appbuild.js
 
+	# build iframe-appeditor
+	# rm ./src/js/appbuild.js
+	./node_modules/browserify/bin/cmd.js ./src/js/appeditor/iframe-main.js >> ./dist/js/iframe-appbuild.js
+	# cp ./src/js/appbuild.js ./dist/js/appbuild.js
+
+
 	# build appmake
 	cp ./src/js/expander.js ./dist/js/expander.js
 
@@ -38,6 +44,7 @@ build:
 
 	# HTML
 	cp ./src/index.html ./dist/index.html
+	cp ./src/iframe-editor.html ./dist/iframe-editor.html
 	# TODO: build appcubator-plugin
 
 

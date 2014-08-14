@@ -1,3 +1,6 @@
+var $ = require('../node_modules/jquery/dist/jquery');
+
+
     var util = {
 
         log_to_server: function(key_str, val_dict, app_id) {

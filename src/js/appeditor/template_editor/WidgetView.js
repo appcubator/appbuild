@@ -1,4 +1,6 @@
-define(['backbone', 'jquery.freshereditor', 'mixins/BackboneUI', 'editor/editor-templates'], function() {
+    require('../../libs/jquery.freshereditor');
+    require('../mixins/BackboneUI');
+    require('./editor-templates');
 
     'use strict';
 
@@ -448,5 +450,4 @@ define(['backbone', 'jquery.freshereditor', 'mixins/BackboneUI', 'editor/editor-
 
     });
 
-    return WidgetView;
-});
+    exports.WidgetView = WidgetView;

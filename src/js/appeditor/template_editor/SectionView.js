@@ -1,13 +1,7 @@
-define(function(require, exports, module) {
-
     'use strict';
 
-    var WidgetView = require('editor/WidgetView');
-    var WidgetModel = require('models/WidgetModel');
-
-    require('backbone');
-    require('util');
-
+    var WidgetView = require('./WidgetView');
+    var WidgetModel = require('../models/WidgetModel');
 
     var SectionView = Backbone.View.extend({
 
@@ -186,5 +180,4 @@ define(function(require, exports, module) {
 
     });
 
-    return SectionView;
-});
+    exports.SectionView = SectionView;
