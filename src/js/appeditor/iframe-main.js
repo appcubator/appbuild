@@ -17,10 +17,10 @@ require("./mixins/BackboneConvenience");
 
 var AppModel = require("./models/AppModel");
 var WidgetView = require("./template_editor/WidgetView");
-var SectionsManagerView = require("./template_editor/SectionsManagerView");
-var MarqueeView = require('./template_editor/MarqueeView');
-var KeyDispatcher = require("./template_editor/KeyDispatcher");
-var MouseDispatcher = require("./template_editor/MouseDispatcher");
+var SectionsManagerView = require("./template_editor/SectionsManagerView").SectionsManagerView;
+var MarqueeView = require('./template_editor/MarqueeView').MarqueeView;
+var KeyDispatcher = require("./template_editor/KeyDispatcher").KeyDispatcher;
+var MouseDispatcher = require("./template_editor/MouseDispatcher").MouseDispatcher;
 
 
 v1State = top.v1State;

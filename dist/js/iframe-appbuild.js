@@ -34606,189 +34606,189 @@ exports.EditorTemplates = Templates;
 
 });
 
-require.define("/appeditor/template_editor/SectionsManagerView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
-    require('../mixins/BackboneConvenience');
+require.define("/appeditor/template_editor/SectionsManagerView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
+require('../mixins/BackboneConvenience');
 
-    var SectionView = require('./SectionView');
-    var WidgetSelectorView = require('./WidgetSelectorView');
+var SectionView = require('./SectionView').SectionView;
+var WidgetSelectorView = require('./WidgetSelectorView').WidgetSelectorView;
 
-    var SectionManagerView = Backbone.View.extend({
+var SectionsManagerView = Backbone.View.extend({
 
-        el: document.body,
+    el: document.body,
 
-        widgetsContainer: null,
+    widgetsContainer: null,
 
-        events: {
-            'click #addNewSectionTitle' : 'showSectionOptions',
-            'click .section-option': 'selectSectionLayout'
-        },
+    events: {
+        'click #addNewSectionTitle' : 'showSectionOptions',
+        'click .section-option': 'selectSectionLayout'
+    },
 
-        optionsHidden : true,
+    optionsHidden : true,
 
-        subviews: [],
+    subviews: [],
 
-        initialize: function(sectionsCollection) {
+    initialize: function(sectionsCollection) {
 
-            _.bindAll(this);
+        _.bindAll(this);
 
-            var self = this;
-            this.subviews = [];
+        var self = this;
+        this.subviews = [];
 
-            this.widgetSelectorView = this.createSubview(WidgetSelectorView, sectionsCollection.getAllWidgets());
+        this.widgetSelectorView = this.createSubview(WidgetSelectorView, sectionsCollection.getAllWidgets());
 
-            this.sectionsCollection = sectionsCollection;
-            this.listenTo(this.sectionsCollection, 'add', this.placeNewSection, true);
-            this.listenTo(this.sectionsCollection, 'rearranged', this.render);
-            this.listenToModels(this.sectionsCollection, 'startedSortingElements', this.highlightSections);
-            this.listenToModels(this.sectionsCollection, 'stoppedSortingElements', this.unhighlightSections);
-        },
+        this.sectionsCollection = sectionsCollection;
+        this.listenTo(this.sectionsCollection, 'add', this.placeNewSection, true);
+        this.listenTo(this.sectionsCollection, 'rearranged', this.render);
+        this.listenToModels(this.sectionsCollection, 'startedSortingElements', this.highlightSections);
+        this.listenToModels(this.sectionsCollection, 'stoppedSortingElements', this.unhighlightSections);
+    },
 
-        render: function() {
+    render: function() {
 
-            this.widgetsContainer = document.body;
+        this.widgetsContainer = document.body;
 
-            var expanded_uielements = this.sectionsCollection.expand();
+        var expanded_uielements = this.sectionsCollection.expand();
 
-            this.$el.html(expanded_uielements.html);
-            this.placeNewSectionPanel();
+        this.$el.html(expanded_uielements.html);
+        this.placeNewSectionPanel();
 
-            this.sectionsCollection.each(function(sectionModel) {
-                var newWidgetView = this.placeSection(sectionModel, false);
-            }, this);
+        this.sectionsCollection.each(function(sectionModel) {
+            var newWidgetView = this.placeSection(sectionModel, false);
+        }, this);
 
-           this.widgetSelectorView.setElement(document).render();
-           this.placeJS(expanded_uielements);
-        },
+       this.widgetSelectorView.setElement(document).render();
+       this.placeJS(expanded_uielements);
+    },
 
-        placeNewSectionPanel: function() {
+    placeNewSectionPanel: function() {
 
-            if (this.$el.find('#addNewSection')) {
-                this.$el.find('#addNewSection').remove();
-            }
-
-            var temp = [
-                '<div class="container editing full-container" id="addNewSection">',
-                    '<span id="addNewSectionTitle" style="display:block;">Add A New Section</span>',
-                    '<ul class="options" style="display:none;">',
-                        '<li class="section-option" id="opt-12">12</li>',
-                        '<li class="section-option" id="opt-3-3-3-3">3-3-3-3</li>',
-                        '<li class="section-option" id="opt-4-4-4">4-4-4</li>',
-                        '<li class="section-option" id="opt-4-8">4-8</li>',
-                        '<li class="section-option" id="opt-8-4">8-4</li>',
-                        '<li class="section-option" id="opt-navbar">Navbar</li>',
-                        '<li class="section-option" id="opt-footer">Footer</li>',
-                    '</ul>',
-                '</div>'
-            ].join('\n');
-
-            $(document.body).append(temp);
-        },
-
-        placeJS: function(expanded) {
-
-            if(!expanded.js || expanded.js === '') return;
-
-            var self = this;
-            var jsTag = 'custom-js-widget-' + this.model.cid;
-            if (jsTag) $(jsTag).remove();
-
-            var appendJSTag = function() {
-
-                var customJSTemp = [
-                    'try {',
-                    '<%= code %>',
-                    '} catch(err) { console.log("Error executing custom js: "+ err); }',
-                ].join('\n');
-
-                try {
-                    jsTag = document.createElement('script');
-                    jsTag.id = 'custom-js-widget-' + self.model.cid;
-                    jsTag.setAttribute("type", "text/javascript");
-
-                    jsTag.text = _.template(customJSTemp, { code: expanded.js });
-
-                    console.log(jsTag);
-                    document.body.appendChild(jsTag);
-                } catch (err) {
-                    console.log('Error adding custom js:' + err);
-                }
-            };
-
-            setTimeout(function() { $(document).ready(appendJSTag); }, 3000);
-            // this.listenTo(v1, 'editor-loaded', appendJSTag, this);
-        },
-
-        showSectionOptions: function() {
-
-            if(!this.optionsHidden) return;
-
-            this.$el.find('#addNewSectionTitle').hide();
-            this.$el.find('.options').fadeIn();
-            this.optionsHidden = false;
-        },
-
-        selectSectionLayout: function(e) {
-            var id = String(e.currentTarget.id).replace('opt-','');
-            this.sectionsCollection.createSectionWithType(id);
-
-            this.$el.find('.options').first().hide();
-            this.$el.find('#addNewSectionTitle').fadeIn();
-            this.optionsHidden = true;
-        },
-
-        matchSection: function(model, isNew, extraData) {
-            //model.setupPageContext(v1.currentApp.getCurrentPage());
-            var sectionView = this.createSubview(SectionView, model);
-            sectionView.render();
-
-            this.listenTo(model, 'hovered', function() {
-                this.changeCurrentSection(model, sectionView);
-            }, this);
-
-            return sectionView;
-        },
-
-        placeNewSection: function(model) {
-
-            var sectionView = this.createSubview(SectionView, model);
-            this.$el.append(sectionView.render().el);
-
-            this.listenTo(model, 'hovered', function() {
-                this.changeCurrentSection(model, sectionView);
-            }, this);
-
-            this.placeNewSectionPanel();
-            return sectionView;
-        },
-
-        placeSection: function(model, isNew, extraData) {
-
-            var sectionView = this.createSubview(SectionView, model);
-            sectionView.render();
-
-            this.listenTo(model, 'hovered', function() {
-                this.changeCurrentSection(model, sectionView);
-            }, this);
-
-            return sectionView;
-        },
-
-        changeCurrentSection: function(model, view) {
-            this.currentSectionModel = model;
-            this.currentSectionView = view;
-        },
-
-        highlightSections: function () {
-            this.$el.find('.ycol').addClass("fancy-borders");
-        },
-
-        unhighlightSections: function () {
-            this.$el.find('.ycol').removeClass("fancy-borders");
+        if (this.$el.find('#addNewSection')) {
+            this.$el.find('#addNewSection').remove();
         }
 
-    });
+        var temp = [
+            '<div class="container editing full-container" id="addNewSection">',
+                '<span id="addNewSectionTitle" style="display:block;">Add A New Section</span>',
+                '<ul class="options" style="display:none;">',
+                    '<li class="section-option" id="opt-12">12</li>',
+                    '<li class="section-option" id="opt-3-3-3-3">3-3-3-3</li>',
+                    '<li class="section-option" id="opt-4-4-4">4-4-4</li>',
+                    '<li class="section-option" id="opt-4-8">4-8</li>',
+                    '<li class="section-option" id="opt-8-4">8-4</li>',
+                    '<li class="section-option" id="opt-navbar">Navbar</li>',
+                    '<li class="section-option" id="opt-footer">Footer</li>',
+                '</ul>',
+            '</div>'
+        ].join('\n');
 
-    exports.SectionManagerView = SectionManagerView;
+        $(document.body).append(temp);
+    },
+
+    placeJS: function(expanded) {
+
+        if(!expanded.js || expanded.js === '') return;
+
+        var self = this;
+        var jsTag = 'custom-js-widget-' + this.model.cid;
+        if (jsTag) $(jsTag).remove();
+
+        var appendJSTag = function() {
+
+            var customJSTemp = [
+                'try {',
+                '<%= code %>',
+                '} catch(err) { console.log("Error executing custom js: "+ err); }',
+            ].join('\n');
+
+            try {
+                jsTag = document.createElement('script');
+                jsTag.id = 'custom-js-widget-' + self.model.cid;
+                jsTag.setAttribute("type", "text/javascript");
+
+                jsTag.text = _.template(customJSTemp, { code: expanded.js });
+
+                console.log(jsTag);
+                document.body.appendChild(jsTag);
+            } catch (err) {
+                console.log('Error adding custom js:' + err);
+            }
+        };
+
+        setTimeout(function() { $(document).ready(appendJSTag); }, 3000);
+        // this.listenTo(v1, 'editor-loaded', appendJSTag, this);
+    },
+
+    showSectionOptions: function() {
+
+        if(!this.optionsHidden) return;
+
+        this.$el.find('#addNewSectionTitle').hide();
+        this.$el.find('.options').fadeIn();
+        this.optionsHidden = false;
+    },
+
+    selectSectionLayout: function(e) {
+        var id = String(e.currentTarget.id).replace('opt-','');
+        this.sectionsCollection.createSectionWithType(id);
+
+        this.$el.find('.options').first().hide();
+        this.$el.find('#addNewSectionTitle').fadeIn();
+        this.optionsHidden = true;
+    },
+
+    matchSection: function(model, isNew, extraData) {
+        //model.setupPageContext(v1.currentApp.getCurrentPage());
+        var sectionView = this.createSubview(SectionView, model);
+        sectionView.render();
+
+        this.listenTo(model, 'hovered', function() {
+            this.changeCurrentSection(model, sectionView);
+        }, this);
+
+        return sectionView;
+    },
+
+    placeNewSection: function(model) {
+
+        var sectionView = this.createSubview(SectionView, model);
+        this.$el.append(sectionView.render().el);
+
+        this.listenTo(model, 'hovered', function() {
+            this.changeCurrentSection(model, sectionView);
+        }, this);
+
+        this.placeNewSectionPanel();
+        return sectionView;
+    },
+
+    placeSection: function(model, isNew, extraData) {
+
+        var sectionView = this.createSubview(SectionView, model);
+        sectionView.render();
+
+        this.listenTo(model, 'hovered', function() {
+            this.changeCurrentSection(model, sectionView);
+        }, this);
+
+        return sectionView;
+    },
+
+    changeCurrentSection: function(model, view) {
+        this.currentSectionModel = model;
+        this.currentSectionView = view;
+    },
+
+    highlightSections: function () {
+        this.$el.find('.ycol').addClass("fancy-borders");
+    },
+
+    unhighlightSections: function () {
+        this.$el.find('.ycol').removeClass("fancy-borders");
+    }
+
+});
+
+exports.SectionsManagerView = SectionsManagerView;
 
 });
 
@@ -34977,673 +34977,2674 @@ require.define("/appeditor/template_editor/SectionView.js",function(require,modu
     exports.SectionView = SectionView;
 });
 
-require.define("/appeditor/template_editor/WidgetSelectorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+require.define("/appeditor/template_editor/WidgetSelectorView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
+
+require('../mixins/BackboneUI');
+
+var PADDING = 2;
+var ALIGNMENT = 1;
+
+var WidgetSelectorView = Backbone.UIView.extend({
+    className: 'editor-page',
+    tagName: 'div',
+    selectedEl: null,
+    isMobile: false,
+
+    events: {
+        // 'click #hover-div': 'hoverClicked',
+        // 'click #select-div': 'doubleClicked',
+        // 'mousedown #hover-div': 'mousedown',
+        // 'mousedown #select-div': 'selectMousedown',
+        // 'mouseup #hover-div': 'mouseup',
+        // 'mouseup #select-div': 'mouseup'
+    },
+
+    initialize: function(widgetsCollection) {
+        _.bindAll(this);
+        var self = this;
+        this.widgetsCollection = widgetsCollection;
+        this.listenTo(this.widgetsCollection, 'add', this.bindWidget, true);
+        this.widgetEditorView = v1.currentApp.view.widgetEditorView;
+        this.widgetEditorView.isMobile = self.isMobile;
+
+        this.widgetsCollection.each(function(widget) {
+            self.bindWidget(widget, false);
+        });
+        this.doKeyBindings();
+    },
+
+    selectMousedown: function(e) {
+        //if(!this.isMouseOn(e)) { return true; }
+        this.mousedown();
+    },
+
+    mousedown: function(e) {
+        //g_marqueeView.setZero();
+        mouseDispatcher.isMousedownActive = true;
+    },
+
+    mouseup: function(e) {
+        mouseDispatcher.isMousedownActive = false;
+    },
+
+    render: function() {
+        var self = this;
+
+        this.elContainer = this.el.getElementById('elements-container');
+
+        var hoverDiv = document.createElement('div');
+        hoverDiv.id = "hover-div";
+        this.hoverDiv = hoverDiv;
+        this.hideNode(hoverDiv);
+        // this.elContainer.appendChild(hoverDiv);
+
+        var selectDiv = document.createElement('div');
+        selectDiv.id = "select-div";
+        this.selectDiv = selectDiv;
+        this.hideNode(selectDiv);
+        // this.elContainer.appendChild(selectDiv);
+
+        $(selectDiv).resizable({
+            handles: "n, e, s, w, nw, ne, sw, se",
+            containment: "parent",
+            resize: self.resizing,
+            stop: self.resized
+        });
+
+        $(hoverDiv).draggable({
+            containment: "parent",
+            drag: self.moving,
+            stop: self.moved,
+            snapMode: "outer",
+            iframeFix: true
+        });
+
+        $(selectDiv).draggable({
+            containment: "parent",
+            drag: self.moving,
+            stop: self.moved,
+            snapMode: "outer",
+            cancel: '#widget-editor',
+            iframeFix: true
+        });
+
+
+        selectDiv.style.zIndex = "2005";
+        hoverDiv.style.zIndex = "2004";
+        //hoverDiv.style.position = "absolute";
+        //selectDiv.style.position = "absolute";
+
+        $(document).on('mousedown', this.clickedPage);
+
+        return this;
+    },
+
+    bindWidget: function(widget, isNew) {
+        var self = this;
+
+        this.listenTo(widget, 'remove', function() {
+            self.deselect();
+        });
+
+        this.listenTo(widget, 'hovered', function() {
+            self.widgetHover(widget);
+        });
+
+        this.listenTo(widget, 'unhovered', function() {
+            self.widgetUnhover(widget);
+        });
+
+        this.listenTo(widget, 'selected', function() {
+            self.widgetUnhover(widget);
+            self.newSelected(widget);
+        });
+
+        this.listenTo(widget, 'doubleClicked', this.doubleClicked);
+
+        this.listenTo(widget, 'deselect', function() {
+            self.deselect();
+        });
+
+        this.listenTo(widget, 'editModeOn', function(position) {
+            self.unbindAll(position);
+        });
+
+        if (isNew) {
+            widget.trigger('selected');
+        }
+    },
+
+    unbindAll: function(position) {
+        var widget = this.selectedEl;
+        widget.on('editModeOff', function() {
+            this.bindWidget(widget);
+            this.setLayout(this.selectDiv, this.selectedEl);
+            this.makeSelectDivVisible();
+        }, this);
+
+        this.stopListening(widget, 'hovered');
+        this.stopListening(widget, 'unhovered');
+        this.stopListening(widget, 'selected');
+        this.makeSelectDivInvisible();
+        this.selectDiv.style.left = (((widget.get('layout').get('width') + widget.get('layout').get('left')) * 80) + 4) + 'px';
+        if (position == "left") {
+            this.selectDiv.style.left = (((widget.get('layout').get('left')) * 80) - 16) + 'px';
+        }
+    },
+
+    makeSelectDivInvisible: function() {
+        this.selectDiv.style.height = 0;
+        this.selectDiv.style.width = 0;
+        $(this.selectDiv).hide();
+    },
+
+    makeSelectDivVisible: function(argument) {
+        $(this.selectDiv).fadeIn();
+    },
+
+    hideHoverDiv: function() {
+        this.hideLayout(this.hoverDiv);
+    },
+
+    setLayout: function(node, widgetModel) {
+        if (!widgetModel) return;
+        $(node).show();
+
+        var $element = $(document).find("[data-cid='" + widgetModel.cid + "']");
+        var element = $element[0];
+        if(!element) return;
+
+        // var offsetFrame = util.getWindowRelativeOffset(window.document, window);
+        var offset = util.getWindowRelativeOffset(window.document, element);
+
+        var leftDist = offset.left; // + offsetFrame.left;
+        var topDist = offset.top + $(window).scrollTop();
+
+        // node.style.width =  $element.outerWidth() + 'px';
+        // node.style.height = $element.outerHeight() + 'px';
+        // node.style.left = (leftDist) + 'px';
+        // node.style.top = (topDist) + 'px';
+
+        return node;
+    },
+
+    hideLayout: function(node) {
+        $(node).hide();
+        node.style.width = '0px';
+        node.style.height = '0px';
+        node.style.left = '0px';
+        node.style.top = '0px';
+        return node;
+    },
+
+    widgetHover: function(widgetModel) {
+        if (g_marqueeView.isDrawing) return;
+        if (this.selectedEl && widgetModel.cid === this.selectedEl.cid) return;
+        // if (g_multiSelectorView.contains(widgetModel)) return;
+        this.hoveredEl = widgetModel;
+        //this.setLayout(this.hoverDiv, widgetModel);
+    },
+
+    widgetUnhover: function(widgetModel) {
+        this.hideNode(this.hoverDiv);
+    },
+
+    bindLocation: function() {},
+
+    newSelected: function(widgetModel) {
+        var self = this;
+        
+        if (this.selectedEl && this.selectedEl.cid == widgetModel.cid) {
+            this.setLayout(this.selectDiv, widgetModel);
+            this.selectedEl.trigger('reselected');
+            return;
+        }
+
+        this.deselect();
+        this.selectedEl = widgetModel;
+        this.hideNode(this.hoverDiv);
+        // this.setLayout(this.selectDiv, widgetModel);
+        this.widgetEditorView.setModel(widgetModel).display();
+    },
+
+    resizing: function(e, ui) {
+        var cid = this.selectedEl.cid;
+        var model = this.selectedEl;
+
+        var elem = this.el.getElementById('widget-wrapper-' + cid);
+
+        elem.style.width = (ui.size.width + PADDING) + 'px';
+        elem.style.height = (ui.size.height + PADDING) + 'px';
+        elem.style.left = (ui.position.left + ALIGNMENT) + 'px';
+        elem.style.top = (ui.position.top + ALIGNMENT) + 'px';
+
+    },
+
+    resized: function(e, ui) {
+        // g_guides.hideAll();
+
+        var left = Math.round((ui.position.left / this.positionHorizontalGrid));
+        var top = Math.round((ui.position.top / this.positionVerticalGrid));
+
+        if (left < 0) left = 0;
+        if (top < 0) top = 0;
+
+        var deltaHeight = Math.round((ui.size.height + 2) / this.positionVerticalGrid);
+        var deltaWidth = Math.round((ui.size.width + 2) / this.positionHorizontalGrid);
+        var elem = this.el.getElementById('widget-wrapper-' + this.selectedEl.cid);
+        elem.style.width = '';
+        elem.style.height = '';
+
+        if (deltaHeight <= 0) deltaHeight = 1;
+        if (deltaWidth <= 0) deltaWidth = 1;
+
+        this.selectedEl.get('layout').set('width', deltaWidth);
+        this.selectedEl.get('layout').set('height', deltaHeight);
+        this.selectedEl.get('layout').set('left', left);
+        this.selectedEl.get('layout').set('top', top);
+        this.setLayout(this.selectDiv, this.selectedEl);
+
+        if (this.selectedEl.getRow()) this.selectedEl.getRow().resizeElements(deltaWidth);
+    },
+
+    moving: function(e, ui) {
+        var model = null;
+
+        if (e.target.id == "hover-div") {
+            model = this.hoveredEl;
+            // if (!g_multiSelectorView.isEmpty()) {
+            //     return g_multiSelectorView.moving(e, ui, model, this.positionHorizontalGrid, this.positionVerticalGrid);
+            // }
+        } else {
+            model = this.selectedEl;
+            this.hideNode(this.hoverDiv);
+        }
+
+        if (!model) return;
+
+        this.widgetEditorView.hide();
+
+        var cid = model.cid;
+
+        var elem = this.el.getElementById('widget-wrapper-' + model.cid);
+        elem.style.top = ui.position.top + ALIGNMENT + 'px';
+        elem.style.left = ui.position.left + ALIGNMENT + 'px';
+    },
+
+    moved: function(e, ui) {
+
+        var self = this;
+        //g_guides.hideAll();
+
+        var model = this.selectedEl;
+        if (e.target.id == "hover-div") {
+            model = this.hoveredEl;
+            if (!g_multiSelectorView.isEmpty()) {
+                return g_multiSelectorView.moved(e, ui, model, this.positionHorizontalGrid, this.positionVerticalGrid, function() {
+                    self.hideNode(self.hoverDiv);
+                });
+            }
+        }
+
+        this.hideHoverDiv();
+
+        var top = Math.round((ui.position.top / this.positionVerticalGrid));
+        var left = Math.round((ui.position.left / this.positionHorizontalGrid));
+
+        if (left < 0) left = 0;
+        if (top < 0) top = 0;
+
+        if (model.get('layout').get('left') == left) {
+            model.get('layout').trigger('change:left');
+        } else {
+            model.get('layout').set('left', left);
+        }
+
+        if (model.get('layout').get('top') == top) {
+            model.get('layout').trigger('change:top');
+        } else {
+            model.get('layout').set('top', top);
+        }
+
+        this.newSelected(model);
+    },
+
+    deselect: function() {
+        if (this.selectedEl) {
+            this.selectedEl.trigger('deselected');
+            this.stopListening(this.selectedEl.get('layout'), 'change');
+        }
+
+        this.selectedEl = null;
+        this.hideNode(this.selectDiv);
+        this.hideNode(this.hoverDiv);
+    },
+
+    moveSelectedDown: function(e) {
+        if (!this.selectedEl) return;
+        if (keyDispatcher.textEditing === true) return;
+        if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
+
+
+        // if(this.selectedEl.getBottom() > v1State.getCurrentPage().getHeight()) {
+        v1State.getCurrentPage().trigger('scroll', this.selectedEl);
+        // }
+
+        this.selectedEl.moveDown();
+        e.preventDefault();
+    },
+
+    moveSelectedUp: function(e) {
+        if (!this.selectedEl) return;
+        if (keyDispatcher.textEditing === true) return;
+        if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
+
+        this.selectedEl.moveUp();
+        e.preventDefault();
+    },
+
+    moveSelectedLeft: function(e) {
+        if (!this.selectedEl) return;
+        if (keyDispatcher.textEditing === true) return;
+        if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
+
+        this.selectedEl.moveLeft();
+        e.preventDefault();
+    },
+
+    moveSelectedRight: function(e) {
+        if (!this.selectedEl) return;
+        if (keyDispatcher.textEditing === true) return;
+        if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
+
+        this.selectedEl.moveRight();
+        e.preventDefault();
+    },
+
+    deleteSelected: function(e) {
+        if (!this.selectedEl) return;
+        if (keyDispatcher.textEditing === true) return;
+        if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
+
+        this.selectedEl.remove();
+        e.preventDefault();
+    },
+
+    doKeyBindings: function() {
+        keyDispatcher.bind('down', this.moveSelectedDown);
+        keyDispatcher.bind('up', this.moveSelectedUp);
+        keyDispatcher.bind('left', this.moveSelectedLeft);
+        keyDispatcher.bind('right', this.moveSelectedRight);
+        keyDispatcher.bind('backspace', this.deleteSelected);
+    },
+
+    hoverClicked: function(e) {
+        if (this.hoveredEl) {
+            this.hoveredEl.trigger('selected');
+        }
+        mouseDispatcher.isMousedownActive = false;
+    },
+
+    clickedPage: function(e) {
+        if (this.selectedEl && !this.isMouseOn(e) && !mouseDispatcher.isMousedownActive) {
+            this.deselect();
+        }
+    },
+
+    doubleClicked: function(e) {
+        //if (!this.isMouseOn(e) || this.selectedEl.editModeOn) return;
+
+        if (this.selectedEl.getContent() && !this.selectedEl.isLoginForm()) {
+            this.selectedEl.trigger('startEditing');
+            this.listenTo(this.selectedEl, 'stopEditing cancelEditing', this.stoppedEditing);
+            this.makeSelectDivInvisible();
+        }
+
+        if (this.selectedEl.isBox()) {
+            util.guideText(e, "You should drop some text here.");
+        }
+    },
+
+    stoppedEditing: function() {
+        this.makeSelectDivVisible();
+        this.setLayout(this.selectDiv, this.selectedEl);
+    },
+
+    isMouseOn: function(e) {
+        if (!this.selectedEl) return false;
+
+        var self = this;
+
+        var mouseX = e.pageX;
+        var mouseY = e.pageY;
+
+        var div = $(document).find("[data-cid='" + this.selectedEl.cid + "']");
+        if(!div.length) return;
+        var divTop = div.offset().top;
+        var divLeft = div.offset().left;
+        var divRight = divLeft + div.width();
+        var divBottom = divTop + div.height();
+        if (mouseX >= divLeft && mouseX <= divRight && mouseY >= divTop && mouseY <= divBottom) {
+            return true;
+        }
+        return false;
+    },
+
+    clear: function() {
+        this.widgetEditorView.clear();
+    },
+
+    hideNode: function(node) {
+        // node.style.height = 0;
+        // node.style.width = 0;
+        // $(node).hide();
+    },
+
+    close: function() {
+        keyDispatcher.unbind('down', this.moveSelectedDown);
+        keyDispatcher.unbind('up', this.moveSelectedUp);
+        keyDispatcher.unbind('left', this.moveSelectedLeft);
+        keyDispatcher.unbind('right', this.moveSelectedRight);
+        keyDispatcher.unbind('backspace', this.deleteSelected);
+        this.deselect();
+        $(document).off('mousedown', this.clickedPage);
+
+        Backbone.View.prototype.close.call(this);
+    }
+
+});
+
+exports.WidgetSelectorView = WidgetSelectorView;
+
+});
+
+require.define("/appeditor/template_editor/MarqueeView.js",function(require,module,exports,__dirname,__filename,process,global){var WidgetEditorView = require('./WidgetEditorView').WidgetEditorView;
+var MultiSelectorView = require('./MultiSelectorView').MultiSelectorView;
+require('../mixins/BackboneUI');
+
+var MarqueeView = Backbone.UIView.extend({
+    className: 'marquee-view',
+    tagName: 'div',
+    isDrawing: false,
+
+    origin: {
+        x: 0,
+        y: 0
+    },
+    clientOrigin: {
+        x: 0,
+        y: 0
+    },
+    events: {},
+    subviews: [],
+
+    initialize: function(widgetsCollection) {
+        _.bindAll(this);
+
+        this.widgetsCollection = widgetsCollection;
+
+        this.multiSelectorView = new MultiSelectorView();
+        g_multiSelectorView = this.multiSelectorView;
+        this.subviews.push(this.multiSelectorView);
+    },
+
+    mousedown: function(e) {
+        if (mouseDispatcher.isMousedownActive) {
+            return true;
+        }
+
+        this.$el.show();
+        this.isDrawing = true;
+
+        var coorX = e.pageX;
+        var coorY = e.pageY;
+        var dist = this.getPageTopLeft();
+        coorX -= dist.left;
+        coorY -= dist.top;
+        coorY -= $(document.body).scrollTop();
+
+        this.setTop(coorY);
+        this.setLeft(coorX);
+        this.setWidth(6);
+        this.setHeight(6);
+
+        this.origin.x = coorX;
+        this.origin.y = coorY;
+
+        this.clientOrigin.x = e.clientX;
+        this.clientOrigin.y = e.clientY;
+    },
+
+    mouseup: function(e) {
+        if (this.isDrawing == false) return;
+
+        var Xcor = e.clientX;
+        var Ycor = e.clientY;
+        var arr = this.widgetsCollection.filter(function(widget) {
+            var elem = document.getElementById('widget-wrapper-' + widget.cid);
+            return util.isRectangleIntersectElement(this.clientOrigin.x, this.clientOrigin.y, Xcor, Ycor, elem);
+        }, this);
+
+        this.isDrawing = false;
+        this.setZero();
+
+        if (arr.length == 1) {
+            arr[0].trigger('selected');
+        } else if (arr.length > 1) {
+            this.multiSelectorView.setContents(arr);
+        }
+    },
+
+    mousemove: function(e) {
+        if (keyDispatcher.textEditing !== true) e.returnValue = false;
+        if (!this.isDrawing) return;
+
+        var coorX = e.pageX;
+        var coorY = e.pageY;
+        var dist = this.getPageTopLeft();
+        coorX -= dist.left;
+        coorY -= dist.top;
+        coorY -= $(document.body).scrollTop();
+
+        if (coorX < 0 || coorY < 0) {
+            return;
+        }
+
+        var distWidth = this.origin.x - coorX;
+        var distHeight = this.origin.y - coorY;
+        var diffWidth = Math.abs(this.origin.x - coorX);
+        var diffHeight = Math.abs(this.origin.y - coorY);
+
+        this.iterateWidgets(this.clientOrigin.x, this.clientOrigin.y, e.clientX, e.clientY);
+
+        this.setWidth(diffWidth);
+        if (distWidth == diffWidth) {
+            this.setLeft(this.origin.x - diffWidth);
+        } else {
+            this.setLeft(this.origin.x);
+        }
+
+        this.setHeight(diffHeight);
+        if (distHeight == diffHeight) {
+            this.setTop(this.origin.y - diffHeight);
+        } else {
+            this.setTop(this.origin.y);
+        }
+
+    },
+
+    iterateWidgets: function(Xorigin, Yorigin, Xcor, Ycor) {
+
+        this.currentPage = v1.currentApp.getCurrentPage();
+        if (Xcor % 3 >= 1 & Ycor % 3 >= 1) return;
+
+        this.widgetsCollection.each(function(widget) {
+            var elem = document.getElementById('widget-wrapper-' + widget.cid);
+            if (util.isRectangleIntersectElement(Xorigin, Yorigin, Xcor, Ycor, elem)) {
+                $(elem).addClass('red-border');
+            } else {
+                $(elem).removeClass('red-border');
+            }
+        });
+
+    },
+
+    setZero: function() {
+
+        this.isDrawing = false;
+
+        this.$el.hide();
+        this.setWidth(0);
+        this.setHeight(0);
+
+        this.widgetsCollection.each(function(widget) {
+            var elem = document.getElementById('widget-wrapper-' + widget.cid);
+            $(elem).removeClass('red-border');
+        });
+    },
+
+    render: function() {
+        document.body.addEventListener('mouseup', this.mouseup, true);
+        document.body.addEventListener('mousedown', this.mousedown, true);
+        document.body.addEventListener('mousemove', this.mousemove, true);
+        this.el.className = 'marquee-view';
+        this.el.id = 'marquee-view';
+        this.container = document.body;
+        this.setZero();
+        this.multiSelectorView.render();
+        return this;
+    },
+
+    getPageTopLeft: function() {
+        var rect = this.container.getBoundingClientRect();
+        var docEl = document.documentElement;
+        return {
+            left: rect.left + (document.body.pageXOffset || docEl.scrollLeft || 0),
+            top: rect.top + (document.body.pageYOffset || docEl.scrollTop || 0)
+        };
+    },
+
+    close: function() {
+        window.removeEventListener('mouseup', this.mouseup);
+        
+        document.body.removeEventListener('mousedown', this.mousedown);
+        document.body.removeEventListener('mousemove', this.mousemove);
+
+        Backbone.View.prototype.close.call(this);
+    }
+
+});
+
+exports.MarqueeView = MarqueeView;
+
+});
+
+require.define("/appeditor/template_editor/WidgetEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
     require('../mixins/BackboneUI');
 
-    var PADDING = 2;
-    var ALIGNMENT = 1;
+    var WidgetSettingsView = require('./WidgetSettingsView');
+    var WidgetContentEditorView = require('./WidgetContentEditorView');
+    var WidgetLayoutEditorView = require('./WidgetLayoutEditorView');
+    var WidgetClassPickerView = require('./WidgetClassPickerView');
+    var CustomWidgetEditorModal = require('./CustomWidgetEditorModal');
 
-    var WidgetSelectorView = Backbone.UIView.extend({
-        className: 'editor-page',
+    var WidgetEditorView = Backbone.UIView.extend({
+
+        className: 'widget-editor animated',
+        id: 'widget-editor',
         tagName: 'div',
-        selectedEl: null,
-        isMobile: false,
+        css: 'widget-editor',
+        type: 'widget',
+        subviews: [],
 
         events: {
-            // 'click #hover-div': 'hoverClicked',
-            // 'click #select-div': 'doubleClicked',
-            // 'mousedown #hover-div': 'mousedown',
-            // 'mousedown #select-div': 'selectMousedown',
-            // 'mouseup #hover-div': 'mouseup',
-            // 'mouseup #select-div': 'mouseup'
+            'click .settings': 'openSettingsView',
+            'click .pick-style': 'openStylePicker',
+            'click .done-editing': 'closeEditingMode',
+            'click .delete-button': 'clickedDelete',
+            'click .done-text-editing': 'clickedDoneTextEditing',
+            'click .edit-custom-widget-btn': 'openCustomWidgetEditor',
+            'click': 'clicked',
+            'change select': 'mouseup'
         },
 
-        initialize: function(widgetsCollection) {
+        initialize: function() {
             _.bindAll(this);
-            var self = this;
-            this.widgetsCollection = widgetsCollection;
-            this.listenTo(this.widgetsCollection, 'add', this.bindWidget, true);
-            this.widgetEditorView = v1.currentApp.view.widgetEditorView;
-            this.widgetEditorView.isMobile = self.isMobile;
-
-            this.widgetsCollection.each(function(widget) {
-                self.bindWidget(widget, false);
-            });
-            this.doKeyBindings();
+            this.subviews = [];
+            util.loadCSS(this.css);
+            this.model = null;
         },
 
-        selectMousedown: function(e) {
-            //if(!this.isMouseOn(e)) { return true; }
-            this.mousedown();
-        },
+        setModel: function(widgetModel) {
+            if (this.model) { this.unbindModel(widgetModel); }
 
-        mousedown: function(e) {
-            //g_marqueeView.setZero();
-            mouseDispatcher.isMousedownActive = true;
-        },
+            this.model = widgetModel;
 
-        mouseup: function(e) {
-            mouseDispatcher.isMousedownActive = false;
-        },
-
-        render: function() {
-            var self = this;
-
-            this.elContainer = this.el.getElementById('elements-container');
-
-            var hoverDiv = document.createElement('div');
-            hoverDiv.id = "hover-div";
-            this.hoverDiv = hoverDiv;
-            this.hideNode(hoverDiv);
-            // this.elContainer.appendChild(hoverDiv);
-
-            var selectDiv = document.createElement('div');
-            selectDiv.id = "select-div";
-            this.selectDiv = selectDiv;
-            this.hideNode(selectDiv);
-            // this.elContainer.appendChild(selectDiv);
-
-            $(selectDiv).resizable({
-                handles: "n, e, s, w, nw, ne, sw, se",
-                containment: "parent",
-                resize: self.resizing,
-                stop: self.resized
-            });
-
-            $(hoverDiv).draggable({
-                containment: "parent",
-                drag: self.moving,
-                stop: self.moved,
-                snapMode: "outer",
-                iframeFix: true
-            });
-
-            $(selectDiv).draggable({
-                containment: "parent",
-                drag: self.moving,
-                stop: self.moved,
-                snapMode: "outer",
-                cancel: '#widget-editor',
-                iframeFix: true
-            });
-
-
-            selectDiv.style.zIndex = "2005";
-            hoverDiv.style.zIndex = "2004";
-            //hoverDiv.style.position = "absolute";
-            //selectDiv.style.position = "absolute";
-
-            $(document).on('mousedown', this.clickedPage);
+            this.listenTo(this.model, 'startEditing', this.startedEditing);
+            this.listenTo(this.model, 'stopEditing cancelEditing', this.stoppedEditing);
+            this.listenTo(this.model, 'reselected', this.show);
+            this.listenTo(this.model, 'deselected', this.clear);
 
             return this;
         },
 
-        bindWidget: function(widget, isNew) {
+        unbindModel: function(model) {
+            this.stopListening(model, 'startEditing', this.startedEditing);
+            this.stopListening(model, 'stopEditing cancelEditing', this.stoppedEditing);
+            this.stopListening(model, 'reselected', this.show);
+            this.stopListening(model, 'deselected', this.clear);
+        },
+
+        render: function() {
+            this.hide();
+            return this;
+        },
+
+        setupScrollEvents: function() {
             var self = this;
-
-            this.listenTo(widget, 'remove', function() {
-                self.deselect();
+            var timer;
+            $(innerDoc).bind('scroll', function() {
+                clearTimeout(timer);
+                timer = setTimeout(refresh, 150);
+                self.hide();
             });
 
-            this.listenTo(widget, 'hovered', function() {
-                self.widgetHover(widget);
-            });
+            var refresh = function() {
+                if (!self.model) return;
+                self.show();
+            };
 
-            this.listenTo(widget, 'unhovered', function() {
-                self.widgetUnhover(widget);
-            });
-
-            this.listenTo(widget, 'selected', function() {
-                self.widgetUnhover(widget);
-                self.newSelected(widget);
-            });
-
-            this.listenTo(widget, 'doubleClicked', this.doubleClicked);
-
-            this.listenTo(widget, 'deselect', function() {
-                self.deselect();
-            });
-
-            this.listenTo(widget, 'editModeOn', function(position) {
-                self.unbindAll(position);
-            });
-
-            if (isNew) {
-                widget.trigger('selected');
-            }
         },
 
-        unbindAll: function(position) {
-            var widget = this.selectedEl;
-            widget.on('editModeOff', function() {
-                this.bindWidget(widget);
-                this.setLayout(this.selectDiv, this.selectedEl);
-                this.makeSelectDivVisible();
-            }, this);
+        display: function() {
+            if (!this.model) return;
 
-            this.stopListening(widget, 'hovered');
-            this.stopListening(widget, 'unhovered');
-            this.stopListening(widget, 'selected');
-            this.makeSelectDivInvisible();
-            this.selectDiv.style.left = (((widget.get('layout').get('width') + widget.get('layout').get('left')) * 80) + 4) + 'px';
-            if (position == "left") {
-                this.selectDiv.style.left = (((widget.get('layout').get('left')) * 80) - 16) + 'px';
-            }
+            this.clearContent();
+            this.fillContent();
+            this.show();
         },
 
-        makeSelectDivInvisible: function() {
-            this.selectDiv.style.height = 0;
-            this.selectDiv.style.width = 0;
-            $(this.selectDiv).hide();
-        },
+        show: function() {
+            if (!this.model) return;
+            this.stopListening(this.model, 'rendered', this.show);
 
-        makeSelectDivVisible: function(argument) {
-            $(this.selectDiv).fadeIn();
-        },
+            var location = this.getLocation();
+            this.location = location;
+            this.el.className += ' ' + location;
 
-        hideHoverDiv: function() {
-            this.hideLayout(this.hoverDiv);
-        },
+            var iframe = document.getElementById('page');
+            var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+            var element = $(innerDoc).find("[data-cid='" + this.model.cid + "']")[0];
 
-        setLayout: function(node, widgetModel) {
-            if (!widgetModel) return;
-            $(node).show();
-
-            var $element = $(document).find("[data-cid='" + widgetModel.cid + "']");
-            var element = $element[0];
-            if(!element) return;
-
-            // var offsetFrame = util.getWindowRelativeOffset(window.document, window);
-            var offset = util.getWindowRelativeOffset(window.document, element);
-
-            var leftDist = offset.left; // + offsetFrame.left;
-            var topDist = offset.top + $(window).scrollTop();
-
-            // node.style.width =  $element.outerWidth() + 'px';
-            // node.style.height = $element.outerHeight() + 'px';
-            // node.style.left = (leftDist) + 'px';
-            // node.style.top = (topDist) + 'px';
-
-            return node;
-        },
-
-        hideLayout: function(node) {
-            $(node).hide();
-            node.style.width = '0px';
-            node.style.height = '0px';
-            node.style.left = '0px';
-            node.style.top = '0px';
-            return node;
-        },
-
-        widgetHover: function(widgetModel) {
-            if (g_marqueeView.isDrawing) return;
-            if (this.selectedEl && widgetModel.cid === this.selectedEl.cid) return;
-            // if (g_multiSelectorView.contains(widgetModel)) return;
-            this.hoveredEl = widgetModel;
-            //this.setLayout(this.hoverDiv, widgetModel);
-        },
-
-        widgetUnhover: function(widgetModel) {
-            this.hideNode(this.hoverDiv);
-        },
-
-        bindLocation: function() {},
-
-        newSelected: function(widgetModel) {
-            var self = this;
-            
-            if (this.selectedEl && this.selectedEl.cid == widgetModel.cid) {
-                this.setLayout(this.selectDiv, widgetModel);
-                this.selectedEl.trigger('reselected');
+            if (!element) {
+                this.listenTo(this.model, 'rendered', this.show);
                 return;
             }
 
-            this.deselect();
-            this.selectedEl = widgetModel;
-            this.hideNode(this.hoverDiv);
-            // this.setLayout(this.selectDiv, widgetModel);
-            this.widgetEditorView.setModel(widgetModel).display();
+            var offsetFrame = util.getWindowRelativeOffset(window.document, iframe);
+            var offset = util.getWindowRelativeOffset(window.document, element);
+
+            var leftDist = offset.left + offsetFrame.left;
+            var topDist = offset.top + offsetFrame.top;
+
+            this.$el.find('.arw').remove();
+
+            switch (this.location) {
+                case "right":
+                    this.$el.append('<div class="left-arrow arw"></div>');
+                    leftDist += element.getBoundingClientRect().width;
+                    this.$el.addClass('fadeInRight');
+
+                    break;
+                case "bottom":
+                    this.$el.append('<div class="top-arrow arw"></div>');
+                    topDist += element.getBoundingClientRect().height;
+                    this.$el.addClass('fadeInUp');
+
+                    break;
+                case "left":
+                    this.$el.append('<div class="right-arrow arw"></div>');
+                    this.$el.addClass('fadeInLeft');
+                    break;
+                case "top":
+                    // not supposed to happen
+                    break;
+            }
+            this.$el.show();
+
+
+            this.el.style.left = leftDist + 'px';
+            this.el.style.top = topDist + 'px';
+
+            this.model.trigger('display-widget-editor');
+
+            return this;
         },
 
-        resizing: function(e, ui) {
-            var cid = this.selectedEl.cid;
-            var model = this.selectedEl;
+        fillContent: function() {
+            var action = "";
+            var type = this.model.get('type');
 
-            var elem = this.el.getElementById('widget-wrapper-' + cid);
+            this.layoutEditor = new WidgetLayoutEditorView(this.model);
+            this.el.appendChild(this.layoutEditor.el);
 
-            elem.style.width = (ui.size.width + PADDING) + 'px';
-            elem.style.height = (ui.size.height + PADDING) + 'px';
-            elem.style.left = (ui.position.left + ALIGNMENT) + 'px';
-            elem.style.top = (ui.position.top + ALIGNMENT) + 'px';
-
-        },
-
-        resized: function(e, ui) {
-            // g_guides.hideAll();
-
-            var left = Math.round((ui.position.left / this.positionHorizontalGrid));
-            var top = Math.round((ui.position.top / this.positionVerticalGrid));
-
-            if (left < 0) left = 0;
-            if (top < 0) top = 0;
-
-            var deltaHeight = Math.round((ui.size.height + 2) / this.positionVerticalGrid);
-            var deltaWidth = Math.round((ui.size.width + 2) / this.positionHorizontalGrid);
-            var elem = this.el.getElementById('widget-wrapper-' + this.selectedEl.cid);
-            elem.style.width = '';
-            elem.style.height = '';
-
-            if (deltaHeight <= 0) deltaHeight = 1;
-            if (deltaWidth <= 0) deltaWidth = 1;
-
-            this.selectedEl.get('layout').set('width', deltaWidth);
-            this.selectedEl.get('layout').set('height', deltaHeight);
-            this.selectedEl.get('layout').set('left', left);
-            this.selectedEl.get('layout').set('top', top);
-            this.setLayout(this.selectDiv, this.selectedEl);
-
-            if (this.selectedEl.getRow()) this.selectedEl.getRow().resizeElements(deltaWidth);
-        },
-
-        moving: function(e, ui) {
-            var model = null;
-
-            if (e.target.id == "hover-div") {
-                model = this.hoveredEl;
-                // if (!g_multiSelectorView.isEmpty()) {
-                //     return g_multiSelectorView.moving(e, ui, model, this.positionHorizontalGrid, this.positionVerticalGrid);
-                // }
-            } else {
-                model = this.selectedEl;
-                this.hideNode(this.hoverDiv);
+            if (this.model.has('className')) {
+                this.widgetClassPickerView = new WidgetClassPickerView(this.model);
+                this.listenTo(this.widgetClassPickerView, 'change', this.classChanged);
+                this.el.appendChild(this.widgetClassPickerView.el);
+                this.el.appendChild(this.renderButtonWithText('pick-style', 'Pick Style'));
             }
 
-            if (!model) return;
-
-            this.widgetEditorView.hide();
-
-            var cid = model.cid;
-
-            var elem = this.el.getElementById('widget-wrapper-' + model.cid);
-            elem.style.top = ui.position.top + ALIGNMENT + 'px';
-            elem.style.left = ui.position.left + ALIGNMENT + 'px';
-        },
-
-        moved: function(e, ui) {
-
-            var self = this;
-            //g_guides.hideAll();
-
-            var model = this.selectedEl;
-            if (e.target.id == "hover-div") {
-                model = this.hoveredEl;
-                if (!g_multiSelectorView.isEmpty()) {
-                    return g_multiSelectorView.moved(e, ui, model, this.positionHorizontalGrid, this.positionVerticalGrid, function() {
-                        self.hideNode(self.hoverDiv);
-                    });
-                }
+            if (this.model.has('href') || this.model.has('src')) {
+                this.contentEditor = new WidgetContentEditorView(this.model, this);
+                this.el.appendChild(this.contentEditor.el);
             }
 
-            this.hideHoverDiv();
-
-            var top = Math.round((ui.position.top / this.positionVerticalGrid));
-            var left = Math.round((ui.position.left / this.positionHorizontalGrid));
-
-            if (left < 0) left = 0;
-            if (top < 0) top = 0;
-
-            if (model.get('layout').get('left') == left) {
-                model.get('layout').trigger('change:left');
-            } else {
-                model.get('layout').set('left', left);
+            if (type == "custom-widget") {
+                this.el.appendChild(this.renderButtonWithText('edit-custom-widget-btn', 'Edit Custom Widget'));
             }
 
-            if (model.get('layout').get('top') == top) {
-                model.get('layout').trigger('change:top');
-            } else {
-                model.get('layout').set('top', top);
+            this.el.appendChild(this.renderSettingsAndDelete('edit-custom-widget-btn', 'Edit Custom Widget'));
+        },
+
+        clearContent: function() {
+        	this.$el.find('.btn-toolbar').remove();
+
+            if (this.contentEditor) {
+				this.contentEditor.clear();
+			}
+            if (this.layoutEditor) {
+            	this.layoutEditor.clear();
+            }
+            if (this.infoEditor) {
+            	this.infoEditor.clear();
             }
 
-            this.newSelected(model);
+            $('.btn-toolbar').remove();
+
+            _(this.subviews).each(function(subview) {
+                subview.close();
+            });
+            this.el.innerHTML = '';
+            this.el.style.width = '';
         },
 
-        deselect: function() {
-            if (this.selectedEl) {
-                this.selectedEl.trigger('deselected');
-                this.stopListening(this.selectedEl.get('layout'), 'change');
-            }
-
-            this.selectedEl = null;
-            this.hideNode(this.selectDiv);
-            this.hideNode(this.hoverDiv);
+        renderButtonWithText: function(className, buttonText) {
+            return this.renderButtonWithWidthCustomWidth(className, buttonText, 230);
         },
 
-        moveSelectedDown: function(e) {
-            if (!this.selectedEl) return;
-            if (keyDispatcher.textEditing === true) return;
-            if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
-
-
-            // if(this.selectedEl.getBottom() > v1State.getCurrentPage().getHeight()) {
-            v1State.getCurrentPage().trigger('scroll', this.selectedEl);
-            // }
-
-            this.selectedEl.moveDown();
-            e.preventDefault();
+        renderButtonWithWidthCustomWidth: function(className, buttonText, width) {
+            var li = document.createElement('ul');
+            li.className = 'pad w-section section-' + className;
+            li.innerHTML += '<span class="option-button tt ' + className + '" style="width:' + width + 'px; display: inline-block;">' + buttonText + '</span>';
+            return li;
         },
 
-        moveSelectedUp: function(e) {
-            if (!this.selectedEl) return;
-            if (keyDispatcher.textEditing === true) return;
-            if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
-
-            this.selectedEl.moveUp();
-            e.preventDefault();
+        renderButtonWithDeleteButtonandText: function(className, buttonText) {
+            var li = document.createElement('ul');
+            li.className = 'w-section section-' + className;
+            li.innerHTML += '<span class="' + className + '  option-button tt" style="width:190px; display: inline-block;">' + buttonText + '</span><span id="delete-widget" class="option-button delete-button tt" style="width:34px;"></span>';
+            return li;
         },
 
-        moveSelectedLeft: function(e) {
-            if (!this.selectedEl) return;
-            if (keyDispatcher.textEditing === true) return;
-            if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
-
-            this.selectedEl.moveLeft();
-            e.preventDefault();
+        renderSettingsAndDelete: function() {
+            var li = document.createElement('ul');
+            li.className = 'w-section';
+            li.innerHTML += '<span id="delete-widget" class="option-button delete-button tt"></span><span class="option-button tt settings"></span>';
+            return li;
         },
 
-        moveSelectedRight: function(e) {
-            if (!this.selectedEl) return;
-            if (keyDispatcher.textEditing === true) return;
-            if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
-
-            this.selectedEl.moveRight();
-            e.preventDefault();
+        openStylePicker: function(e) {
+            this.hideSubviews();
+            this.widgetClassPickerView.show();
+            this.widgetClassPickerView.expand();
         },
 
-        deleteSelected: function(e) {
-            if (!this.selectedEl) return;
-            if (keyDispatcher.textEditing === true) return;
-            if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
-
-            this.selectedEl.remove();
-            e.preventDefault();
+        openCustomWidgetEditor: function() {
+            new CustomWidgetEditorModal(this.model);
         },
 
-        doKeyBindings: function() {
-            keyDispatcher.bind('down', this.moveSelectedDown);
-            keyDispatcher.bind('up', this.moveSelectedUp);
-            keyDispatcher.bind('left', this.moveSelectedLeft);
-            keyDispatcher.bind('right', this.moveSelectedRight);
-            keyDispatcher.bind('backspace', this.deleteSelected);
+        openSettingsView: function() {
+            new WidgetSettingsView(this.model).render();
         },
 
-        hoverClicked: function(e) {
-            if (this.hoveredEl) {
-                this.hoveredEl.trigger('selected');
-            }
-            mouseDispatcher.isMousedownActive = false;
+        closeEditingMode: function() {
+            this.$el.find('.section-done-editing').remove();
+            this.el.style.width = '';
+            $(this.listGalleryView).remove();
+            this.showSubviews();
+            this.model.trigger('editModeOff');
+            this.model.trigger('stopEditingRow');
+            this.model.trigger('unhighlight');
         },
 
-        clickedPage: function(e) {
-            if (this.selectedEl && !this.isMouseOn(e) && !mouseDispatcher.isMousedownActive) {
-                this.deselect();
-            }
+        clickedDoneTextEditing: function() {
+            this.model.trigger('stopEditing');
         },
 
-        doubleClicked: function(e) {
-            //if (!this.isMouseOn(e) || this.selectedEl.editModeOn) return;
+        classChanged: function() {
+            this.showSubviews();
+            this.widgetClassPickerView.$el.hide();
+        },
 
-            if (this.selectedEl.getContent() && !this.selectedEl.isLoginForm()) {
-                this.selectedEl.trigger('startEditing');
-                this.listenTo(this.selectedEl, 'stopEditing cancelEditing', this.stoppedEditing);
-                this.makeSelectDivInvisible();
-            }
-
-            if (this.selectedEl.isBox()) {
-                util.guideText(e, "You should drop some text here.");
-            }
+        startedEditing: function() {
+            if (this.editingMode) return;
+            this.hideSubviews();
+            this.el.appendChild(this.renderButtonWithText('done-text-editing', 'Done Editing'));
+            this.editingMode = true;
         },
 
         stoppedEditing: function() {
-            this.makeSelectDivVisible();
-            this.setLayout(this.selectDiv, this.selectedEl);
-        },
-
-        isMouseOn: function(e) {
-            if (!this.selectedEl) return false;
-
-            var self = this;
-
-            var mouseX = e.pageX;
-            var mouseY = e.pageY;
-
-            var div = $(document).find("[data-cid='" + this.selectedEl.cid + "']");
-            if(!div.length) return;
-            var divTop = div.offset().top;
-            var divLeft = div.offset().left;
-            var divRight = divLeft + div.width();
-            var divBottom = divTop + div.height();
-            if (mouseX >= divLeft && mouseX <= divRight && mouseY >= divTop && mouseY <= divBottom) {
-                return true;
-            }
-            return false;
+            $('.btn-toolbar').remove();
+            $('.section-done-text-editing').remove();
+            this.showSubviews();
+            this.editingMode = false;
         },
 
         clear: function() {
-            this.widgetEditorView.clear();
+            this.clearContent();
+            this.unbindModel(this.model);
+
+            this.model = null;
+
+            this.hide();
         },
 
-        hideNode: function(node) {
-            // node.style.height = 0;
-            // node.style.width = 0;
-            // $(node).hide();
+        hide: function() {
+            this.$el.removeClass('left');
+            this.$el.removeClass('right');
+            this.$el.removeClass('bottom');
+
+            this.$el.removeClass('fadeInBottom');
+            this.$el.removeClass('fadeInUp');
+            this.$el.removeClass('fadeInLeft');
+            this.$el.removeClass('fadeInRight');
+            this.$el.hide();
         },
 
-        close: function() {
-            keyDispatcher.unbind('down', this.moveSelectedDown);
-            keyDispatcher.unbind('up', this.moveSelectedUp);
-            keyDispatcher.unbind('left', this.moveSelectedLeft);
-            keyDispatcher.unbind('right', this.moveSelectedRight);
-            keyDispatcher.unbind('backspace', this.deleteSelected);
-            this.deselect();
-            $(document).off('mousedown', this.clickedPage);
+        setTempContent: function(domNode) {
+            this.tempContent = domNode;
+            this.hideSubviews();
+            this.el.appendChild(domNode);
+        },
 
-            Backbone.View.prototype.close.call(this);
+        removeTempContent: function() {
+            if (this.tempContent) this.el.removeChild(this.tempContent);
+            this.showSubviews();
+        },
+
+        showSubviews: function() {
+            //if(this.widgetClassPickerView) this.widgetClassPickerView.$el.fadeIn();
+            if (this.contentEditor) this.contentEditor.$el.fadeIn();
+            if (this.layoutEditor) this.layoutEditor.$el.fadeIn();
+            if (this.infoEditor) this.infoEditor.$el.fadeIn();
+            this.$el.find('.section-style-editor').fadeIn();
+            this.$el.find('.section-form-editor-btn').fadeIn();
+            this.$el.find('.section-query-editor-btn').fadeIn();
+            this.$el.find('.section-edit-query-btn').fadeIn();
+            this.$el.find('.section-edit-row-btn').fadeIn();
+            this.$el.find('.section-delete-button').fadeIn();
+            this.$el.find('.section-pick-style').fadeIn();
+            this.$el.find('.section-edit-login-form-btn').fadeIn();
+        },
+
+        hideSubviews: function() {
+            if (this.widgetClassPickerView) this.widgetClassPickerView.$el.hide();
+            if (this.contentEditor) this.contentEditor.$el.hide();
+            if (this.layoutEditor) this.layoutEditor.$el.hide();
+            if (this.infoEditor) this.infoEditor.$el.hide();
+            this.$el.find('.section-edit-login-form-btn').hide();
+            this.$el.find('.section-style-editor').hide();
+            this.$el.find('.section-form-editor-btn').hide();
+            this.$el.find('.section-query-editor-btn').hide();
+            this.$el.find('.section-edit-query-btn').hide();
+            this.$el.find('.section-edit-row-btn').hide();
+            this.$el.find('.section-delete-button').hide();
+            this.$el.find('.section-pick-style').hide();
+        },
+
+        getLocation: function() {
+            if (this.defaultLocation) return this.defaultLocation;
+
+            return "bottom";
+            // var layout = this.model.get('layout');
+            // var rightCoor = layout.get('left') + layout.get('width');
+
+            // var pageHeight = $('#page-wrapper').height();
+            // var widgetBottom = layout.get('top') + layout.get('height');
+
+            // if (widgetBottom + 8 > pageHeight) {
+            //     if ((12 - rightCoor) < 2) return "left";
+            //     return "right";
+            // }
+
+            // if (layout.get('height') < 22) {
+            //     return "bottom";
+            // }
+
+            // if ((12 - rightCoor) < 2) return "left";
+            // return "right";
+        },
+
+        clickedDelete: function() {
+            if (this.model) {
+                this.model.remove();
+            }
+        },
+
+        clicked: function(e) {
+            e.stopPropagation();
+        },
+
+        mousedown: function(e) {
+            mouseDispatcher.isMousedownActive = true;
+        },
+
+        mouseup: function() {
+            mouseDispatcher.isMousedownActive = false;
         }
 
     });
 
-    exports.WidgetSelectorView = WidgetSelectorView;
+    exports.WidgetEditorView = WidgetEditorView;
 
 });
 
-require.define("/appeditor/template_editor/MarqueeView.js",function(require,module,exports,__dirname,__filename,process,global){define([
-        'editor/WidgetEditorView',
-        'editor/MultiSelectorView',
-        'mixins/BackboneUI',
-        'util'
-    ],
-    function(WidgetEditorView,
-        MultiSelectorView) {
+require.define("/appeditor/template_editor/WidgetSettingsView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+    require('../mixins/BackboneCardView');
 
-        var MarqueeView = Backbone.UIView.extend({
-            className: 'marquee-view',
-            tagName: 'div',
-            isDrawing: false,
+    var GeneratorEditorView = require('../GeneratorEditorView').GeneratorEditorView;
+    var TemplatesEditorView = require('../TemplatesEditorView').TemplatesEditorView;
+    var WidgetModelEditorView = require('./WidgetModelEditorView').WidgetModelEditorView;
 
-            origin: {
-                x: 0,
-                y: 0
+    var tableTemplate = [
+            '<div class="header">',
+                '<div>',
+                '<h2>Widget Settings Editor</h2>',
+                '<div class="q-mark-circle"></div>',
+                '</div>',
+                '<ul class="tabs">',
+                    '<li class="attributes-li right-icon">',
+                    '<span>Settings</span>',
+                    '</li><li class="code-li right-icon">',
+                    '<span>Generated Code</span>',
+                    '</li><li class="right-icon info-li">',
+                    '<span>More Info</span>',
+                    '</li>',
+                '</ul>',
+            '</div>',
+            '<div class="current-content">',
+            '</div>',
+    ].join('\n');
+
+    var WidgetSettingsView = Backbone.CardView.extend({
+
+        className: 'widget-settings-pane',
+        subviews: [],
+
+        events: {
+            'change .attribs'     : 'changedAttribs',
+            'click .q-mark-circle': 'showTableTutorial',
+            'click .right-icon'   : 'tabClicked',
+            'keyup .attr-input'   : 'attributeChanged'
+        },
+
+
+        initialize: function(widgetModel) {
+            _.bindAll(this);
+            this.model = widgetModel;
+        },
+
+        render: function() {
+            this.el.innerHTML = _.template(tableTemplate, this.model.serialize());
+            this.el.id = 'table-' + this.model.cid;
+            this.currentContentPane = this.$el.find('.current-content');
+            this.renderAttributes();
+
+            return this;
+        },
+
+        reRender: function() {
+            this.el.innerHTML = '';
+            this.render();
+        },
+
+        renderAttributes: function() {
+            
+            this.$el.find('.current-content').html('');
+
+            var modelEditorView = new WidgetModelEditorView(this.model);
+            this.currentContentPane.append(modelEditorView.render().el);
+
+            this.$el.find('.attributes-li').addClass('active');
+        },
+
+        renderCode: function() {
+            var tableCodeView = new GeneratorEditorView({ generate: this.model.generate, widgetModel: this.model });
+            this.$el.find('.current-content').html('');
+            this.$el.find('.current-content').append(tableCodeView.render().el);
+            this.$el.find('.code-li').addClass('active');
+        },
+
+        renderInfo: function() {
+            this.$el.find('.current-content').html('');
+            this.$el.find('.current-content').append('<p>Documentation about this widget would go here</p>');
+            this.$el.find('.info-li').addClass('active');
+        },
+
+        tabClicked: function(e) {
+            this.$el.find('.active').removeClass('active');
+
+            if($(e.currentTarget).hasClass('info-li')) {
+                this.renderInfo();
+            }
+            else if($(e.currentTarget).hasClass('attributes-li')) {
+                this.renderAttributes();
+            }
+            else if($(e.currentTarget).hasClass('code-li')) {
+                this.renderCode();
+            }
+        },
+
+        onClose: function() {
+            this.model.trigger('rerender');
+        }
+
+    });
+
+    exports.WidgetSettingsView = WidgetSettingsView;
+
+});
+
+require.define("/appeditor/mixins/BackboneCardView.js",function(require,module,exports,__dirname,__filename,process,global){        Backbone.CardView = Backbone.View.extend({
+            width: 800,
+            padding: 0,
+
+            bodyEl: null,
+
+            events: {
+                'click .modal-bg': 'closeModal',
+                'keydown': 'handleKey',
+                'click .done': 'closeModal'
             },
-            clientOrigin: {
-                x: 0,
-                y: 0
-            },
-            events: {},
-            subviews: [],
 
-            initialize: function(widgetsCollection) {
+            _configure: function(options) {
+                Backbone.ModalView.__super__._configure.call(this, options);
+                if (options.height) {
+                    this.height = options.height;
+                }
+                this.bodyEl = document.body;
+                this.backgroundDiv = this.setupModal();
+                this.modalWindow = this.setupModalWindow();
                 _.bindAll(this);
-
-                this.widgetsCollection = widgetsCollection;
-
-                this.multiSelectorView = new MultiSelectorView();
-                g_multiSelectorView = this.multiSelectorView;
-                this.subviews.push(this.multiSelectorView);
             },
 
-            mousedown: function(e) {
-                if (mouseDispatcher.isMousedownActive) {
-                    return true;
-                }
-
-                this.$el.show();
-                this.isDrawing = true;
-
-                var coorX = e.pageX;
-                var coorY = e.pageY;
-                var dist = this.getPageTopLeft();
-                coorX -= dist.left;
-                coorY -= dist.top;
-                coorY -= $(document.body).scrollTop();
-
-                this.setTop(coorY);
-                this.setLeft(coorX);
-                this.setWidth(6);
-                this.setHeight(6);
-
-                this.origin.x = coorX;
-                this.origin.y = coorY;
-
-                this.clientOrigin.x = e.clientX;
-                this.clientOrigin.y = e.clientY;
+            _ensureElement: function(options) {
+                Backbone.ModalView.__super__._ensureElement.call(this, options);
             },
 
-            mouseup: function(e) {
-                if (this.isDrawing == false) return;
-
-                var Xcor = e.clientX;
-                var Ycor = e.clientY;
-                var arr = this.widgetsCollection.filter(function(widget) {
-                    var elem = document.getElementById('widget-wrapper-' + widget.cid);
-                    return util.isRectangleIntersectElement(this.clientOrigin.x, this.clientOrigin.y, Xcor, Ycor, elem);
-                }, this);
-
-                this.isDrawing = false;
-                this.setZero();
-
-                if (arr.length == 1) {
-                    arr[0].trigger('selected');
-                } else if (arr.length > 1) {
-                    this.multiSelectorView.setContents(arr);
-                }
+            setBodyEl: function(el) {
+                this.bodyEl = el;
             },
 
-            mousemove: function(e) {
-                if (keyDispatcher.textEditing !== true) e.returnValue = false;
-                if (!this.isDrawing) return;
+            setupModal: function() {
+                var self = this;
+                var div = document.createElement('div');
+                div.className = "modal-bg";
+                div.style.position = 'fixed';
+                div.style.width = '100%';
+                div.style.height = '100%';
+                div.style.top = '0';
+                div.style.left = '0';
+                div.style.backgroundColor = '#222';
+                div.style.opacity = '0.7';
+                div.style.zIndex = 3000;
+                this.bodyEl.appendChild(div);
 
-                var coorX = e.pageX;
-                var coorY = e.pageY;
-                var dist = this.getPageTopLeft();
-                coorX -= dist.left;
-                coorY -= dist.top;
-                coorY -= $(document.body).scrollTop();
-
-                if (coorX < 0 || coorY < 0) {
-                    return;
-                }
-
-                var distWidth = this.origin.x - coorX;
-                var distHeight = this.origin.y - coorY;
-                var diffWidth = Math.abs(this.origin.x - coorX);
-                var diffHeight = Math.abs(this.origin.y - coorY);
-
-                this.iterateWidgets(this.clientOrigin.x, this.clientOrigin.y, e.clientX, e.clientY);
-
-                this.setWidth(diffWidth);
-                if (distWidth == diffWidth) {
-                    this.setLeft(this.origin.x - diffWidth);
-                } else {
-                    this.setLeft(this.origin.x);
-                }
-
-                this.setHeight(diffHeight);
-                if (distHeight == diffHeight) {
-                    this.setTop(this.origin.y - diffHeight);
-                } else {
-                    this.setTop(this.origin.y);
-                }
-
-            },
-
-            iterateWidgets: function(Xorigin, Yorigin, Xcor, Ycor) {
-
-                this.currentPage = v1.currentApp.getCurrentPage();
-                if (Xcor % 3 >= 1 & Ycor % 3 >= 1) return;
-
-                this.widgetsCollection.each(function(widget) {
-                    var elem = document.getElementById('widget-wrapper-' + widget.cid);
-                    if (util.isRectangleIntersectElement(Xorigin, Yorigin, Xcor, Ycor, elem)) {
-                        $(elem).addClass('red-border');
-                    } else {
-                        $(elem).removeClass('red-border');
+                var closeHandler = function(e) {
+                    if (e.keyCode == 27) {
+                        self.closeModal(closeHandler);
                     }
-                });
-
-            },
-
-            setZero: function() {
-
-                this.isDrawing = false;
-
-                this.$el.hide();
-                this.setWidth(0);
-                this.setHeight(0);
-
-                this.widgetsCollection.each(function(widget) {
-                    var elem = document.getElementById('widget-wrapper-' + widget.cid);
-                    $(elem).removeClass('red-border');
-                });
-            },
-
-            render: function() {
-                document.body.addEventListener('mouseup', this.mouseup, true);
-                document.body.addEventListener('mousedown', this.mousedown, true);
-                document.body.addEventListener('mousemove', this.mousemove, true);
-                this.el.className = 'marquee-view';
-                this.el.id = 'marquee-view';
-                this.container = document.body;
-                this.setZero();
-                this.multiSelectorView.render();
-                return this;
-            },
-
-            getPageTopLeft: function() {
-                var rect = this.container.getBoundingClientRect();
-                var docEl = document.documentElement;
-                return {
-                    left: rect.left + (document.body.pageXOffset || docEl.scrollLeft || 0),
-                    top: rect.top + (document.body.pageYOffset || docEl.scrollTop || 0)
                 };
+
+                $(div).on('click', function() {
+                    self.closeModal(closeHandler);
+                });
+
+
+                $(window).on('keydown', closeHandler);
+
+                return div;
             },
 
-            close: function() {
-                window.removeEventListener('mouseup', this.mouseup);
-                
-                document.body.removeEventListener('mousedown', this.mousedown);
-                document.body.removeEventListener('mousemove', this.mousemove);
+            setupModalWindow: function() {
+                var self = this;
 
-                Backbone.View.prototype.close.call(this);
+                var div = document.createElement('div');
+                div.style.position = 'fixed';
+                div.className = 'card-view bounceInUp ' + this.className;
+                div.style.width = this.width + 'px';
+                if (this.height) {
+                    div.style.height = this.height + 'px';
+                } else {
+                    div.style.minHeight = '300px';
+                    div.style.maxHeight = '630px';
+                }
+                div.style.top = '50%';
+                div.style.left = '50%';
+                div.style.marginLeft = '-' + (this.width / 2) + 'px';
+                div.style.marginTop = '-300px';
+                div.style.zIndex = 3001;
+                div.style.padding = 0;
+
+                if (this.title) {
+                    var title = document.createElement('h3');
+                    title.innerText = this.title;
+                    div.appendChild(title);
+                }
+                if (this.doneButton) {
+                    var qMark = '';
+                    if (this.address) {
+                        qMark = '<div class="q-mark"></div>';
+                    }
+                    $(div).append('<div class="bottom-sect">' + qMark + '<div class="btn done">Done</div></div>');
+                    $(div).find('.done').on('click', function() {
+                        self.closeModal();
+                    });
+                }
+
+                var span = document.createElement('span');
+                span.className = 'modal-down';
+                span.style.position = 'absolute';
+                span.style.right = '18px';
+                span.style.top = '20px';
+                span.innerText = '✔';
+                span.style.zIndex = '1000';
+                div.appendChild(span);
+
+                var content = document.createElement('div');
+                content.style.width = '100%';
+                if (!this.title) content.style.height = (this.contentHeight || '100%');
+                content.style.position = "relative";
+                content.style.padding = (this.padding || 0) + 'px';
+                div.appendChild(content);
+
+                this.bodyEl.appendChild(div);
+
+                $(span).on('click', function() {
+                    self.closeModal();
+                });
+
+                this.el = content;
+                return div;
+            },
+
+            closeModal: function(closeHandlerFn) {
+                var self = this;
+                this.undelegateEvents();
+                if (this.callback) this.callback();
+                if (this.onClose) this.onClose();
+                
+                $(self.modalWindow).addClass('animated');
+                $(self.modalWindow).removeClass('bounceInUp');
+                $(self.modalWindow).addClass('bounceOutDown');
+                
+                $(self.backgroundDiv).fadeOut();
+
+                setTimeout(function() {
+                    self.$el.remove();
+                    self.remove();
+                    $(self.modalWindow).remove();
+                    $(self.backgroundDiv).remove();
+                }, 550);
+
+                if (closeHandlerFn) {
+                    $(window).unbind('keydown', closeHandlerFn);
+                }
+
+                this.close();
+            },
+
+            handleKey: function(e) {
+                if (e.keyCode == 27) { //escape
+                    this.closeModal();
+                    e.stopPropagation();
+                }
             }
 
         });
 
-        return MarqueeView;
+     
+});
+
+require.define("/appeditor/GeneratorEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+
+    var Generator = require('./Generator');
+
+    var GeneratorEditorView = Backbone.View.extend({
+        el: null,
+        tagName: 'div',
+        collection: null,
+        parentName: "",
+        className: 'code-view',
+        subviews: [],
+
+        events: {
+            'click .edit-current' : 'editCurrentGen',
+            'click .fork-current' : 'forkCurrentGen',
+            'click .clone-button' : 'cloneGenerator',
+            'click .edit-code'    : 'editCode'
+        },
+
+
+        initialize: function(options) {
+            _.bindAll(this);
+            this.model = options.widgetModel;
+            this.setupGenerator(options.generate || this.model.generate);
+        },
+
+        setupGenerator: function(generatorPath) {
+            this.generatorPath = generatorPath;
+            this.generator = G.getGenerator(this.generatorPath);
+            this.model.setGenerator(generatorPath);
+        },
+
+        render: function() {
+            this.el.innerHTML = _.template([
+                '<div id="name-editor" class="sub-settings">',
+                    '<div style="line-height: 60px; display:inline-block;">Current Generator: <%= name %></div>',
+                    '<div class="btn-group right">',
+                        '<button type="button" class="btn btn-default edit-code">',
+                        'Edit Code',
+                        '</button>',
+                        '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">',
+                        'Change Generator <span class="caret"></span>',
+                        '</button>',
+                        '<ul class="dropdown-menu abs action-menu" role="menu">',
+                            '<li class="fork-current"><a href="#">Fork Current Generator</a></li>',
+                            '<li class="divider"></li>',
+                        '</ul>',
+                    '</div>',
+                '</div>',
+                '<div class="generated-code"><%= generatedCode %></div>'
+            ].join('\n'), { name: this.generatorPath, generatedCode: this.getGeneratedCode() });
+
+
+            if(!v1State.get('plugins').isGeneratorEditable(this.generatorPath)) {
+                this.$el.find('.edit-code').addClass('disabled');
+                this.$el.find('.edit-code').attr('title', 'Native generators cannot be edited. They need to be forked.');
+            }
+            this.$el.find('.dropdown-toggle').dropdown();
+            this.renderCloneButtons();
+
+            this.$el.tooltip();
+
+            return this;
+        },
+
+        renderCloneButtons: function() {
+
+            var currentModule = util.packageModuleName(this.generatorPath).module;
+            // e.g. if module == uielements, it can only clone uielements
+            var generators = v1State.get('plugins').getAllGeneratorsWithModule(currentModule);
+
+            _.each(generators, function(generator) {
+                var genPath = [generator.package, currentModule, generator.name].join('.');
+                this.$el.find('.action-menu').append('<li class="clone-button" id="'+ genPath +'"><a href="#">Switch Generator to '+  generator.name +'</a></li>');
+            }, this);
+        },
+
+        editCurrentGen: function() {
+            alert('todo link to the plugin editor');
+        },
+
+        forkCurrentGen: function() {
+            // alert('Not yet implemented');
+
+            var self = this;
+            var newName = window.prompt("What do you want to name the new generator?", util.packageModuleName(self.generatorPath).name + "_edited");
+
+            if (newName!=null) {
+
+                var newPackageModuleName = util.packageModuleName(self.generatorPath);
+                newPackageModuleName.name = newName;
+
+                // isNameUnique needs work, plz see function
+                if(!v1State.get('plugins').isNameUnique(newPackageModuleName)) { self.forkCurrentGen(); }
+
+                var genObj = _.clone(this.generator);
+                var newGenPath = v1State.get('plugins').fork(this.generatorPath, newName);
+
+                self.setupGenerator(newGenPath);
+                self.render();
+            }
+            else {
+                self.forkCurrentGen();
+            }
+
+        },
+
+        getGeneratedCode: function() {
+            var string  = "";
+            try {
+                    // This will force it to use defaults in the generator
+                    // console.log('Trying to generate code')
+                    var gPath = this.generatorPath;
+                    var generated = this.model.expand();
+                    console.log(generated);
+
+                    if(typeof generated === 'object') {
+                        var str = '<div>';
+
+                        _.each(generated, function(val, key) {
+                            str += '<h4>' + key + '</h4>';
+                            str += '<pre>' + String(val).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</pre>';
+                        });
+                        
+                        string = str;
+                    }
+                    else if (typeof generated === 'string') {
+                        string = '<pre>' + generated.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</pre>';
+                    }
+
+                }
+                catch (e) {
+                    string = 'Could not be generated: '+ e;
+                }
+
+            return string;
+        },
+
+        editCode: function() {
+            if(v1State.get('plugins').isGeneratorEditable(this.generatorPath)) {
+                var url = "/app/" + appId + "/dev/#" + this.generatorPath;
+                window.open(url, "Generator Editor");
+            }
+        },
+
+        cloneGenerator: function(e) {
+            var genPath = String(e.currentTarget.id);
+            console.log(genPath);
+            this.model.setGenerator(genPath);
+
+            // changes data related to this view and rerenders
+            this.generatorPath = genPath;
+            this.generator = G.getGenerator(genPath);
+
+            this.render();
+        },
 
     });
+
+    exports.GeneratorEditorView = GeneratorEditorView;
+
+});
+
+require.define("/appeditor/TemplatesEditorView.js",function(require,module,exports,__dirname,__filename,process,global){
+    'use strict';
+
+    var Generator = require('./Generator');
+
+    var funcTemplate = [
+        '<div class="code-chunk">',
+            '<span class="title"><%= name %></span>',
+            '<div class="code-editor" id="template-editor-<%= name %>"></div>',
+        '</div>'
+    ].join('\n');
+
+    var TemplatesEditorView = Backbone.View.extend({
+        el: null,
+        tagName: 'div',
+        collection: null,
+        parentName: "",
+        className: 'code-view',
+        subviews: [],
+
+        events: {
+            'click .edit-current' : 'editCurrentGen',
+            'click .clone-button' : 'cloneGenerator'
+        },
+
+
+        initialize: function(options) {
+            _.bindAll(this);
+            this.widgetModel = options.widgetModel;
+            this.generatorName = options.generate;
+            this.generator = G.getGenerator(this.generatorName);
+        },
+
+        render: function() {
+            var strHTML = _.template([
+                '<div id="name-editor" class="sub-settings">',
+                    '<div style="line-height: 60px; display:inline-block;">Current Generator: <%= name %></div>',
+                    '<div class="btn-group right">',
+                        '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">',
+                        'Edit Code <span class="caret"></span>',
+                        '</button>',
+                        '<ul class="dropdown-menu abs action-menu" role="menu">',
+                            '<li><a href="#" class="edit-current">Edit Current Code</a></li>',
+                            '<li class="divider"></li>',
+                        '</ul>',
+                    '</div>',
+                '</div>'
+            ].join('\n'), { name: this.generatorName });
+            
+            strHTML += '<div class="instance sect">';
+            _.each(this.generator.templates, function(val, key) {
+                strHTML += _.template(funcTemplate, { name: key });
+            });
+
+            strHTML += [
+                    '<div id="add-template-box">',
+                        '<form style="display:none;">',
+                            '<input type="text" class="property-name-input" placeholder="Template Name...">',
+                            '<input type="submit" class="done-btn" value="Done">',
+                        '</form>',
+                        '<div class="add-button box-button">+ Create a New Template</div>',
+                    '</div>'
+                ].join('\n');
+
+            strHTML += '</div>';
+
+            this.el.innerHTML = strHTML;
+
+            this.$el.find('.dropdown-toggle').dropdown();
+            this.addPropertyBox = new Backbone.NameBox({}).setElement(this.$el.find('#add-template-box')).render();
+            this.addPropertyBox.on('submit', this.createTemplate);
+            
+            this.renderCloneButtons();
+            return this;
+        },
+
+        reRender :function() {
+            this.el.innerHTML = '';
+            this.render();
+            this.setupAce();
+        },
+
+        renderCloneButtons: function() {
+            
+            var packageModuleName = expanderfactory(function(code, globals) { }).parseGenID(this.generatorName);
+            var plugins = [];
+
+            if (packageModuleName.package != "local" &&
+                appState.plugins[packageModuleName.package] &&
+                appState.plugins[packageModuleName.package][packageModuleName.module]) {
+                plugins = _.map(appState.plugins[packageModuleName.package][packageModuleName.module], function(obj) { obj.package = packageModuleName.package; return obj; });
+            }
+
+            if (appState.plugins["local"] &&
+                appState.plugins["local"][packageModuleName.module]) {
+                var localGens = _.map(appState.plugins["local"][packageModuleName.module], function(obj) { obj.package = "local"; return obj; });
+                plugins = _.union(plugins, localGens);
+            }
+
+            plugins = _.reject(plugins, function(generator) {
+                var genName = [packageModuleName.package, packageModuleName.module, generator.name].join('.');
+                return genName == this.generatorName;
+            }, this);
+
+            _.each(plugins, function(generator) {
+                var genName = [generator.package, packageModuleName.module, generator.name].join('.');
+                this.$el.find('.action-menu').append('<li class="clone-button" id="'+ genName +'"><a href="#">Clone '+  generator.name +'X</a></li>');
+            }, this);
+        },
+
+        setupAce: function() {
+            
+            var packageModuleName = expanderfactory(function(code, globals) { }).parseGenID(this.generatorName);
+
+            _.each(this.generator.templates, function(val, key) {
+
+                var self = this;
+                var editor = ace.edit("template-editor-" + key);
+                editor.getSession().setMode("ace/mode/html");
+                editor.setValue(String(val), -1);
+                editor.on("change", function() {
+                    self.keyup(editor, key);
+                });
+
+                if(packageModuleName.package != "local") {
+                    
+                    editor.setReadOnly(true);  // false to make it editable
+                    editor.setHighlightActiveLine(false);
+                    editor.setHighlightGutterLine(false);
+                    editor.renderer.$cursorLayer.element.style.opacity=0;
+
+                }
+                else {
+                    editor.setReadOnly(false);  // false to make it editable
+                }
+
+            }, this);
+
+        },
+
+        editCurrentGen: function() {
+            var genObj = _.clone(this.generator);
+
+            var gensWrapper = v1.currentApp.model.get('plugins');
+            var packageModuleName = expanderfactory(function(code, globals) { }).parseGenID(this.generatorName);
+            packageModuleName.package = 'local';
+            gensWrapper.local = gensWrapper.local || {};
+            gensWrapper.local[packageModuleName.module] = gensWrapper.local[packageModuleName.module] || [];
+
+
+            var i = 2;
+            var newName = packageModuleName.name + '_v' + i;
+            while(!this.isUnique(packageModuleName, newName)) { i++; newName =  packageModuleName.name + '_v' + i;  }
+
+            packageModuleName.name = newName;
+
+            this.generatorName = [  packageModuleName.package,
+                                    packageModuleName.module,
+                                    packageModuleName.name].join('.');
+            
+            this.widgetModel.generate = this.generatorName;
+            genObj.name = packageModuleName.name;
+            this.generator = genObj;
+
+            gensWrapper.local[packageModuleName.module].push(this.generator);
+            this.reRender();
+        },
+
+        isUnique: function(packageModuleName, name) {
+            var gensWrapper = v1.currentApp.model.get('plugins');
+            var isUnique = true;
+            var gens = gensWrapper.local[packageModuleName.module];
+            _.each(gens, function(gen) {
+                if(gen.name == name) isUnique = false;
+            }, this);
+
+            return isUnique;
+        },
+
+        createTemplate: function(name) {
+            this.generator.templates[name] = "";
+            this.reRender();
+        },
+
+        cloneGenerator: function(e) {
+            var genPath = String(e.currentTarget.id);
+            this.widgetModel.generate = genPath;
+            this.generatorName = genPath;
+            this.generator = G.getGenerator(this.generatorName);
+
+            this.reRender();
+        },
+
+        keyup: function(editor, key) {
+            this.generator.templates[key] = editor.getValue();
+        }
+
+    });
+
+    exports.TemplatesEditorView = TemplatesEditorView;
+
+});
+
+require.define("/appeditor/template_editor/WidgetModelEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+
+    var ModelEditorView = require('../ModelEditorView');
+
+    var WidgetModelEditorView = Backbone.View.extend({
+
+        className: 'widget-model-editor-table',
+        subviews: [],
+
+        events: {
+            'click .switch-json'  : 'renderJSONAttributes',
+            'click .switch-table' : 'renderAttributes',
+            'click .update-json'  : 'updateJSON'
+        },
+
+
+        initialize: function(model) {
+            _.bindAll(this);
+            this.model = model;
+            // this.listenTo(this.model, 'change', this.changed);
+        },
+
+
+        render: function (argument) {
+            this.renderJSONAttributes();
+
+            return this;
+        },
+
+        renderAttributes: function() {
+            
+            this.$el.find('.current-content').html('');
+
+            var template = [
+                '<div id="name-editor" class="sub-settings">',
+                    '<div class="btn-group right">',
+                        '<button type="button" class="btn btn-default switch-json">',
+                        'JSON View',
+                        '</button>',
+                    '</div>',
+                '</div>'].join('\n');
+
+            this.$el.html(template);
+
+            var modelEditorView = new ModelEditorView(this.model);
+            this.el.appendChild(modelEditorView.render().el);
+        },
+
+        renderJSONAttributes: function() {
+            this.$el.find('.current-content').html('');
+
+            var template = [
+                '<div id="name-editor" class="sub-settings">',
+                    '<div class="btn-group">',
+                        '<span class="btn update-json">Update</span>',
+                    '</div>',
+                    '<div class="btn-group right">',
+                        '<button type="button" class="btn btn-default switch-table">',
+                        'Table View',
+                        '</button>',
+                    '</div>',
+                '</div>',
+                '<div id="json-editor-model" style="height:450px; width: 100%; margin-top:0px;"></div>'
+                ].join('\n');
+
+            this.$el.html(template);
+            setTimeout(this.setupAce, 300);
+        },
+
+        setupAce: function() {
+            var json = this.model.toJSON();
+            var json_str = JSON.stringify(json, {}, 4);
+
+            this.editor = ace.edit("json-editor-model");
+            this.editor.getSession().setMode("ace/mode/json");
+            this.editor.setValue(String(json_str), -1);
+        },
+
+        updateJSON: function(e) {
+            var newJSON = this.editor.getValue();
+            var obj = jQuery.parseJSON(newJSON);
+            this.model.updateJSON(obj);
+            e.currentTarget.innerHTML = 'Updated';
+            var timer = setTimeout(function() {
+                 e.currentTarget.innerHTML = 'Update';
+                 clearTimeout(timer);
+            }, 2000);
+        }
+
+    });
+
+    exports.WidgetModelEditorView = WidgetModelEditorView;
+
+});
+
+require.define("/appeditor/ModelEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+
+    var ModelEditorView = Backbone.View.extend({
+
+        className: 'model-editor-table',
+        subviews: [],
+
+        tagName: 'table',
+
+        events: {
+            'change .attribs'     : 'changedAttribs',
+            'click .right-icon'   : 'tabClicked',
+            'keyup .attr-input'   : 'attributeChanged',
+            'click .remove-attr'  : 'removeAttribute'
+        },
+
+
+        initialize: function(model) {
+            _.bindAll(this);
+            this.model = model;
+            this.listenTo(this.model, 'change', this.changed);
+        },
+
+        render: function (argument) {
+        	
+
+            _.each(this.model.attributes, function(val, key) {
+                if(Backbone.isModel(val) || Backbone.isCollection(val)) return;
+                this.createRow(val, key);
+            }, this);
+
+            this.el.insertRow(-1).innerHTML =[
+                    '<tr><td colspan="3">',
+            			'<div id="add-attribute-box">',
+                        '<form style="display:none;">',
+                            '<input type="text" class="property-name-input" placeholder="Template Name...">',
+                            '<input type="submit" class="done-btn" value="Done">',
+                        '</form>',
+                        '<div class="add-button box-button">+ Add New Attribute</div>',
+                    '</div>',
+                    '</td></tr>'].join('\n');
+
+
+            this.addAttributeBox = new Backbone.NameBox({}).setElement(this.$el.find('#add-attribute-box')).render();
+            this.addAttributeBox.on('submit', this.createAttribute);
+
+            return this;
+        },
+
+        createRow: function (val, key, ind) {
+
+            ind = ind || -1;
+            var row = this.el.insertRow(ind);
+            row.id = "attr-" + key;
+            row.innerHTML = ['<td>' + key + '</td>',
+                    '<td><input type="text" class="attr-input" id="inp-'+ key +'" value="' + val +'"></td>',
+                    '<td class="settings"><span class="remove-attr">-</span></td>'].join('\n');
+
+            return row;
+        },
+
+        changed: function (e) {
+
+            var changedAttrib = e.changedAttributes();
+
+            _.each(changedAttrib, function(val, key) {
+
+                // Key is Removed
+                if (!val && val != "") {
+                    this.$el.find('#attr-'+key).remove();
+                }
+                // Key is New
+                else if (this.$el.find('#attr-'+key).length == 0) {
+                    var nmrRows = this.el.getElementsByTagName("tr").length;
+                    this.createRow(val, key, nmrRows-1);                   
+                }
+
+            }, this);
+
+        },
+
+        attributeChanged: function(e) {
+            var attributeKey = String(e.currentTarget.id).replace('inp-','');
+            this.model.set(attributeKey, e.currentTarget.value);
+        },
+
+        createAttribute: function(name) {
+            this.model.set(name, '');
+        },
+
+        removeAttribute: function (e) {
+            var attributeKey = String(e.currentTarget.parentNode.parentNode.id).replace('attr-','');
+            this.model.unset(attributeKey);
+        }
+    });
+
+    exports.ModelEditorView = ModelEditorView;
+});
+
+require.define("/appeditor/template_editor/WidgetContentEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+
+    var SelectView = require('../mixins/SelectView');
+
+    var WidgetContentEditorView = Backbone.View.extend({
+        el: document.getElementById('content-editor'),
+        className: 'content-editor w-section',
+        tagName: 'ul',
+        events: {
+            'keyup .content-editor': 'changedContent',
+            'click #toggle-bold': 'toggleBold',
+            'click .change-src-btn': 'clickedChangeSrc',
+            'click .change-link-btn': 'clickedChangeHref',
+            'change .font-picker': 'changeFont',
+            'change .statics': 'changeSrc',
+            'change .select-href': 'changeHref',
+            'submit #external-link-form': 'addExternalLink'
+        },
+
+        initialize: function(widgetModel, parentView) {
+            _.bindAll(this);
+
+            this.model = widgetModel;
+            this.parentView = parentView;
+            this.render();
+        },
+
+        render: function() {
+            if (this.model.has('src')) {
+                this.el.appendChild(this.renderSrcInfo());
+            }
+            if (this.model.has('href') || this.model.generate == "uielements.design-button") {
+                this.el.appendChild(this.renderHrefInfo());
+            }
+        },
+
+        renderHrefInfo: function() {
+
+
+            // return this.hrefLi;
+
+            var href = (this.model.get('href') || null);
+            var li = document.createElement('li');
+            li.className = "w-section change-link-btn";
+            if (href) {
+                li.innerHTML = "Change Link Target";
+            } else {
+                li.innerHTML = "Add Link";
+            }
+            return li;
+        },
+
+        renderSrcInfo: function() {
+            // var li = document.createElement('li');
+            // li.appendChild(new comp().div('Image Source').classN('header-div').el);
+
+
+            // li.appendChild(selecView.el);
+            // 
+
+            var li = document.createElement('li');
+            li.className = "w-section change-src-btn";
+            li.innerHTML = "Change Image Source";
+            return li;
+        },
+
+        inputChanged: function(e) {
+            e.stopPropagation();
+            var hash = e.target.id.replace('prop-', '');
+            var info = hash.split('-');
+
+            if (info.length == 2) {
+                this.mode.get(info[0]).set(info[1], e.target.value);
+            } else if (info.length == 1) {
+                this.model.set(info[0], e.target.value);
+            }
+        },
+
+        changedContent: function(e) {
+            this.model.set("content", e.target.value);
+        },
+
+        changeFont: function(e) {
+            if (!this.model.get('content_attribs').has('style')) {
+                this.model.get('content_attribs').set('style', 'font-size:12px;');
+            }
+            var curStyle = this.model.get('content_attribs').get('style');
+
+            if (/font-size:([^]+);/g.exec(curStyle)) {
+                curStyle = curStyle.replace(/(font-size:)(.*?)(;)/gi, e.target.value);
+            } else {
+                curStyle = curStyle + ' ' + e.target.value;
+            }
+
+            this.model.get('content_attribs').set('style', curStyle);
+            mouseDispatcher.isMousedownActive = false;
+        },
+
+        toggleBold: function(e) {
+            var curStyle = (this.model.get('content_attribs').get('style') || '');
+            if (curStyle.indexOf('font-weight:bold;') < 0) {
+                $('#toggle-bold').addClass('selected');
+                curStyle += 'font-weight:bold;';
+                this.model.get('content_attribs').set('style', curStyle);
+            } else {
+                $('#toggle-bold').removeClass('selected');
+                curStyle = curStyle.replace('font-weight:bold;', '');
+                this.model.get('content_attribs').set('style', curStyle);
+            }
+        },
+
+        staticsAdded: function(files, self) {
+            _(files).each(function(file) {
+                file.name = file.filename;
+                statics.push(file);
+            });
+            self.model.set('src', _.last(files).url);
+            // self.model.get('data').set('content', _.last(files).url);
+        },
+
+        clickedChangeSrc: function() {
+            var self = this;
+
+            var statics_list = _.map(statics, function(obj) {
+                var newObj = {};
+                newObj.val = obj.url;
+                newObj.name = obj.name;
+                return newObj;
+            });
+
+            statics_list = _.union({
+                val: "new-image",
+                name: "Upload New Image"
+            }, statics_list);
+
+            var curValName = this.model.get('src');
+            if (this.model.has('src_content')) {
+                curValName = this.model.get('content_attribs').get('src_content');
+            }
+            var curVal = {
+                name: curValName,
+                val: this.model.get('src')
+            };
+
+            var selectView = new SelectView(statics_list, curVal, true, {
+                maxHeight: 5
+            });
+
+            this.parentView.setTempContent(selectView.el);
+
+            selectView.bind('change', this.changeSrc);
+            selectView.bind('change', function() {
+                self.parentView.removeTempContent();
+            });
+
+            selectView.expand();
+        },
+
+        changeSrc: function(inp) {
+            var self = this;
+            if (inp == 'new-image') {
+                top.util.filepicker.openFilePick(self.staticsAdded, self, appId);
+            } else {
+                this.model.set('src', inp);
+                //this.model.set('content', inp);
+            }
+        },
+
+        clickedChangeHref: function() {
+            var self = this;
+            var listOfPages = v1.currentApp.model.get('routes').map(function(routeModel) {
+                return { name: routeModel.get('name'), val: routeModel.getUrlString() };
+            });
+
+            var href = (this.model.get('href') || null);
+
+            if (href === null) {
+                href = {
+                    name: "Currently no Target",
+                    val: null
+                };
+            } else {
+                href = {
+                    name: href,
+                    val: href
+                };
+            }
+
+            var selectView = new SelectView(listOfPages, href, true, {
+                maxHeight: 5
+            });
+
+            this.parentView.setTempContent(selectView.el);
+
+            selectView.bind('change', this.changeHref);
+            selectView.bind('change', function() {
+                self.parentView.removeTempContent();
+            });
+
+            selectView.expand();
+        },
+
+        changeHref: function(inp) {
+            var self = this;
+            var target = inp;
+            if (target == "External Link") {
+                self.hrefLi.innerHTML = '<form id="external-link-form"><input id="external-link-input" type="text" placeholder="http://"></form>';
+                $('#external-link-input').focus();
+                return;
+            }
+            // else if (this.model.get('context')) {
+            //     target = 'internal://' + target;
+            //     target += ('/' + this.model.get('data').get('context'));
+            // }
+            this.model.set('href', target);
+            this.renderHrefInfo();
+        },
+
+        addExternalLink: function(e) {
+            e.preventDefault();
+            var page_link = util.get('external-link-input').value;
+            this.model.set('href', page_link);
+            $('#external-link-form').remove();
+            this.hrefOptions.unshift(page_link);
+            this.renderHrefInfo();
+        },
+
+        clear: function() {
+            this.el.innerHTML = '';
+            this.model = null;
+            this.remove();
+        }
+    });
+
+    exports.WidgetContentEditorView = WidgetContentEditorView;
+});
+
+require.define("/appeditor/mixins/SelectView.js",function(require,module,exports,__dirname,__filename,process,global){  SelectView = Backbone.View.extend({
+    tagName: 'div',
+    className : 'select-view',
+    expanded: false,
+
+    events: {
+      'click'                : 'expand',
+      'click li'             : 'select',
+      'click .updown-handle' : 'toggle'
+    },
+
+    initialize: function(list, currentVal, isNameVal, options) {
+      _.bindAll(this);
+
+      this.list = list;
+      this.currentVal = currentVal;
+      this.isNameVal = isNameVal || false;
+      this.options = (options||{});
+      this.render();
+      return this;
+    },
+
+    render: function() {
+      var self = this;
+      var list = document.createElement('ul');
+
+      if(this.currentVal) {
+        var currentLi = document.createElement('li');
+        currentLi.innerHTML = this.currentVal;
+        if(self.isNameVal) { currentLi.innerHTML = this.currentVal.name; }
+        currentLi.className = 'selected';
+        list.appendChild(currentLi);
+      }
+
+      _(this.list).each(function(val, ind) {
+        if(val == self.currentVal || _.isEqual(val, self.currentVal)) return;
+        var li = document.createElement('li');
+        li.id = 'li-' + self.cid + '-' + ind;
+        val = val;
+        if(self.isNameVal) { val = val.name; }
+        li.innerHTML = val;
+        list.appendChild(li);
+      });
+
+      var handle = document.createElement('div');
+      handle.className = "updown-handle";
+      this.handle = handle;
+
+      this.el.appendChild(handle);
+      this.el.appendChild(list);
+
+      return this;
+    },
+
+    expand: function(e) {
+      var length = this.list.length;
+
+      if(this.currentVal && !_.contains(this.list, this.currentVal)) {
+        length += 1;
+      }
+
+      if(this.options.maxHeight && length > this.options.maxHeight) length = this.options.maxHeight;
+
+      this.el.style.height = length * 40 + 'px';
+      this.expanded = true;
+      if(e) e.stopPropagation();
+    },
+
+    shrink : function(e) {
+      this.el.style.height = 40 + 'px';
+      this.expanded = false;
+      e.stopPropagation();
+    },
+
+    select: function(e) {
+      this.shrink(e);
+      if(e.target.className == "selected") return;
+      var ind = String(e.target.id).replace('li-' + this.cid + '-', '');
+      this.trigger('change', this.list[ind].val);
+    },
+
+    selectCurrent: function() {
+      this.trigger('change', this.currentVal);
+    },
+
+    toggle: function(e) {
+      if(this.expanded) this.shrink(e);
+      else this.expand(e);
+    }
+
+  });
+
+  exports.SelectView = SelectView;
+
+});
+
+require.define("/appeditor/template_editor/WidgetLayoutEditorView.js",function(require,module,exports,__dirname,__filename,process,global){
+    var WidgetClassPickerView = require('./WidgetClassPickerView').WidgetClassPickerView;
+
+        var ToolTipHints = {
+            "a-left": "Align left",
+            "a-center": "Align center",
+            "a-right": "Align right",
+            "padding-tb": "Top-Bottom Padding",
+            "padding-lr": "Left-Right Padding",
+            "pick-style": "Click to add a style"
+        };
+
+
+        var WidgetLayoutEditorView = Backbone.View.extend({
+            el: document.getElementById('layout-editor'),
+            className: 'w-section layout-editor',
+            events: {
+                'click .a-pick': 'changeAlignment',
+                'click .padding': 'changePadding',
+                'click #delete-widget': 'deleteWidget',
+                'mouseover .tt': 'showToolTip',
+                'mouseout .tt': 'hideToolTip'
+            },
+
+            initialize: function(widgetModel) {
+                _.bindAll(this);
+
+                this.model = widgetModel;
+                this.render();
+            },
+
+
+            changeAlignment: function(e) {
+                $('.selected', '.alignment-picker').removeClass('selected');
+                var direction = (e.target.className).replace(' a-pick', '');
+                direction = direction.replace(' tt', '');
+                direction = direction.replace('a-', '');
+
+                this.model.get('layout').set('alignment', direction);
+                e.target.className += ' selected';
+            },
+
+            changePadding: function(e) {
+                var padding = (e.target.id).replace('padding-', '');
+                $(e.target).toggleClass('selected');
+
+
+                if (padding == "tb") {
+                    if ($(e.target).hasClass('selected')) {
+                        this.model.get('layout').set('t_padding', 15);
+                        this.model.get('layout').set('b_padding', 15);
+                    } else {
+                        this.model.get('layout').set('t_padding', 0);
+                        this.model.get('layout').set('b_padding', 0);
+                    }
+                } else {
+                    if ($(e.target).hasClass('selected')) {
+                        this.model.get('layout').set('r_padding', 15);
+                        this.model.get('layout').set('l_padding', 15);
+                    } else {
+                        this.model.get('layout').set('r_padding', 0);
+                        this.model.get('layout').set('l_padding', 0);
+                    }
+                }
+            },
+
+            render: function() {
+                var self = this;
+                this.el.appendChild(this.renderPaddingInfo());
+                this.el.appendChild(this.renderLayoutInfo());
+            },
+
+            renderLayoutInfo: function() {
+                var aLeft = this.model.has('layout') && this.model.get('layout').get('alignment') == "left" ? " selected" : "";
+                var aCenter = this.model.has('layout') && this.model.get('layout').get('alignment') == "center" ? " selected" : "";
+                var aRight = this.model.has('layout') && this.model.get('layout').get('alignment') == "right" ? " selected" : "";
+
+                var div = document.createElement('div');
+                div.className = "alignment-picker";
+                div.innerHTML += '<div class="a-left a-pick tt' + aLeft + '" id="a-left"></div><div class="a-center a-pick tt' + aCenter + '" id="a-center"></div><div class="a-right a-pick tt' + aRight + '" id="a-right"></div>';
+                return div;
+            },
+
+            renderPaddingInfo: function() {
+                var paddingLR = this.model.has('layout') && this.model.get('layout').get('r_padding') > 0 ? "selected" : "";
+                var paddingTB = this.model.has('layout') && this.model.get('layout').get('b_padding') > 0 ? "selected" : "";
+
+                var div = document.createElement('div');
+                div.className = "padding-picker right";
+                div.innerHTML += '<div class="padding tb tt ' + paddingTB + '" id="padding-tb"></div><div class="padding lr tt ' + paddingLR + '" id="padding-lr"></div>';
+                return div;
+            },
+
+            showToolTip: function(e) {
+                if (this.toolTip) {
+                    $(this.toolTip).remove();
+                }
+
+                var div = document.createElement('div');
+                div.className = "tool-tip-box fadeIn";
+                var text = ToolTipHints[e.target.id];
+                if (text) {
+                    div.innerHTML = text;
+                    this.toolTip = div;
+                    this.el.appendChild(div);
+                }
+
+            },
+
+            hideToolTip: function(e) {
+                if (this.toolTip) {
+                    $(this.toolTip).remove();
+                }
+            },
+
+            deleteWidget: function() {
+                this.model.remove();
+            },
+
+            clear: function() {
+                this.el.innerHTML = '';
+                this.model = null;
+                this.remove();
+            }
+        });
+
+        exports.WidgetLayoutEditorView = WidgetLayoutEditorView;
+});
+
+require.define("/appeditor/template_editor/WidgetClassPickerView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+
+    var SelectView = require('../mixins/SelectView').SelectView;
+
+    var WidgetClassPickerView = SelectView.extend({
+        className: 'class-picker select-view',
+        id: 'class-editor',
+        tagName: 'div',
+        css: 'widget-editor',
+
+        events: {
+            'click li'                : 'select',
+            'click .updown-handle'    : 'selectCurrent',
+            'mouseover li'            : 'hovered',
+            'mouseover .updown-handle': 'hovered'
+        },
+
+        initialize: function(widgetModel) {
+            _.bindAll(this);
+
+            this.model = widgetModel;
+            var type = this.model.get('type');
+            var currentClass = this.model.get('className');
+            var currentVal = -1;
+
+            var els = top.v1UIEState.getUIEVals(type).toJSON();
+
+            this.list = _.map(els, function(obj, key) {
+                if (obj.class_name == currentClass) {
+                    currentVal = key;
+                }
+                return {
+                    name: obj.class_name,
+                    val: key
+                };
+            });
+
+            this.uieVals = els;
+            this.isNameVal = true;
+
+            if (currentClass == "") {
+                currentClass = '<i>No Class Selected</i>';
+            };
+            this.currentVal = {
+                name: currentClass,
+                val: currentVal
+            };
+
+            this.render();
+        },
+
+        render: function() {
+            WidgetClassPickerView.__super__.render.call(this);
+            this.expand();
+            this.hide();
+        },
+
+        hovered: function(e) {
+            if (e.currentTarget.className == "updown-handle" && this.uieVals[this.currentVal.val]) {
+                this.model.set('tagName',   this.uieVals[this.currentVal.val].tagName);
+                this.model.set('className', this.uieVals[this.currentVal.val].class_name);
+                return;
+            }
+
+            if(!this.list[ind]) return;
+
+            var ind = String(e.currentTarget.id).replace('li-' + this.cid + '-', '');
+            this.model.set('tagName', this.uieVals[this.list[ind].val].tagName);
+            this.model.set('className', this.uieVals[this.list[ind].val].class_name);
+        },
+
+        show: function() {
+            this.$el.fadeIn();
+        },
+
+        hide: function() {
+            this.$el.hide();
+        }
+    });
+
+    exports.WidgetClassPickerView = WidgetClassPickerView;
+
+});
+
+require.define("/appeditor/template_editor/CustomWidgetEditorModal.js",function(require,module,exports,__dirname,__filename,process,global){    require('../mixins/BackboneCardView');
+
+
+    var CustomWidgetEditorModal = Backbone.CardView.extend({
+        className: 'custom-widget-editor',
+        padding: 0,
+        title: "Custom Widget Editor",
+        // doneButton: true,
+
+        events: {
+            'click .sub-title': 'toggle',
+        },
+
+        initialize: function(widgetModel) {
+            _.bindAll(this);
+            this.model = widgetModel;
+            this.render();
+        },
+
+        render: function() {
+            var self = this;
+            var htmlStr = this.model.get('htmlC') || '';
+            var cssStr = this.model.get('cssC') || '';
+            var jsStr = this.model.get('jsC') || '';
+
+            var content = [
+                '<div class="sect"><div class="sub-title" id="e-html">» HTML</div><div id="edit-html-inp" style="background-color:#eee; height: 400px; width:100%; position:relative;"></div></div>',
+                '<div class="sect"><div class="sub-title" id="e-js">» JS</div><div id="edit-js-inp" style="position:relative; background-color:#eee; height: 400px; width:100%;"></div></div>',
+                '<div class="sect"><div class="sub-title" id="e-css">» CSS</div><div id="edit-css-inp" style="position:relative; background-color:#eee; height: 400px; width:100%;"></div></div>',
+                '<a style="position: relative; width:100%; display:block; text-align: center; padding: 8px; color: #666; margin-top:20px;" href="/resources/tutorials/custom-widget/" rel="external" target="_blank">Guide on using the Custom Widget</a>'
+            ].join('\n');
+
+            this.el.innerHTML = content;
+            this.el.style.overflow = "hidden";
+
+            this.editors = {};
+
+            this.editors["e-css"] = ace.edit("edit-css-inp");
+            this.editors["e-css"].getSession().setMode("ace/mode/css");
+            this.editors["e-css"].setValue(cssStr, -1);
+
+            this.editors["e-html"] = ace.edit("edit-html-inp");
+            this.editors["e-html"].getSession().setMode("ace/mode/html");
+            this.editors["e-html"].setValue(htmlStr, -1);
+
+            this.editors["e-js"] = ace.edit("edit-js-inp");
+            this.editors["e-js"].getSession().setMode("ace/mode/javascript");
+            this.editors["e-js"].setValue(jsStr, -1);
+
+            return this;
+        },
+
+        toggle: function(e) {
+            if ($(e.currentTarget.parentNode).hasClass('expanded')) return this.shrink(e);
+            this.$el.find('.expanded').removeClass('expanded');
+            $(e.currentTarget.parentNode).addClass('expanded');
+            this.editors[e.currentTarget.id].focus();
+        },
+
+        shrink: function(e) {
+            $(e.currentTarget.parentNode).removeClass('expanded');
+        },
+
+        onClose: function() {
+            this.model.set('cssC', this.editors["e-css"].getValue());
+            this.model.set('jsC', this.editors["e-js"].getValue());
+            this.model.set('htmlC', this.editors["e-html"].getValue());
+            this.model.trigger('custom_edited');
+        }
+
+    });
+
+    exports.CustomWidgetEditorModal = CustomWidgetEditorModal;
+});
+
+require.define("/appeditor/template_editor/MultiSelectorView.js",function(require,module,exports,__dirname,__filename,process,global){exports.WidgetSelectorView = Backbone.UIView.extend({
+    className: 'multi-selector',
+    tagName: 'div',
+    contents: [],
+
+    events: {
+        // 'click #hover-div'     : 'hoverClicked',
+        // 'click #select-div'    : 'doubleClicked',
+        // 'mousedown #hover-div' : 'mousedown',
+        // 'mousedown #select-div': 'mousedown',
+        // 'mouseup #hover-div'   : 'mouseup',
+        // 'mouseup #select-div'  : 'mouseup'
+    },
+
+    initialize: function() {
+        _.bindAll(this);
+        var self = this;
+        this.doKeyBindings();
+    },
+
+    setContents: function(arr) {
+        this.unselectAll();
+        this.contents = arr;
+        this.selectAll();
+    },
+
+    // mousedown: function(e) { mouseDispatcher.isMousedownActive = true; },
+    // mouseup  : function(e) { mouseDispatcher.isMousedownActive = false; },
+
+    render: function() {
+        $(window).on('mousedown', this.clickedPage);
+        return this;
+    },
+
+    bindWidget: function(widget) {
+
+    },
+
+    unbindAll: function() {},
+
+
+    moveSelectedDown: function(e) {
+        if (!this.contents.length) return;
+        if (keyDispatcher.textEditing === true) return;
+        _(this.contents).each(function(widgetModel) {
+            widgetModel.moveDown();
+        });
+
+        e.preventDefault();
+    },
+
+    moveSelectedUp: function() {
+        if (!this.contents.length) return;
+        if (keyDispatcher.textEditing === true) return;
+        _(this.contents).each(function(widgetModel) {
+            widgetModel.moveUp();
+        });
+    },
+
+    moveSelectedLeft: function() {
+        if (!this.contents.length) return;
+        if (keyDispatcher.textEditing === true) return;
+        _(this.contents).each(function(widgetModel) {
+            widgetModel.moveLeft();
+        });
+    },
+
+    moveSelectedRight: function() {
+        if (!this.contents.length) return;
+        if (keyDispatcher.textEditing === true) return;
+        _(this.contents).each(function(widgetModel) {
+            widgetModel.moveRight();
+        });
+    },
+
+    moving: function(e, ui, model ,pHorizontalGrid, pVerticalGrid) {
+        var cid = model.cid;
+        g_guides.hideAll();
+
+        var deltaTop = (model.get('layout').get('top') * pVerticalGrid) - ui.position.top;
+        var deltaLeft = (model.get('layout').get('left') * pHorizontalGrid) - ui.position.left;
+
+        _.each(this.contents, function(wModel) {
+            var elem = util.get('widget-wrapper-' + wModel.cid);
+            var topPosition = (wModel.get('layout').get('top') * pVerticalGrid)  - deltaTop;
+            var leftPosition = (wModel.get('layout').get('left') * pHorizontalGrid) - deltaLeft;
+            elem.style.top = topPosition + 'px';
+            elem.style.left = leftPosition + 'px';
+        });
+
+    },
+
+    moved: function(e, ui, model ,pHorizontalGrid, pVerticalGrid, hideHoverDivFn) {
+
+        var deltaTop = (model.get('layout').get('top') * pVerticalGrid) - ui.position.top;
+        var deltaLeft = (model.get('layout').get('left') * pHorizontalGrid) - ui.position.left;
+
+        var deltaTopUnit = Math.round(deltaTop / pVerticalGrid);
+        var deltaLeftUnit =  Math.round(deltaLeft / pHorizontalGrid);
+
+        _.each(this.contents, function(wModel) {
+
+            var top = wModel.get('layout').get('top') - deltaTopUnit;
+            var left = wModel.get('layout').get('left') - deltaLeftUnit;
+
+            if (left < 0) left = 0;
+            if (top < 0) top = 0;
+
+            if (wModel.get('layout').get('left') == left) {
+                wModel.get('layout').trigger('change:left');
+            } else {
+                wModel.get('layout').set('left', left);
+            }
+
+            if (wModel.get('layout').get('top') == top) {
+                wModel.get('layout').trigger('change:top');
+            } else {
+                wModel.get('layout').set('top', top);
+            }
+
+        });
+
+        hideHoverDivFn.call(this);
+    },
+
+    deleteSelected: function(e) {
+        if (!this.contents.length) return;
+        if (keyDispatcher.textEditing === true) return;
+        e.preventDefault();
+        _(this.contents).each(function(widgetModel) {
+            widgetModel.remove();
+        });
+    },
+
+    doKeyBindings: function() {
+        keyDispatcher.bind('down', this.moveSelectedDown);
+        keyDispatcher.bind('up', this.moveSelectedUp);
+        keyDispatcher.bind('left', this.moveSelectedLeft);
+        keyDispatcher.bind('right', this.moveSelectedRight);
+        keyDispatcher.bind('backspace', this.deleteSelected);
+    },
+
+    selectAll: function() {
+        _(this.contents).each(function(widgetModel) {
+            $('#widget-wrapper-' + widgetModel.cid).addClass('red-border');
+        });
+    },
+
+    unselectAll: function() {
+        _(this.contents).each(function(widgetModel) {
+            widgetModel.trigger('deselect');
+            $('#widget-wrapper-' + widgetModel.cid).removeClass('red-border');
+        });
+    },
+
+    isEmpty: function() {
+
+        return this.contents.length === 0;
+    },
+
+    empty: function() {
+        this.contents = [];
+        this.unselectAll();
+    },
+
+    clickedPage: function(e) {
+        if(mouseDispatcher.isMousedownActive === true) return;
+        this.empty();
+    },
+
+    contains: function(widgetModel) {
+        return _.contains(this.contents, widgetModel);
+    },
+
+    remove: function() {
+        keyDispatcher.unbind('down', this.moveSelectedDown);
+        keyDispatcher.unbind('up', this.moveSelectedUp);
+        keyDispatcher.unbind('left', this.moveSelectedLeft);
+        keyDispatcher.unbind('right', this.moveSelectedRight);
+        keyDispatcher.unbind('backspace', this.deleteSelected);
+        $(window).off('mousedown', this.clickedPage);
+        Backbone.View.prototype.remove.call(this);
+    }
+});
+
 });
 
 require.define("/appeditor/template_editor/KeyDispatcher.js",function(require,module,exports,__dirname,__filename,process,global){  var KeyDispatcher = function() {
@@ -35723,10 +37724,10 @@ require("./mixins/BackboneConvenience");
 
 var AppModel = require("./models/AppModel");
 var WidgetView = require("./template_editor/WidgetView");
-var SectionsManagerView = require("./template_editor/SectionsManagerView");
-var MarqueeView = require('./template_editor/MarqueeView');
-var KeyDispatcher = require("./template_editor/KeyDispatcher");
-var MouseDispatcher = require("./template_editor/MouseDispatcher");
+var SectionsManagerView = require("./template_editor/SectionsManagerView").SectionsManagerView;
+var MarqueeView = require('./template_editor/MarqueeView').MarqueeView;
+var KeyDispatcher = require("./template_editor/KeyDispatcher").KeyDispatcher;
+var MouseDispatcher = require("./template_editor/MouseDispatcher").MouseDispatcher;
 
 
 v1State = top.v1State;

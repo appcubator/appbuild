@@ -1,25 +1,21 @@
-define(function(require, exports, module) {
+'use strict';
 
-    'use strict';
+require('util');
+require('mixins/BackboneDropdownView');
 
-    require('util');
-    require('mixins/BackboneDropdownView');
+var AccountDropdownView = Backbone.DropdownView.extend({
+    events: {
 
-    var AccountDropdownView = Backbone.DropdownView.extend({
-        events: {
+    },
+    subviews: [],
 
-        },
-        subviews: [],
+    initialize: function() {
 
-        initialize: function() {
+    },
 
-        },
-
-        render: function() {
-            return this;
-        }
-    });
-
-    return AccountDropdownView;
-
+    render: function() {
+        return this;
+    }
 });
+
+return AccountDropdownView;
