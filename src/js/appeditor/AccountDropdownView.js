@@ -3,7 +3,7 @@
 require('util');
 require('mixins/BackboneDropdownView');
 
-var AccountDropdownView = Backbone.DropdownView.extend({
+exports.AccountDropdownView = Backbone.DropdownView.extend({
     events: {
 
     },
@@ -17,5 +17,3 @@ var AccountDropdownView = Backbone.DropdownView.extend({
         return this;
     }
 });
-
-return AccountDropdownView;
