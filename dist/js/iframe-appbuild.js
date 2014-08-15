@@ -34981,6 +34981,9 @@ require.define("/appeditor/template_editor/WidgetSelectorView.js",function(requi
 
 
 require('../mixins/BackboneUI');
+var jQuery = require('../../libs/node_modules/jquery/dist/jquery');
+var $ = jQuery;
+require('../../libs/node_modules/jquery-ui/jquery-ui');
 
 var PADDING = 2;
 var ALIGNMENT = 1;
