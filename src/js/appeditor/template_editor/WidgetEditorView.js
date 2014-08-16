@@ -1,7 +1,5 @@
     'use strict';
 
-    require('../mixins/BackboneUI');
-
     var WidgetSettingsView = require('./WidgetSettingsView');
     var WidgetContentEditorView = require('./WidgetContentEditorView');
     var WidgetLayoutEditorView = require('./WidgetLayoutEditorView');

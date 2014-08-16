@@ -1,18 +1,3 @@
-var jQuery = require('../libs/node_modules/jquery/dist/jquery');
-var $ = jQuery;
-require('../libs/node_modules/jquery-ui/jquery-ui');
-require("../libs/jquery.scrollbar");
-
-
-window._ = require('../libs/node_modules/underscore/underscore');
-window.Backbone = require('../libs/node_modules/backbone/backbone');
-Backbone.$ = $;
-require('../libs/util/util');
-require('../libs/util/util.path');
-
-
-require("./mixins/BackboneConvenience");
-
 var AppModel = require("./models/AppModel");
 var WidgetView = require("./template_editor/WidgetView");
 var SectionsManagerView = require("./template_editor/SectionsManagerView").SectionsManagerView;

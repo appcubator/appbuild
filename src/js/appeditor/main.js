@@ -2,7 +2,6 @@ var Generator = require('./Generator').Generator;
 var AppModel = require('./models/AppModel').AppModel;
 var RouteCollection = require('./collections/RouteCollection').RouteCollection;
 var ThemeModel = require('./models/ThemeModel').ThemeModel;
-require('./mixins/BackboneConvenience');
 var KeyDispatcher = require('./template_editor/KeyDispatcher').KeyDispatcher;
 var MouseDispatcher = require('./template_editor/MouseDispatcher').MouseDispatcher;
 
