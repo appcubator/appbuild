@@ -581,53 +581,53 @@ require.define("/models/AppInfoModel.js",function(require,module,exports,__dirna
 
 });
 
-require.define("/collections/NodeModelCollection.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+require.define("/collections/NodeModelCollection.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
-    var NodeModelModel = require('../models/NodeModelModel').NodeModelModel;
+var NodeModelModel = require('../models/NodeModelModel').NodeModelModel;
 
-    var NodeModelCollection = Backbone.Collection.extend({
-        model: NodeModelModel,
-        uniqueKeys: ["name"],
+var NodeModelCollection = Backbone.Collection.extend({
+    model: NodeModelModel,
+    uniqueKeys: ["name"],
 
-        createTableWithName: function (nameStr) {
-            return this.push({
-                name: nameStr
+    createTableWithName: function (nameStr) {
+        return this.push({
+            name: nameStr
+        });
+    },
+
+    getTableWithName: function (tableNameStr) {
+        var table = this.where({
+            name: tableNameStr
+        })[0];
+        return table;
+    },
+
+    getRelationsWithEntityName: function (tableNameStr) {
+        var arrFields = [];
+        this.each(function (table) {
+            table.get('fields').each(function (fieldModel) {
+                if (fieldModel.has('entity_name') && fieldModel.get('entity_name') == tableNameStr) {
+                    var obj = fieldModel.serialize();
+                    obj.cid = fieldModel.cid;
+                    obj.entity = table.get('name');
+                    obj.entity_cid = table.cid;
+                    arrFields.push(obj);
+                }
             });
-        },
+        });
 
-        getTableWithName: function (tableNameStr) {
-            var table = this.where({
-                name: tableNameStr
-            })[0];
-            return table;
-        },
+        return arrFields;
+    },
 
-        getRelationsWithEntityName: function (tableNameStr) {
-            var arrFields = [];
-            this.each(function (table) {
-                table.get('fields').each(function (fieldModel) {
-                    if (fieldModel.has('entity_name') && fieldModel.get('entity_name') == tableNameStr) {
-                        var obj = fieldModel.serialize();
-                        obj.cid = fieldModel.cid;
-                        obj.entity = table.get('name');
-                        obj.entity_cid = table.cid;
-                        arrFields.push(obj);
-                    }
-                });
-            });
+    getAllRelations: function () {
+        return this.reduce(function (memo, model) {
+            return _.union(memo, model.getRelationalFields());
+        }, []);
+    },
 
-            return arrFields;
-        },
+});
 
-        getAllRelations: function () {
-            return this.reduce(function (memo, model) {
-                return _.union(memo, model.getRelationalFields());
-            }, []);
-        },
-
-    });
-
-    exports.NodeModelCollection = NodeModelCollection;
+exports.NodeModelCollection = NodeModelCollection;
 
 });
 
@@ -731,7 +731,7 @@ require.define("/models/NodeModelModel.js",function(require,module,exports,__dir
 
 });
 
-require.define("/collections/FieldsCollection.js",function(require,module,exports,__dirname,__filename,process,global){  var FieldModel = ('../models/FieldModel').FieldModel;
+require.define("/collections/FieldsCollection.js",function(require,module,exports,__dirname,__filename,process,global){  var FieldModel = require('../models/FieldModel').FieldModel;
 
   var FieldsCollection = Backbone.Collection.extend({
       model: FieldModel,
@@ -744,6 +744,85 @@ require.define("/collections/FieldsCollection.js",function(require,module,export
   });
 
   exports.FieldsCollection = FieldsCollection;
+
+});
+
+require.define("/models/FieldModel.js",function(require,module,exports,__dirname,__filename,process,global){var FieldModel = Backbone.Model.extend({
+    defaults: {
+        "name": "Property Name",
+        "type": "String"
+    },
+
+    // return a string version of the relationship
+    getNLType: function () {
+        var type = this.get('type');
+
+        if (type == "o2o" || type == "fk") {
+            return "Has one " + this.get('entity_name');
+        }
+        if (type == "m2m") {
+            return "List of " + this.get('entity_name');
+        }
+
+        var nlType = this.nlTable[type];
+
+        return nlType;
+    },
+
+    isRelatedField: function () {
+        var type = this.get('type');
+        return (type == "o2o" || type == "fk" || type == "m2m");
+    },
+
+    // return the relationship type
+    getNL: function () {
+        var type = this.get('type');
+
+        // if(type == "o2o"){
+        //   return
+        // } || type == "fk") {
+        //   return this.get('entity_name');
+        // }
+        // if(type == "m2m") {
+        //   return "List of " + this.get('entity_name');
+        // }
+
+        // var nlType = this.nlTable[type];
+
+        // return nlType;
+    },
+
+    // since o2m relationships are stored in the other entity as an fk,
+    // find entities which relate to this model with an fk
+    getOneToManyRelationships: function () {
+        var self = this;
+        var otherEntities = Array.prototype.concat.apply(v1State.get('tables').models, v1State.get('users').models);
+        otherEntities = _.without(otherEntities, this);
+        return _.filter(otherEntities, function (entity) {
+            return (entity.get('type') === 'fk' && entity.get('entity_name') == self.get('name'));
+        });
+    },
+
+    validate: function () {
+        var valid = true;
+        var name = this.get('name');
+        if (!util.isAlphaNumeric(name) || util.doesStartWithKeywords(name)) {
+            return false;
+        }
+    },
+
+    nlTable: {
+        "text": 'Text',
+        "number": 'Number',
+        "email": 'Email',
+        "image": 'Image',
+        "date": 'Date',
+        "file": 'File'
+    }
+
+});
+
+exports.FieldModel = FieldModel;
 
 });
 
@@ -871,609 +950,609 @@ exports.TemplateCollection = TemplateCollection;
 
 });
 
-require.define("/models/TemplateModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+require.define("/models/TemplateModel.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
-    var SectionCollection = require('../collections/SectionCollection').SectionCollection;
+var SectionCollection = require('../collections/SectionCollection').SectionCollection;
 
-    var TemplateModel = Backbone.Model.extend({
+var TemplateModel = Backbone.Model.extend({
 
-        initialize: function (bone) {
-            this.set('name', bone.name);
-            this.set('head', bone.head || "");
-            this.set('uielements', new SectionCollection(bone.uielements || []));
+    initialize: function (bone) {
+        this.set('name', bone.name);
+        this.set('head', bone.head || "");
+        this.set('uielements', new SectionCollection(bone.uielements || []));
 
-            if (!this.generate) {
-                this.setGenerator('templates.page');
-            }
-        },
-
-        getSections: function () {
-            return this.get('uielements');
-        },
-
-        getUIElements: function () {
-            if (this.widgetsCollection) return this.widgetsCollection;
-
-            var WidgetCollection = require('../collections/WidgetCollection').WidgetCollection;
-            var sections = this.getSections();
-            this.widgetsCollection = new WidgetCollection();
-
-            sections.each(function (sectionModel) {
-                this.widgetsCollection.add(sectionModel.getWidgetsCollection().models);
-                // this.bindColumn(columnModel);
-            }, this);
-
-            //this.get('columns').on('add', this.bindColumn);
-
-            return this.widgetsCollection;
-
-        },
-
-        toJSON: function (options) {
-
-            var json = _.clone(this.attributes);
-            json.uielements = json.uielements.serialize(options);
-            return json;
+        if (!this.generate) {
+            this.setGenerator('templates.page');
         }
-    });
+    },
 
-    exports.TemplateModel = TemplateModel;
+    getSections: function () {
+        return this.get('uielements');
+    },
+
+    getUIElements: function () {
+        if (this.widgetsCollection) return this.widgetsCollection;
+
+        var WidgetCollection = require('../collections/WidgetCollection').WidgetCollection;
+        var sections = this.getSections();
+        this.widgetsCollection = new WidgetCollection();
+
+        sections.each(function (sectionModel) {
+            this.widgetsCollection.add(sectionModel.getWidgetsCollection().models);
+            // this.bindColumn(columnModel);
+        }, this);
+
+        //this.get('columns').on('add', this.bindColumn);
+
+        return this.widgetsCollection;
+
+    },
+
+    toJSON: function (options) {
+
+        var json = _.clone(this.attributes);
+        json.uielements = json.uielements.serialize(options);
+        return json;
+    }
+});
+
+exports.TemplateModel = TemplateModel;
 
 });
 
-require.define("/collections/SectionCollection.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
-    var SectionModel = require('../models/SectionModel').SectionModel;
-    var WidgetCollection = require('./WidgetCollection').WidgetCollection;
-    var ColumnModel = require('../models/ColumnModel').ColumnModel;
+require.define("/collections/SectionCollection.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
+var SectionModel = require('../models/SectionModel').SectionModel;
+var WidgetCollection = require('./WidgetCollection').WidgetCollection;
+var ColumnModel = require('../models/ColumnModel').ColumnModel;
 
-    var SectionCollection = Backbone.Collection.extend({
+var SectionCollection = Backbone.Collection.extend({
 
-        model: SectionModel,
+    model: SectionModel,
 
-        initialize: function () {
-            Backbone.Regrettable.bind(this);
+    initialize: function () {
+        Backbone.Regrettable.bind(this);
 
-            if (!this.generate) {
-                this.setGenerator('templates.layoutSections');
-            }
-        },
+        if (!this.generate) {
+            this.setGenerator('templates.layoutSections');
+        }
+    },
 
-        createSectionWithType: function (type) {
+    createSectionWithType: function (type) {
 
-            switch (type) {
+        switch (type) {
 
-            case "navbar":
-                var sectionModel = new SectionModel();
-                sectionModel.setGenerator('templates.navbar');
-                this.add(sectionModel);
-                break;
+        case "navbar":
+            var sectionModel = new SectionModel();
+            sectionModel.setGenerator('templates.navbar');
+            this.add(sectionModel);
+            break;
 
-            case "footer":
-                var sectionModel = new SectionModel();
-                sectionModel.setGenerator('templates.footer');
-                this.add(sectionModel);
-                break;
+        case "footer":
+            var sectionModel = new SectionModel();
+            sectionModel.setGenerator('templates.footer');
+            this.add(sectionModel);
+            break;
 
-            default:
-                var sectionsLayouts = type.split('-');
-                var sectionModel = new SectionModel();
-                sectionModel.setupColumns();
+        default:
+            var sectionsLayouts = type.split('-');
+            var sectionModel = new SectionModel();
+            sectionModel.setupColumns();
 
-                _.each(sectionsLayouts, function (columnLayout) {
-                    var columnM = new ColumnModel();
-                    columnM.set('layout', columnLayout);
-                    sectionModel.get('columns').push(columnM);
-                }, this);
-
-                this.add(sectionModel);
-                return;
-                break;
-            }
-
-        },
-
-        getAllWidgets: function (argument) {
-            if (!this.allWidgets) this.allWidgets = this.constructWidgetCollection();
-            return this.allWidgets;
-        },
-
-        arrangeSections: function (fromInd, toInd) {
-            this.models.splice(toInd, 0, this.models.splice(fromInd, 1)[0]);
-            this.trigger('rearranged');
-        },
-
-        constructWidgetCollection: function () {
-            var widgetCollection = new WidgetCollection();
-
-            this.each(function (sectionModel) {
-                if (!sectionModel.has('columns')) return;
-                var collection = sectionModel.get('columns');
-                collection.each(function (columnModel) {
-
-                    var widgetColl = columnModel.get('uielements');
-                    widgetCollection.add(widgetColl.models);
-                    widgetColl.on('add', function (model) {
-                        widgetCollection.add(model);
-                    });
-
-                });
+            _.each(sectionsLayouts, function (columnLayout) {
+                var columnM = new ColumnModel();
+                columnM.set('layout', columnLayout);
+                sectionModel.get('columns').push(columnM);
             }, this);
 
-            this.on('add', function (sectionModel) {
-                if (!sectionModel.has('columns')) return;
+            this.add(sectionModel);
+            return;
+            break;
+        }
 
-                var collection = sectionModel.get('columns');
-                collection.each(function (columnModel) {
+    },
 
-                    var widgetColl = columnModel.get('uielements');
-                    widgetCollection.add(widgetColl.models);
-                    widgetColl.on('add', function (model) {
-                        widgetCollection.add(model);
-                    });
+    getAllWidgets: function (argument) {
+        if (!this.allWidgets) this.allWidgets = this.constructWidgetCollection();
+        return this.allWidgets;
+    },
 
+    arrangeSections: function (fromInd, toInd) {
+        this.models.splice(toInd, 0, this.models.splice(fromInd, 1)[0]);
+        this.trigger('rearranged');
+    },
+
+    constructWidgetCollection: function () {
+        var widgetCollection = new WidgetCollection();
+
+        this.each(function (sectionModel) {
+            if (!sectionModel.has('columns')) return;
+            var collection = sectionModel.get('columns');
+            collection.each(function (columnModel) {
+
+                var widgetColl = columnModel.get('uielements');
+                widgetCollection.add(widgetColl.models);
+                widgetColl.on('add', function (model) {
+                    widgetCollection.add(model);
                 });
+
             });
+        }, this);
 
-            /* TODO: go one level deeper on listening */
+        this.on('add', function (sectionModel) {
+            if (!sectionModel.has('columns')) return;
 
-            return widgetCollection;
-        }
-    });
+            var collection = sectionModel.get('columns');
+            collection.each(function (columnModel) {
 
-    exports.SectionCollection = SectionCollection;
+                var widgetColl = columnModel.get('uielements');
+                widgetCollection.add(widgetColl.models);
+                widgetColl.on('add', function (model) {
+                    widgetCollection.add(model);
+                });
+
+            });
+        });
+
+        /* TODO: go one level deeper on listening */
+
+        return widgetCollection;
+    }
+});
+
+exports.SectionCollection = SectionCollection;
 
 });
 
-require.define("/models/SectionModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+require.define("/models/SectionModel.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
-    var WidgetCollection = require('../collections/WidgetCollection');
-    var ColumnModel = require('../models/ColumnModel');
+var WidgetCollection = require('../collections/WidgetCollection').WidgetCollection;
+var ColumnModel = require('../models/ColumnModel').ColumnModel;
 
-    var SectionModel = Backbone.Model.extend({
+var SectionModel = Backbone.Model.extend({
 
-        initialize: function (bone) {
+    initialize: function (bone) {
 
-            var bone = bone || {};
+        var bone = bone || {};
 
-            if (bone.columns) {
-                var ColumnCollection = Backbone.Collection.extend({
-                    model: ColumnModel
-                });
-                var columnsColl = new ColumnCollection();
-                columnsColl.add(bone.columns || []);
-                this.set("columns", columnsColl);
-            }
-
-            if (!this.generate) {
-                this.generate = "templates.layoutSection";
-            }
-        },
-
-        setupColumns: function () {
+        if (bone.columns) {
             var ColumnCollection = Backbone.Collection.extend({
                 model: ColumnModel
             });
             var columnsColl = new ColumnCollection();
+            columnsColl.add(bone.columns || []);
             this.set("columns", columnsColl);
-        },
+        }
 
-        updateJSON: function (bone) {
+        if (!this.generate) {
+            this.generate = "templates.layoutSection";
+        }
+    },
 
-            var cleanBone = _.omit(bone, ['layout', 'data', 'context', 'fields']);
-            this.set(cleanBone);
+    setupColumns: function () {
+        var ColumnCollection = Backbone.Collection.extend({
+            model: ColumnModel
+        });
+        var columnsColl = new ColumnCollection();
+        this.set("columns", columnsColl);
+    },
 
-            if (bone.columns) {
-                var ColumnCollection = Backbone.Collection.extend({
-                    model: ColumnModel
-                });
-                var columnsColl = new ColumnCollection();
-                columnsColl.add(bone.columns || []);
-                this.set("columns", columnsColl);
+    updateJSON: function (bone) {
+
+        var cleanBone = _.omit(bone, ['layout', 'data', 'context', 'fields']);
+        this.set(cleanBone);
+
+        if (bone.columns) {
+            var ColumnCollection = Backbone.Collection.extend({
+                model: ColumnModel
+            });
+            var columnsColl = new ColumnCollection();
+            columnsColl.add(bone.columns || []);
+            this.set("columns", columnsColl);
+        }
+
+        _.each(this.attributes, function (val, key) {
+            if (!bone[key]) {
+                this.unset(key);
             }
+        }, this);
 
-            _.each(this.attributes, function (val, key) {
-                if (!bone[key]) {
-                    this.unset(key);
-                }
-            }, this);
+    },
 
-        },
-
-        getWidgetsCollection: function () {
-            if (this.widgetsCollection) {
-                return this.widgetsCollection;
-            }
-
-            this.widgetsCollection = new Backbone.Collection();
-
-            if (this.has('columns')) {
-
-                this.get('columns').each(function (columnModel) {
-                    this.widgetsCollection.add(columnModel.get('uielements').models);
-                    columnModel.get('uielements').each(function (widgetModel) {
-                        widgetModel.collection = columnModel.get('uielements');
-                    });
-                    this.bindColumn(columnModel);
-                }, this);
-                this.get('columns').on('add', this.bindColumn);
-            }
-
-
+    getWidgetsCollection: function () {
+        if (this.widgetsCollection) {
             return this.widgetsCollection;
-        },
-
-        bindColumn: function (columnModel) {
-
-            columnModel.get('uielements').on('remove', function (widgetModel) {
-                this.widgetsCollection.remove(widgetModel, columnModel);
-            }, this);
-
-            columnModel.get('uielements').on('add', function (widgetModel) {
-                this.widgetsCollection.add(widgetModel, columnModel);
-            }, this);
-
-        },
-
-        toJSON: function (options) {
-            var options = options || {};
-            var json = _.clone(this.attributes);
-            if (json.columns) {
-                json.columns = json.columns.serialize(options);
-            }
-            return json;
-        }
-    });
-
-    exports.SectionModel = SectionModel;
-
-});
-
-require.define("/collections/WidgetCollection.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
-
-    var WidgetModel = require("../models/WidgetModel").WidgetModel;
-    var Generator = require("../Generator").Generator;
-
-    var WidgetCollection = Backbone.Collection.extend({
-
-        model: WidgetModel,
-
-        initialize: function () {
-            Backbone.Regrettable.bind(this);
-        },
-
-        createElementWithGenPath: function (layout, generatorPath, type, extraData) {
-            this.createUIElement(type, layout, generatorPath, extraData);
-        },
-
-        createUIElement: function (type, layout, generatorPath, extraData) {
-            var generator = G.getGenerator(generatorPath);
-
-            var widget = {};
-            widget.layout = layout;
-            widget.type = type;
-
-            if (generator.defaults) {
-                widget = _.extend(widget, generator.defaults);
-            }
-            if (extraData) {
-                widget = _.extend(widget, extraData);
-            }
-
-            var widgetModel = new WidgetModel(widget);
-            widgetModel.setGenerator(generatorPath);
-
-            this.push(widgetModel);
-
-            return widgetModel;
         }
 
-    });
+        this.widgetsCollection = new Backbone.Collection();
 
-    exports.WidgetCollection = WidgetCollection;
+        if (this.has('columns')) {
 
-});
-
-require.define("/models/WidgetModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
-
-    var LayoutModel = require('./LayoutModel');
-    var FormFieldCollection = require('../collections/FormFieldCollection');
-
-    var WidgetModel = Backbone.Model.extend({
-        selected: false,
-        editMode: false,
-        /* idAttribute as cid allows duplicate widgets to be stored in the collection */
-        idAttribute: 'cid',
-
-        initialize: function (bone, isNew) {
-
-            if (bone.layout) {
-                this.set('layout', new LayoutModel(bone.layout || {}));
-            }
-
-            this.set('context', new Backbone.Collection(bone.context || []));
-
-            if (bone.fields) {
-                this.set('fields', new FormFieldCollection(bone.fields || []));
-            }
-            if (bone.row) {
-                var RowModel = require('../models/RowModel');
-                this.set('row', new RowModel(bone.row || {}));
-            }
-
-            this.bind('editModeOn', function () {
-                this.editMode = true;
-            }, this);
-            this.bind('editModeOff', function () {
-                this.editMode = false;
-            }, this);
-
-        },
-
-        updateJSON: function (bone) {
-
-            var cleanBone = _.omit(bone, ['data', 'layout', 'fields']);
-            this.set(cleanBone, {
-                silent: true
-            });
-
-            if (this.has('layout') && bone.layout) {
-                console.log(bone.layout);
-                this.get('layout').set(bone.layout, {
-                    silent: true
-                });
-            }
-
-            if (this.has('fields') && bone.fields) {
-                this.get('fields').set(bone.fields, {
-                    silent: true
-                });
-            }
-
-            _.each(this.attributes, function (val, key) {
-                if (!bone[key]) {
-                    this.unset(key, {
-                        silent: true
-                    });
-                }
-            }, this);
-
-            this.trigger('change');
-        },
-
-        remove: function () {
-            if (this.get('deletable') === false) return;
-            if (this.collection) {
-                this.collection.remove(this);
-            }
-        },
-
-        isFullWidth: function () {
-            return this.get('layout').get('isFull') === true;
-        },
-
-        moveLeft: function () {
-            if (this.isFullWidth()) return;
-
-            if (this.get('layout').get('left') < 1 || this.collection.editMode) return;
-            this.get('layout').set('left', this.get('layout').get('left') - 1);
-        },
-
-        moveRight: function () {
-            if (this.isFullWidth()) return;
-
-            var maxWidth = this.collection.grid.maxWidth;
-            if (maxWidth && this.get('layout').get('left') + this.get('layout').get('width') > (maxWidth - 1)) return;
-            this.get('layout').set('left', this.get('layout').get('left') + 1);
-        },
-
-        moveUp: function () {
-            if (this.get('layout').get('top') < 1 || this.collection.editMode) return;
-            this.get('layout').set('top', this.get('layout').get('top') - 1);
-        },
-
-        moveDown: function () {
-            if (this.collection.editMode) return;
-            this.get('layout').set('top', this.get('layout').get('top') + 1);
-        },
-
-        setupPageContext: function (pageModel) {
-            // TODO: Fix this
-            //var entityList = pageModel.getContextEntities();
-            var entityList = [];
-            var contextList = this.get('context');
-
-            _(entityList).each(function (entity) {
-                contextList.push({
-                    entity: entity,
-                    context: 'Page.' + entity
-                });
-            });
-
-            return this;
-        },
-
-        setupLoopContext: function (entityModel) {
-            var newContext = {
-                entity: entityModel.get('name'),
-                context: 'loop.' + entityModel.get('name')
-            };
-            var isUnique = true;
-
-            this.get('context').each(function (context) {
-                if (_.isEqual(context.serialize(), newContext)) {
-                    isUnique = false;
-                }
-            });
-
-            if (isUnique) {
-                this.get('context').push({
-                    entity: entityModel.get('name'),
-                    context: 'loop.' + entityModel.get('name')
-                });
-            }
-
-            return this;
-        },
-
-        getAction: function () {
-            if (this.get('data').has('container_info')) return this.get('data').get('container_info').get('action');
-            else return this.get('data').get('action');
-
-            return;
-        },
-
-        getRow: function () {
-            if (!this.has('row')) return null;
-            return this.get('row');
-        },
-
-        getContent: function () {
-            return this.get('content');
-        },
-
-        getForm: function () {
-            if (!this.get('data').has('container_info')) return null;
-            return this.get('data').get('container_info').get('form');
-        },
-
-        hasForm: function () {
-            if (this.has('fields')) return true;
-            return false;
-        },
-
-        getLoginRoutes: function () {
-
-            if (this.get('data').has('loginRoutes')) {
-                return this.get('data').get('loginRoutes');
-            }
-
-            if (this.get('data').has('container_info') &&
-                this.get('data').get('container_info').has('form')) {
-                return this.get('data').get('container_info').get('form').get('loginRoutes');
-            }
-
-            return null;
-        },
-
-
-        getSearchQuery: function () {
-            return this.get('data').get('searchQuery');
-        },
-
-        isNode: function () {
-            return this.get('type') == "node";
-        },
-
-        isImage: function () {
-            return (this.isNode() && this.get('data').get('nodeType') == "images");
-        },
-
-        isBox: function () {
-            return (this.isNode() && this.get('data').get('nodeType') == "boxes");
-        },
-
-        isBgElement: function () {
-            if ((this.get('type') == "node" && this.get('data').get('nodeType') == "boxes") ||
-                (this.get('type') == "imageslider")) return true;
-            return false;
-        },
-
-        isForm: function () {
-            return this.get('type') == "form";
-        },
-
-        isLoginForm: function () {
-            return false;
-            //return (this.isForm() && this.get('data').get('container_info').get('action') == "login") || (this.get('type') == "thirdpartylogin");
-        },
-
-        isList: function () {
-            if (this.get('type') == "loop") return true;
-            return false;
-        },
-
-        isCustomWidget: function () {
-            if (this.get('type') == "custom" ||
-                this.get('data').has('cssC') ||
-                this.get('data').has('jsC') ||
-                this.get('data').has('htmlC')) return true;
-        },
-
-        isBuyButton: function () {
-            return this.get('type') === "buybutton";
-        },
-
-        isSearchList: function () {
-            return this.get('data').has('container_info') && this.get('data').get('container_info').get('action') == "searchlist";
-        },
-
-        getBottom: function () {
-            return this.get('layout').get('height') + this.get('layout').get('top');
-        },
-
-        getWidgetsCollection: function () {
-            if (this.widgetsCollection) return this.widgetsCollection;
-            var WidgetCollection = require('../collections/WidgetCollection');
-            this.widgetsCollection = new WidgetCollection();
-
-            this.get('row').get('columns').each(function (columnModel) {
+            this.get('columns').each(function (columnModel) {
                 this.widgetsCollection.add(columnModel.get('uielements').models);
+                columnModel.get('uielements').each(function (widgetModel) {
+                    widgetModel.collection = columnModel.get('uielements');
+                });
                 this.bindColumn(columnModel);
             }, this);
-
-            this.get('row').get('columns').on('add', this.bindColumn);
-
-            return this.widgetsCollection;
-        },
-
-
-        bindColumn: function (columnModel) {
-
-            columnModel.get('uielements').on('remove', function (widgetModel) {
-                this.widgetsCollection.remove(widgetModel, columnModel);
-            }, this);
-
-            columnModel.get('uielements').on('add', function (widgetModel) {
-                this.widgetsCollection.add(widgetModel, columnModel);
-            }, this);
-
-        },
-
-        toJSON: function (options) {
-            options = options || {};
-
-            var json = _.clone(this.attributes);
-            json = _.omit(json, 'selected', 'deletable', 'context');
-
-            if (json.layout) {
-                json.layout = this.get('layout').serialize(options);
-            }
-            if (json.fields) {
-                json.fields = json.fields.serialize(options);
-            }
-            // if (json.row) { json.row = json.row.serialize(options); }
-            if (json.context) delete json.context;
-
-            return json;
-        },
-
-        safeExpand: function () {
-            try {
-                return this.expand();
-            } catch (e) {
-                console.log("Expander error:");
-                console.log(e);
-                return {
-                    html: '<img src="http://cdn.memegenerator.net/instances/500x/43563104.jpg">',
-                    js: '',
-                    css: ''
-                };
-            }
+            this.get('columns').on('add', this.bindColumn);
         }
 
-    });
 
-    exports.WidgetModel = WidgetModel;
+        return this.widgetsCollection;
+    },
+
+    bindColumn: function (columnModel) {
+
+        columnModel.get('uielements').on('remove', function (widgetModel) {
+            this.widgetsCollection.remove(widgetModel, columnModel);
+        }, this);
+
+        columnModel.get('uielements').on('add', function (widgetModel) {
+            this.widgetsCollection.add(widgetModel, columnModel);
+        }, this);
+
+    },
+
+    toJSON: function (options) {
+        var options = options || {};
+        var json = _.clone(this.attributes);
+        if (json.columns) {
+            json.columns = json.columns.serialize(options);
+        }
+        return json;
+    }
+});
+
+exports.SectionModel = SectionModel;
+
+});
+
+require.define("/collections/WidgetCollection.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
+
+var WidgetModel = require("../models/WidgetModel").WidgetModel;
+var Generator = require("../Generator").Generator;
+
+var WidgetCollection = Backbone.Collection.extend({
+
+    model: WidgetModel,
+
+    initialize: function () {
+        Backbone.Regrettable.bind(this);
+    },
+
+    createElementWithGenPath: function (layout, generatorPath, type, extraData) {
+        this.createUIElement(type, layout, generatorPath, extraData);
+    },
+
+    createUIElement: function (type, layout, generatorPath, extraData) {
+        var generator = G.getGenerator(generatorPath);
+
+        var widget = {};
+        widget.layout = layout;
+        widget.type = type;
+
+        if (generator.defaults) {
+            widget = _.extend(widget, generator.defaults);
+        }
+        if (extraData) {
+            widget = _.extend(widget, extraData);
+        }
+
+        var widgetModel = new WidgetModel(widget);
+        widgetModel.setGenerator(generatorPath);
+
+        this.push(widgetModel);
+
+        return widgetModel;
+    }
+
+});
+
+exports.WidgetCollection = WidgetCollection;
+
+});
+
+require.define("/models/WidgetModel.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
+
+var LayoutModel = require('./LayoutModel').LayoutModel;
+var FormFieldCollection = require('../collections/FormFieldCollection').FormFieldCollection;
+
+var WidgetModel = Backbone.Model.extend({
+    selected: false,
+    editMode: false,
+    /* idAttribute as cid allows duplicate widgets to be stored in the collection */
+    idAttribute: 'cid',
+
+    initialize: function (bone, isNew) {
+
+        if (bone.layout) {
+            this.set('layout', new LayoutModel(bone.layout || {}));
+        }
+
+        this.set('context', new Backbone.Collection(bone.context || []));
+
+        if (bone.fields) {
+            this.set('fields', new FormFieldCollection(bone.fields || []));
+        }
+        if (bone.row) {
+            var RowModel = require('../models/RowModel');
+            this.set('row', new RowModel(bone.row || {}));
+        }
+
+        this.bind('editModeOn', function () {
+            this.editMode = true;
+        }, this);
+        this.bind('editModeOff', function () {
+            this.editMode = false;
+        }, this);
+
+    },
+
+    updateJSON: function (bone) {
+
+        var cleanBone = _.omit(bone, ['data', 'layout', 'fields']);
+        this.set(cleanBone, {
+            silent: true
+        });
+
+        if (this.has('layout') && bone.layout) {
+            console.log(bone.layout);
+            this.get('layout').set(bone.layout, {
+                silent: true
+            });
+        }
+
+        if (this.has('fields') && bone.fields) {
+            this.get('fields').set(bone.fields, {
+                silent: true
+            });
+        }
+
+        _.each(this.attributes, function (val, key) {
+            if (!bone[key]) {
+                this.unset(key, {
+                    silent: true
+                });
+            }
+        }, this);
+
+        this.trigger('change');
+    },
+
+    remove: function () {
+        if (this.get('deletable') === false) return;
+        if (this.collection) {
+            this.collection.remove(this);
+        }
+    },
+
+    isFullWidth: function () {
+        return this.get('layout').get('isFull') === true;
+    },
+
+    moveLeft: function () {
+        if (this.isFullWidth()) return;
+
+        if (this.get('layout').get('left') < 1 || this.collection.editMode) return;
+        this.get('layout').set('left', this.get('layout').get('left') - 1);
+    },
+
+    moveRight: function () {
+        if (this.isFullWidth()) return;
+
+        var maxWidth = this.collection.grid.maxWidth;
+        if (maxWidth && this.get('layout').get('left') + this.get('layout').get('width') > (maxWidth - 1)) return;
+        this.get('layout').set('left', this.get('layout').get('left') + 1);
+    },
+
+    moveUp: function () {
+        if (this.get('layout').get('top') < 1 || this.collection.editMode) return;
+        this.get('layout').set('top', this.get('layout').get('top') - 1);
+    },
+
+    moveDown: function () {
+        if (this.collection.editMode) return;
+        this.get('layout').set('top', this.get('layout').get('top') + 1);
+    },
+
+    setupPageContext: function (pageModel) {
+        // TODO: Fix this
+        //var entityList = pageModel.getContextEntities();
+        var entityList = [];
+        var contextList = this.get('context');
+
+        _(entityList).each(function (entity) {
+            contextList.push({
+                entity: entity,
+                context: 'Page.' + entity
+            });
+        });
+
+        return this;
+    },
+
+    setupLoopContext: function (entityModel) {
+        var newContext = {
+            entity: entityModel.get('name'),
+            context: 'loop.' + entityModel.get('name')
+        };
+        var isUnique = true;
+
+        this.get('context').each(function (context) {
+            if (_.isEqual(context.serialize(), newContext)) {
+                isUnique = false;
+            }
+        });
+
+        if (isUnique) {
+            this.get('context').push({
+                entity: entityModel.get('name'),
+                context: 'loop.' + entityModel.get('name')
+            });
+        }
+
+        return this;
+    },
+
+    getAction: function () {
+        if (this.get('data').has('container_info')) return this.get('data').get('container_info').get('action');
+        else return this.get('data').get('action');
+
+        return;
+    },
+
+    getRow: function () {
+        if (!this.has('row')) return null;
+        return this.get('row');
+    },
+
+    getContent: function () {
+        return this.get('content');
+    },
+
+    getForm: function () {
+        if (!this.get('data').has('container_info')) return null;
+        return this.get('data').get('container_info').get('form');
+    },
+
+    hasForm: function () {
+        if (this.has('fields')) return true;
+        return false;
+    },
+
+    getLoginRoutes: function () {
+
+        if (this.get('data').has('loginRoutes')) {
+            return this.get('data').get('loginRoutes');
+        }
+
+        if (this.get('data').has('container_info') &&
+            this.get('data').get('container_info').has('form')) {
+            return this.get('data').get('container_info').get('form').get('loginRoutes');
+        }
+
+        return null;
+    },
+
+
+    getSearchQuery: function () {
+        return this.get('data').get('searchQuery');
+    },
+
+    isNode: function () {
+        return this.get('type') == "node";
+    },
+
+    isImage: function () {
+        return (this.isNode() && this.get('data').get('nodeType') == "images");
+    },
+
+    isBox: function () {
+        return (this.isNode() && this.get('data').get('nodeType') == "boxes");
+    },
+
+    isBgElement: function () {
+        if ((this.get('type') == "node" && this.get('data').get('nodeType') == "boxes") ||
+            (this.get('type') == "imageslider")) return true;
+        return false;
+    },
+
+    isForm: function () {
+        return this.get('type') == "form";
+    },
+
+    isLoginForm: function () {
+        return false;
+        //return (this.isForm() && this.get('data').get('container_info').get('action') == "login") || (this.get('type') == "thirdpartylogin");
+    },
+
+    isList: function () {
+        if (this.get('type') == "loop") return true;
+        return false;
+    },
+
+    isCustomWidget: function () {
+        if (this.get('type') == "custom" ||
+            this.get('data').has('cssC') ||
+            this.get('data').has('jsC') ||
+            this.get('data').has('htmlC')) return true;
+    },
+
+    isBuyButton: function () {
+        return this.get('type') === "buybutton";
+    },
+
+    isSearchList: function () {
+        return this.get('data').has('container_info') && this.get('data').get('container_info').get('action') == "searchlist";
+    },
+
+    getBottom: function () {
+        return this.get('layout').get('height') + this.get('layout').get('top');
+    },
+
+    getWidgetsCollection: function () {
+        if (this.widgetsCollection) return this.widgetsCollection;
+        var WidgetCollection = require('../collections/WidgetCollection');
+        this.widgetsCollection = new WidgetCollection();
+
+        this.get('row').get('columns').each(function (columnModel) {
+            this.widgetsCollection.add(columnModel.get('uielements').models);
+            this.bindColumn(columnModel);
+        }, this);
+
+        this.get('row').get('columns').on('add', this.bindColumn);
+
+        return this.widgetsCollection;
+    },
+
+
+    bindColumn: function (columnModel) {
+
+        columnModel.get('uielements').on('remove', function (widgetModel) {
+            this.widgetsCollection.remove(widgetModel, columnModel);
+        }, this);
+
+        columnModel.get('uielements').on('add', function (widgetModel) {
+            this.widgetsCollection.add(widgetModel, columnModel);
+        }, this);
+
+    },
+
+    toJSON: function (options) {
+        options = options || {};
+
+        var json = _.clone(this.attributes);
+        json = _.omit(json, 'selected', 'deletable', 'context');
+
+        if (json.layout) {
+            json.layout = this.get('layout').serialize(options);
+        }
+        if (json.fields) {
+            json.fields = json.fields.serialize(options);
+        }
+        // if (json.row) { json.row = json.row.serialize(options); }
+        if (json.context) delete json.context;
+
+        return json;
+    },
+
+    safeExpand: function () {
+        try {
+            return this.expand();
+        } catch (e) {
+            console.log("Expander error:");
+            console.log(e);
+            return {
+                html: '<img src="http://cdn.memegenerator.net/instances/500x/43563104.jpg">',
+                js: '',
+                css: ''
+            };
+        }
+    }
+
+});
+
+exports.WidgetModel = WidgetModel;
 
 });
 
@@ -1881,36 +1960,36 @@ require.define("/models/PluginModel.js",function(require,module,exports,__dirnam
 
 });
 
-require.define("/collections/RouteCollection.js",function(require,module,exports,__dirname,__filename,process,global){    var RouteModel = require('../models/RouteModel').RouteModel;
+require.define("/collections/RouteCollection.js",function(require,module,exports,__dirname,__filename,process,global){var RouteModel = require('../models/RouteModel').RouteModel;
 
-    var RouteCollection = Backbone.Collection.extend({
+var RouteCollection = Backbone.Collection.extend({
 
-        model: RouteModel,
-        uniqueKeys: ["name"],
+    model: RouteModel,
+    uniqueKeys: ["name"],
 
-        getRouteWithTemplate: function (templateModel) {
+    getRouteWithTemplate: function (templateModel) {
 
-            var templateName = templateModel.get('name');
-            var routeM = null;
-            this.each(function (routeModel) {
-                if (routeModel.get('name') == templateName) {
-                    routeM = routeModel;
-                }
-            });
+        var templateName = templateModel.get('name');
+        var routeM = null;
+        this.each(function (routeModel) {
+            if (routeModel.get('name') == templateName) {
+                routeM = routeModel;
+            }
+        });
 
-            return routeM;
-        },
+        return routeM;
+    },
 
-        removePagesWithContext: function (tableM) {
-            var arr = this.getPageModelsWithEntityName(tableM.get('name'));
-            _.each(arr, function (pageM) {
-                this.remove(pageM);
-            }, this);
-        }
+    removePagesWithContext: function (tableM) {
+        var arr = this.getPageModelsWithEntityName(tableM.get('name'));
+        _.each(arr, function (pageM) {
+            this.remove(pageM);
+        }, this);
+    }
 
-    });
+});
 
-    exports.RouteCollection = RouteCollection;
+exports.RouteCollection = RouteCollection;
 
 });
 
@@ -10554,85 +10633,6 @@ require.define("/models_view/NodeModelView.js",function(require,module,exports,_
     });
 
     exports.NodeModelView = NodeModelView;
-
-});
-
-require.define("/models/FieldModel.js",function(require,module,exports,__dirname,__filename,process,global){var FieldModel = Backbone.Model.extend({
-    defaults: {
-        "name": "Property Name",
-        "type": "String"
-    },
-
-    // return a string version of the relationship
-    getNLType: function () {
-        var type = this.get('type');
-
-        if (type == "o2o" || type == "fk") {
-            return "Has one " + this.get('entity_name');
-        }
-        if (type == "m2m") {
-            return "List of " + this.get('entity_name');
-        }
-
-        var nlType = this.nlTable[type];
-
-        return nlType;
-    },
-
-    isRelatedField: function () {
-        var type = this.get('type');
-        return (type == "o2o" || type == "fk" || type == "m2m");
-    },
-
-    // return the relationship type
-    getNL: function () {
-        var type = this.get('type');
-
-        // if(type == "o2o"){
-        //   return
-        // } || type == "fk") {
-        //   return this.get('entity_name');
-        // }
-        // if(type == "m2m") {
-        //   return "List of " + this.get('entity_name');
-        // }
-
-        // var nlType = this.nlTable[type];
-
-        // return nlType;
-    },
-
-    // since o2m relationships are stored in the other entity as an fk,
-    // find entities which relate to this model with an fk
-    getOneToManyRelationships: function () {
-        var self = this;
-        var otherEntities = Array.prototype.concat.apply(v1State.get('tables').models, v1State.get('users').models);
-        otherEntities = _.without(otherEntities, this);
-        return _.filter(otherEntities, function (entity) {
-            return (entity.get('type') === 'fk' && entity.get('entity_name') == self.get('name'));
-        });
-    },
-
-    validate: function () {
-        var valid = true;
-        var name = this.get('name');
-        if (!util.isAlphaNumeric(name) || util.doesStartWithKeywords(name)) {
-            return false;
-        }
-    },
-
-    nlTable: {
-        "text": 'Text',
-        "number": 'Number',
-        "email": 'Email',
-        "image": 'Image',
-        "date": 'Date',
-        "file": 'File'
-    }
-
-});
-
-exports.FieldModel = FieldModel;
 
 });
 

@@ -1,42 +1,42 @@
-    'use strict';
+'use strict';
 
-    var WidgetModel = require("../models/WidgetModel").WidgetModel;
-    var Generator = require("../Generator").Generator;
+var WidgetModel = require("../models/WidgetModel").WidgetModel;
+var Generator = require("../Generator").Generator;
 
-    var WidgetCollection = Backbone.Collection.extend({
+var WidgetCollection = Backbone.Collection.extend({
 
-        model: WidgetModel,
+    model: WidgetModel,
 
-        initialize: function () {
-            Backbone.Regrettable.bind(this);
-        },
+    initialize: function () {
+        Backbone.Regrettable.bind(this);
+    },
 
-        createElementWithGenPath: function (layout, generatorPath, type, extraData) {
-            this.createUIElement(type, layout, generatorPath, extraData);
-        },
+    createElementWithGenPath: function (layout, generatorPath, type, extraData) {
+        this.createUIElement(type, layout, generatorPath, extraData);
+    },
 
-        createUIElement: function (type, layout, generatorPath, extraData) {
-            var generator = G.getGenerator(generatorPath);
+    createUIElement: function (type, layout, generatorPath, extraData) {
+        var generator = G.getGenerator(generatorPath);
 
-            var widget = {};
-            widget.layout = layout;
-            widget.type = type;
+        var widget = {};
+        widget.layout = layout;
+        widget.type = type;
 
-            if (generator.defaults) {
-                widget = _.extend(widget, generator.defaults);
-            }
-            if (extraData) {
-                widget = _.extend(widget, extraData);
-            }
-
-            var widgetModel = new WidgetModel(widget);
-            widgetModel.setGenerator(generatorPath);
-
-            this.push(widgetModel);
-
-            return widgetModel;
+        if (generator.defaults) {
+            widget = _.extend(widget, generator.defaults);
+        }
+        if (extraData) {
+            widget = _.extend(widget, extraData);
         }
 
-    });
+        var widgetModel = new WidgetModel(widget);
+        widgetModel.setGenerator(generatorPath);
 
-    exports.WidgetCollection = WidgetCollection;
+        this.push(widgetModel);
+
+        return widgetModel;
+    }
+
+});
+
+exports.WidgetCollection = WidgetCollection;
