@@ -6,9 +6,9 @@
     /* Contains metadata and convenience methods for Plugins */
     var PluginsModel = Backbone.Model.extend({
 
-        initialize: function(bone) {
+        initialize: function (bone) {
 
-            _.each(bone, function(val, key) {
+            _.each(bone, function (val, key) {
 
                 /* Help initialize plugins that don't have proper metadata. */
                 /* TODO put this in the initialize method of the PluginModel instead. */
@@ -22,17 +22,17 @@
         },
 
         /* builtin plugins are not in the model by default,
-         * so this fn includes them in its return value 
-         * 
+         * so this fn includes them in its return value
+         *
          * returns { pluginName1: plugingModel1, ... } */
-        getAllPlugins: function() {
+        getAllPlugins: function () {
 
             var plugins = {};
             plugins = _.extend(plugins, _.clone(this.attributes)); // pluginName : pluginModel object
 
             /* Start with local plugins and merge builtin plugins in, not overwriting local plugins. */
 
-            _.each(G.expander.builtinGenerators, function(builtInPlugin, pluginName) {
+            _.each(G.expander.builtinGenerators, function (builtInPlugin, pluginName) {
                 var pluginModel = new PluginModel(builtInPlugin);
 
                 if (!plugins[pluginName]) {
@@ -42,15 +42,15 @@
                     var localCopy = new PluginModel();
 
                     // app-state copy of the package 
-                    _.each(plugins[pluginName].attributes, function(val, key) {
+                    _.each(plugins[pluginName].attributes, function (val, key) {
                         localCopy.set(key, _.clone(val));
-                    }); 
+                    });
 
                     // iterating over the builtin ones and mergins the gens
-                    _.each(builtInPlugin, function(gens, moduleName) {
+                    _.each(builtInPlugin, function (gens, moduleName) {
                         if (moduleName === 'metadata')
                             return;
-                        if(!localCopy.has(moduleName)) {
+                        if (!localCopy.has(moduleName)) {
                             localCopy.set(moduleName, gens);
                         } else {
                             localCopy.set(moduleName, _.union(localCopy.get(moduleName), gens));
@@ -64,81 +64,87 @@
             return plugins;
         },
 
-        getAllPluginsSerialized: function() {
+        getAllPluginsSerialized: function () {
             var plugins = this.getAllPlugins();
             var serializedPlugins = {};
 
-            _.each(plugins, function(val, key) {
+            _.each(plugins, function (val, key) {
                 serializedPlugins[key] = val.serialize();
             });
 
             return util.deepCopy(serializedPlugins);
         },
 
-        install: function(plugin) {
+        install: function (plugin) {
             if (!plugin.metadata || !plugin.metadata.name)
                 alert('not installing because this plugin doesn\'t have metadata.');
             var pluginModel = new PluginModel(plugin);
             this.set(plugin.metadata.name, pluginModel);
         },
 
-        uninstall: function(pluginName) {
+        uninstall: function (pluginName) {
             this.unset(pluginName);
             // TODO do something about generator references to this plugin?
         },
 
-        getPluginsWithModule: function(moduleName) {
-            return _.filter(this.getAllPlugins(), function(pluginModel, pluginName) {
+        getPluginsWithModule: function (moduleName) {
+            return _.filter(this.getAllPlugins(), function (pluginModel, pluginName) {
                 pluginModel.name = pluginName;
                 return pluginModel.has(moduleName);
             });
         },
 
-        getAllPluginsWithModule: function(moduleName) {
+        getAllPluginsWithModule: function (moduleName) {
             var plugins = this.getAllPlugins();
-            return _.filter(plugins, function(pluginModel) {
+            return _.filter(plugins, function (pluginModel) {
                 return pluginModel.has(moduleName);
             });
         },
 
-        getGeneratorsWithModule: function(generatorModule) {
-            var generators = _.flatten(_.map(this.getAllPlugins(), function(pluginModel, packageName) {
+        getGeneratorsWithModule: function (generatorModule) {
+            var generators = _.flatten(_.map(this.getAllPlugins(), function (pluginModel, packageName) {
                 return pluginModel.getGensByModule(generatorModule);
             }));
 
             return generators;
         },
 
-        getAllGeneratorsWithModule: function(moduleName) {
+        getAllGeneratorsWithModule: function (moduleName) {
             var plugins = this.getAllPluginsWithModule(moduleName);
-            plugins = _.filter(plugins, function(pluginModel, key) {
+            plugins = _.filter(plugins, function (pluginModel, key) {
                 return pluginModel.has(moduleName);
             });
 
-            var generators = _.flatten(_.map(plugins, function(pluginModel) {
+            var generators = _.flatten(_.map(plugins, function (pluginModel) {
                 var gens = pluginModel.get(moduleName);
-                _.each(gens, function(gen) { gen.package = pluginModel.getName(); });
+                _.each(gens, function (gen) {
+                    gen.package = pluginModel.getName();
+                });
                 return gens;
             }));
 
             return generators;
         },
 
-        isPluginInstalledToModel: function(pluginModel, nodeModelModel) {
+        isPluginInstalledToModel: function (pluginModel, nodeModelModel) {
             var gens = pluginModel.getGensByModule('model_methods');
-            var genNames = _.map(gens, function(g) { return pluginModel.getName() + '.model_methods.' + g.name; });
-            var functions = nodeModelModel.get('functions').map(function(fn) { return fn.generate; });
+            var genNames = _.map(gens, function (g) {
+                return pluginModel.getName() + '.model_methods.' + g.name;
+            });
+            var functions = nodeModelModel.get('functions').map(function (fn) {
+                return fn.generate;
+            });
             return _.intersection(genNames, functions).length > 0 ? true : false;
         },
 
-        installPluginToModel: function(pluginModel, nodeModelModel) {
+        installPluginToModel: function (pluginModel, nodeModelModel) {
             if (!pluginModel) {
                 alert('yo, what are you doing.');
                 return;
             }
             var gens = pluginModel.getGensByModule('model_methods');
 
-            _.each(gens, function(gen) {
+            _.each(gens, function (gen) {
                 var methodModel = new NodeModelMethodModel();
                 var genIDStr = pluginModel.getName() + '.model_methods.' + gen.name;
                 methodModel.setGenerator(genIDStr);
@@ -148,11 +154,11 @@
             });
         },
 
-        uninstallPluginToModel: function(plugin, nodeModelModel) {
+        uninstallPluginToModel: function (plugin, nodeModelModel) {
             var gens = [];
 
-            nodeModelModel.get('functions').each(function(fn) {
-                if(fn.isInPackage(plugin.getName())) {
+            nodeModelModel.get('functions').each(function (fn) {
+                if (fn.isInPackage(plugin.getName())) {
                     gens.push(fn);
                 }
             });
@@ -170,7 +176,11 @@
 
             if (!this.has(genID.package)) {
                 // NOTE this only happens when builtin generator is forked
-                this.set(genID.package, new PluginModel({metadata: {name: genID.package}}));
+                this.set(genID.package, new PluginModel({
+                    metadata: {
+                        name: genID.package
+                    }
+                }));
             }
 
             if (!this.get(genID.package).has(genID.module)) {
@@ -185,13 +195,13 @@
             return [genID.package, genID.module, genID.name].join('.');
         },
 
-        assertWeHaveGenerator: function(generatorPath) {
+        assertWeHaveGenerator: function (generatorPath) {
             // ensures the plugin is either builin or in the app state
-                // throws an error if for some reason the generatorPath refers to a nonexistant generator
+            // throws an error if for some reason the generatorPath refers to a nonexistant generator
             util.findGenerator(this.serialize(), generatorPath);
         },
 
-        isGeneratorBuiltin: function(generatorPath) {
+        isGeneratorBuiltin: function (generatorPath) {
             this.assertWeHaveGenerator(generatorPath);
 
             var genID = util.packageModuleName(generatorPath);
@@ -202,17 +212,19 @@
             }
 
             // let's try to find the generator in the app state.
-            var localGen = _.find(this.get(genID.package).getGensByModule(genID.module), function(gen) { return gen.name === genID.name; });
+            var localGen = _.find(this.get(genID.package).getGensByModule(genID.module), function (gen) {
+                return gen.name === genID.name;
+            });
 
             // expect it to not be found if it's builtin.
             return localGen === undefined;
         },
 
-        isGeneratorEditable: function(generatorPath) {
+        isGeneratorEditable: function (generatorPath) {
             return !this.isGeneratorBuiltin(generatorPath);
         },
 
-        isNameUnique: function(newPackageModuleName) {
+        isNameUnique: function (newPackageModuleName) {
             // TODO FIXME
             // 1. this doesn't include builtins
             // 2. shouldn't you do a has check before doing get?
@@ -230,7 +242,7 @@
             return true;
         },
 
-        toJSON: function() {
+        toJSON: function () {
             var json = _.clone(this.attributes);
 
             _.each(json, function (val, key) {

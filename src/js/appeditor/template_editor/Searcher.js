@@ -4,7 +4,7 @@
 
         this.items = [];
 
-        this.register = function(id, className, text, icon) {
+        this.register = function (id, className, text, icon) {
             this.items.push({
                 id: id,
                 className: className,
@@ -13,10 +13,10 @@
             });
         };
 
-        this.search = function(str) {
+        this.search = function (str) {
 
             var results = [];
-            _.each(this.items, function(item) {
+            _.each(this.items, function (item) {
                 if (item.text.toLowerCase().indexOf(str.toLowerCase()) > -1) {
                     results.push(item);
                 }

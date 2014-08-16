@@ -7,12 +7,12 @@
 
     var funcTemplate = [
         '<div class="code-chunk" id="func-chunk-<%= cid %>">',
-            '<span class="title">',
-                '<%= name %>',
-                '<div class="option-button settings blue pull-right" id="func-settings-<%= cid %>"></div>',
-                '<span class="func-type-container"></span>',
-            '</span>',
-            '<div class="code-editor" id="func-editor-<%= cid %>"></div>',
+        '<span class="title">',
+        '<%= name %>',
+        '<div class="option-button settings blue pull-right" id="func-settings-<%= cid %>"></div>',
+        '<span class="func-type-container"></span>',
+        '</span>',
+        '<div class="code-editor" id="func-editor-<%= cid %>"></div>',
         '</div>'
     ].join('\n');
 
@@ -22,19 +22,21 @@
         events: {
             'click .func-type-change': 'changeTypeHandler',
         },
-        initialize: function(el, methodModel) {
+        initialize: function (el, methodModel) {
             this.setElement(el);
             this.methodModel = methodModel;
             _.bindAll(this);
         },
-        render: function() {
+        render: function () {
             var funcTypeTemplate = '<span class="func-type"><%= funcType %></span>';
             if (!this.methodModel.isGenerator())
                 funcTypeTemplate += '<button class="func-type-change" type="button">Change type</button>';
-            this.$el.html(_.template(funcTypeTemplate, {funcType: this.methodModel.getType()}));
+            this.$el.html(_.template(funcTypeTemplate, {
+                funcType: this.methodModel.getType()
+            }));
             return this;
         },
-        changeTypeHandler: function() {
+        changeTypeHandler: function () {
             var newType = this.methodModel.toggleType();
             this.$el.find('.func-type').text(newType);
         },
@@ -52,7 +54,7 @@
         },
 
 
-        initialize: function(tableModel) {
+        initialize: function (tableModel) {
             _.bindAll(this);
             this.model = tableModel;
 
@@ -60,19 +62,19 @@
             this.listenTo(this.model.get('functions'), 'remove', this.removeMethod);
         },
 
-        render: function() {
+        render: function () {
 
             this.el.innerHTML = [
                 '<div class="static sect">',
-                    '<span class="title">Functions</span>',
-                    '<div id="static-methods-list"></div>',
-                    '<div id="add-static-box">',
-                        '<form style="display:none;">',
-                            '<input type="text" class="property-name-input" placeholder="Property Name...">',
-                            '<input type="submit" class="done-btn" value="Done">',
-                        '</form>',
-                        '<div class="add-button box-button">+ Create a New Function</div>',
-                    '</div>',
+                '<span class="title">Functions</span>',
+                '<div id="static-methods-list"></div>',
+                '<div id="add-static-box">',
+                '<form style="display:none;">',
+                '<input type="text" class="property-name-input" placeholder="Property Name...">',
+                '<input type="submit" class="done-btn" value="Done">',
+                '</form>',
+                '<div class="add-button box-button">+ Create a New Function</div>',
+                '</div>',
                 '</div>'
             ].join('\n');
 
@@ -81,11 +83,14 @@
             var list = this.$el.find('#static-methods-list')[0];
             this.list = list;
 
-            this.model.get('functions').each(function(methodModel, i){
+            this.model.get('functions').each(function (methodModel, i) {
                 var methodObj = methodModel.getGenerated();
-                list.innerHTML += _.template(funcTemplate, { name: methodObj.name, cid: methodModel.cid });
+                list.innerHTML += _.template(funcTemplate, {
+                    name: methodObj.name,
+                    cid: methodModel.cid
+                });
             });
-            _.each($(list).find('.func-type-container'), function(el, i) {
+            _.each($(list).find('.func-type-container'), function (el, i) {
                 var methodModel = self.model.get('functions').at(i);
                 var fcv = new FuncChooserView(el, methodModel);
                 fcv.render();
@@ -97,8 +102,8 @@
             return this;
         },
 
-        setupAce: function() {
-            this.model.get('functions').each(function(methodModel) {
+        setupAce: function () {
+            this.model.get('functions').each(function (methodModel) {
                 this.setupSingleAce(methodModel);
             }, this);
 
@@ -107,7 +112,7 @@
             // this.editor.on("change", this.keyup);
         },
 
-        setupSingleAce: function(methodModel) {
+        setupSingleAce: function (methodModel) {
             /* pass true as second argument to render this as a model_method from some plugin */
             /* this breaks when this.el is not rendered */
             var self = this;
@@ -121,15 +126,18 @@
                 console.log('setting read only');
                 editor.setReadOnly(true);
             } else {
-                editor.on("change", function() {
+                editor.on("change", function () {
                     self.codeChanged(methodModel, editor.getValue());
                 });
             }
         },
 
-        renderStaticMethod: function(methodModel) {
+        renderStaticMethod: function (methodModel) {
             var methodObj = methodModel.getGenerated();
-            this.list.innerHTML += _.template(funcTemplate, { name: methodObj.name, cid: methodModel.cid });
+            this.list.innerHTML += _.template(funcTemplate, {
+                name: methodObj.name,
+                cid: methodModel.cid
+            });
             var el = $(this.list).find('.func-type-container').last();
             var fcv = new FuncChooserView(el, methodModel);
             fcv.render();
@@ -140,21 +148,24 @@
             }
         },
 
-        clickedSettings: function(e) {
-            var cid = e.currentTarget.id.replace('func-settings-','');
+        clickedSettings: function (e) {
+            var cid = e.currentTarget.id.replace('func-settings-', '');
             var methodModel = this.model.get('functions').get(cid);
             new WidgetSettingsView(methodModel).render();
         },
 
-        removeMethod: function(methodModel) {
+        removeMethod: function (methodModel) {
             this.$el.find('#func-chunk-', methodModel.cid).remove();
         },
 
-        createStaticFunction: function(functionName) {
-            this.model.get('functions').add(new NodeModelMethodModel({ name: functionName, code: '' }));
+        createStaticFunction: function (functionName) {
+            this.model.get('functions').add(new NodeModelMethodModel({
+                name: functionName,
+                code: ''
+            }));
         },
 
-        codeChanged: function(methodModel, newValue) {
+        codeChanged: function (methodModel, newValue) {
             methodModel.set('code', newValue);
         }
 

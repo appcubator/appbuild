@@ -1,5 +1,5 @@
         var FormFieldModel = Backbone.Model.extend({
-            initialize: function(bone) {
+            initialize: function (bone) {
                 this.set('field_name', bone.field_name);
                 if (bone.type) {
                     this.set('type', bone.type);
@@ -14,7 +14,7 @@
                 }
             },
 
-            toJSON: function() {
+            toJSON: function () {
                 var json = _.clone(this.attributes);
                 if (json.displayType == "button") {
                     json = _.omit(json, 'options');

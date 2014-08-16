@@ -120,7 +120,7 @@
             'submit .element-create-form': 'submitForm'
         },
 
-        initialize: function(UIElementColl, type) {
+        initialize: function (UIElementColl, type) {
             _.bindAll(this);
             this.type = type;
             this.collection = UIElementColl;
@@ -128,14 +128,14 @@
             this.collection.bind('remove', this.removeUIE);
         },
 
-        render: function() {
+        render: function () {
             var self = this;
             var div = document.createElement('span');
             div.className = 'elems';
             this.elems = div;
             this.el.appendChild(this.elems);
 
-            this.collection.each(function(uieModel) {
+            this.collection.each(function (uieModel) {
                 uieModel.id = self.collection.length;
                 self.appendUIE(uieModel);
             });
@@ -143,8 +143,8 @@
             var createBtn = document.createElement('span');
             var temp = [
                 '<div class="create-text">',
-                  '<img src="/static/img/add.png" class="span2 add-img">',
-                  '<h3 class="offset1">Create an element</span>',
+                '<img src="/static/img/add.png" class="span2 add-img">',
+                '<h3 class="offset1">Create an element</span>',
                 '</div>',
             ].join('\n');
             createBtn.innerHTML = _.template(temp, {});
@@ -154,22 +154,24 @@
         },
 
 
-        showForm: function(e) {
+        showForm: function (e) {
             var root = {};
-            if (baseTags[this.type]) { root = baseTags[this.type][0]; }
+            if (baseTags[this.type]) {
+                root = baseTags[this.type][0];
+            }
             this.collection.push(root);
         },
 
-        submitForm: function(e) {
+        submitForm: function (e) {
             //alert("HEEEEY");
         },
 
-        appendUIE: function(uieModel) {
+        appendUIE: function (uieModel) {
             var newView = new UIElementView(uieModel);
             this.elems.appendChild(newView.render().el);
         },
 
-        removeUIE: function(uieModel) {
+        removeUIE: function (uieModel) {
             $('#' + uieModel.cid).remove();
         }
 

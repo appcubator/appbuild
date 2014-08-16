@@ -9,61 +9,61 @@
         },
         top: false,
 
-        initialize: function(options, closeCallback) {
+        initialize: function (options, closeCallback) {
             _.bindAll(this);
 
             this.text = options.text;
             this.path = options.path;
 
             // wrap the callback in a function, since the callback may be undefined
-            this.closeCallback = function() {
-                if (typeof(closeCallback) == 'function') return closeCallback();
+            this.closeCallback = function () {
+                if (typeof (closeCallback) == 'function') return closeCallback();
                 else return false;
             };
             this.render();
         },
 
-        resolve: function() {
+        resolve: function () {
             var arr = this.path.split('/');
             var el = arr[0];
             var str = "<p>";
 
             switch (el) {
-                case "pages":
-                    var pageObj = appState.pages[arr[1]];
-                    str += "Problem is on <a href='/app/" + appId + "/page/" + arr[1] + "/'>" + pageObj.name + '</a>';
-                    break;
+            case "pages":
+                var pageObj = appState.pages[arr[1]];
+                str += "Problem is on <a href='/app/" + appId + "/page/" + arr[1] + "/'>" + pageObj.name + '</a>';
+                break;
             }
 
             str += "</p>";
 
             switch (arr[2]) {
-                case "uielements":
-                    var widgetObj = v1State.get('pages').models[arr[1]].get('uielements').models[arr[3]];
+            case "uielements":
+                var widgetObj = v1State.get('pages').models[arr[1]].get('uielements').models[arr[3]];
 
-                    var iframe = document.getElementById('page');
-                    if (iframe) {
-                        var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-                        var domEl = innerDoc.getElementById('widget-wrapper-' + widgetObj.cid);
+                var iframe = document.getElementById('page');
+                if (iframe) {
+                    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    var domEl = innerDoc.getElementById('widget-wrapper-' + widgetObj.cid);
 
-                        if (domEl) {
-                            this.overlayEl = util.addOverlay(domEl);
-                        } else {
-                            this.listenTo(v1, 'editor-loaded', function() {
-                                var domEl = document.getElementById('widget-wrapper-' + widgetObj.cid);
-                                var self = this;
-                                setTimeout(function() {
-                                    self.overlayEl = util.addOverlay(domEl);
-                                }, 300);
-                            }, this);
-                        }
+                    if (domEl) {
+                        this.overlayEl = util.addOverlay(domEl);
+                    } else {
+                        this.listenTo(v1, 'editor-loaded', function () {
+                            var domEl = document.getElementById('widget-wrapper-' + widgetObj.cid);
+                            var self = this;
+                            setTimeout(function () {
+                                self.overlayEl = util.addOverlay(domEl);
+                            }, 300);
+                        }, this);
                     }
+                }
             }
 
             return str;
         },
 
-        render: function() {
+        render: function () {
 
             var div = document.createElement('div');
             div.className = "modal-bg fadeIn";
@@ -91,7 +91,7 @@
             return this;
         },
 
-        close: function() {
+        close: function () {
             $(this.bgDiv).remove();
             if (this.overlayEl) $(this.overlayEl).remove();
             this.stopListening(v1, 'editor-loaded');

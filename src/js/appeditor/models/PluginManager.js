@@ -1,22 +1,21 @@
     var PluginManager = Backbone.Model.extend({
-        initialize: function(options) {
+        initialize: function (options) {
             _.bindAll(this);
             this.pages = options.pages;
-            this.collection = options.collection    
+            this.collection = options.collection
         },
         defaults: {
             plugins: [],
-            getPlugins: function(){
+            getPlugins: function () {
                 var pluginAddress = "http://localhost:3001/packageList"
                 $.ajax({
-                    url:
-                    success: function(genList){
+                    url: success: function (genList) {
 
                     }
                 })
             },
         },
-         d
+        d
     });
 
     exports.PluginManager = PluginManager;

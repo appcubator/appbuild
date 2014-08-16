@@ -26,15 +26,17 @@
             'change select': 'mouseup'
         },
 
-        initialize: function() {
+        initialize: function () {
             _.bindAll(this);
             this.subviews = [];
             util.loadCSS(this.css);
             this.model = null;
         },
 
-        setModel: function(widgetModel) {
-            if (this.model) { this.unbindModel(widgetModel); }
+        setModel: function (widgetModel) {
+            if (this.model) {
+                this.unbindModel(widgetModel);
+            }
 
             this.model = widgetModel;
 
@@ -46,35 +48,35 @@
             return this;
         },
 
-        unbindModel: function(model) {
+        unbindModel: function (model) {
             this.stopListening(model, 'startEditing', this.startedEditing);
             this.stopListening(model, 'stopEditing cancelEditing', this.stoppedEditing);
             this.stopListening(model, 'reselected', this.show);
             this.stopListening(model, 'deselected', this.clear);
         },
 
-        render: function() {
+        render: function () {
             this.hide();
             return this;
         },
 
-        setupScrollEvents: function() {
+        setupScrollEvents: function () {
             var self = this;
             var timer;
-            $(innerDoc).bind('scroll', function() {
+            $(innerDoc).bind('scroll', function () {
                 clearTimeout(timer);
                 timer = setTimeout(refresh, 150);
                 self.hide();
             });
 
-            var refresh = function() {
+            var refresh = function () {
                 if (!self.model) return;
                 self.show();
             };
 
         },
 
-        display: function() {
+        display: function () {
             if (!this.model) return;
 
             this.clearContent();
@@ -82,7 +84,7 @@
             this.show();
         },
 
-        show: function() {
+        show: function () {
             if (!this.model) return;
             this.stopListening(this.model, 'rendered', this.show);
 
@@ -108,25 +110,25 @@
             this.$el.find('.arw').remove();
 
             switch (this.location) {
-                case "right":
-                    this.$el.append('<div class="left-arrow arw"></div>');
-                    leftDist += element.getBoundingClientRect().width;
-                    this.$el.addClass('fadeInRight');
+            case "right":
+                this.$el.append('<div class="left-arrow arw"></div>');
+                leftDist += element.getBoundingClientRect().width;
+                this.$el.addClass('fadeInRight');
 
-                    break;
-                case "bottom":
-                    this.$el.append('<div class="top-arrow arw"></div>');
-                    topDist += element.getBoundingClientRect().height;
-                    this.$el.addClass('fadeInUp');
+                break;
+            case "bottom":
+                this.$el.append('<div class="top-arrow arw"></div>');
+                topDist += element.getBoundingClientRect().height;
+                this.$el.addClass('fadeInUp');
 
-                    break;
-                case "left":
-                    this.$el.append('<div class="right-arrow arw"></div>');
-                    this.$el.addClass('fadeInLeft');
-                    break;
-                case "top":
-                    // not supposed to happen
-                    break;
+                break;
+            case "left":
+                this.$el.append('<div class="right-arrow arw"></div>');
+                this.$el.addClass('fadeInLeft');
+                break;
+            case "top":
+                // not supposed to happen
+                break;
             }
             this.$el.show();
 
@@ -139,7 +141,7 @@
             return this;
         },
 
-        fillContent: function() {
+        fillContent: function () {
             var action = "";
             var type = this.model.get('type');
 
@@ -165,68 +167,68 @@
             this.el.appendChild(this.renderSettingsAndDelete('edit-custom-widget-btn', 'Edit Custom Widget'));
         },
 
-        clearContent: function() {
-        	this.$el.find('.btn-toolbar').remove();
+        clearContent: function () {
+            this.$el.find('.btn-toolbar').remove();
 
             if (this.contentEditor) {
-				this.contentEditor.clear();
-			}
+                this.contentEditor.clear();
+            }
             if (this.layoutEditor) {
-            	this.layoutEditor.clear();
+                this.layoutEditor.clear();
             }
             if (this.infoEditor) {
-            	this.infoEditor.clear();
+                this.infoEditor.clear();
             }
 
             $('.btn-toolbar').remove();
 
-            _(this.subviews).each(function(subview) {
+            _(this.subviews).each(function (subview) {
                 subview.close();
             });
             this.el.innerHTML = '';
             this.el.style.width = '';
         },
 
-        renderButtonWithText: function(className, buttonText) {
+        renderButtonWithText: function (className, buttonText) {
             return this.renderButtonWithWidthCustomWidth(className, buttonText, 230);
         },
 
-        renderButtonWithWidthCustomWidth: function(className, buttonText, width) {
+        renderButtonWithWidthCustomWidth: function (className, buttonText, width) {
             var li = document.createElement('ul');
             li.className = 'pad w-section section-' + className;
             li.innerHTML += '<span class="option-button tt ' + className + '" style="width:' + width + 'px; display: inline-block;">' + buttonText + '</span>';
             return li;
         },
 
-        renderButtonWithDeleteButtonandText: function(className, buttonText) {
+        renderButtonWithDeleteButtonandText: function (className, buttonText) {
             var li = document.createElement('ul');
             li.className = 'w-section section-' + className;
             li.innerHTML += '<span class="' + className + '  option-button tt" style="width:190px; display: inline-block;">' + buttonText + '</span><span id="delete-widget" class="option-button delete-button tt" style="width:34px;"></span>';
             return li;
         },
 
-        renderSettingsAndDelete: function() {
+        renderSettingsAndDelete: function () {
             var li = document.createElement('ul');
             li.className = 'w-section';
             li.innerHTML += '<span id="delete-widget" class="option-button delete-button tt"></span><span class="option-button tt settings"></span>';
             return li;
         },
 
-        openStylePicker: function(e) {
+        openStylePicker: function (e) {
             this.hideSubviews();
             this.widgetClassPickerView.show();
             this.widgetClassPickerView.expand();
         },
 
-        openCustomWidgetEditor: function() {
+        openCustomWidgetEditor: function () {
             new CustomWidgetEditorModal(this.model);
         },
 
-        openSettingsView: function() {
+        openSettingsView: function () {
             new WidgetSettingsView(this.model).render();
         },
 
-        closeEditingMode: function() {
+        closeEditingMode: function () {
             this.$el.find('.section-done-editing').remove();
             this.el.style.width = '';
             $(this.listGalleryView).remove();
@@ -236,30 +238,30 @@
             this.model.trigger('unhighlight');
         },
 
-        clickedDoneTextEditing: function() {
+        clickedDoneTextEditing: function () {
             this.model.trigger('stopEditing');
         },
 
-        classChanged: function() {
+        classChanged: function () {
             this.showSubviews();
             this.widgetClassPickerView.$el.hide();
         },
 
-        startedEditing: function() {
+        startedEditing: function () {
             if (this.editingMode) return;
             this.hideSubviews();
             this.el.appendChild(this.renderButtonWithText('done-text-editing', 'Done Editing'));
             this.editingMode = true;
         },
 
-        stoppedEditing: function() {
+        stoppedEditing: function () {
             $('.btn-toolbar').remove();
             $('.section-done-text-editing').remove();
             this.showSubviews();
             this.editingMode = false;
         },
 
-        clear: function() {
+        clear: function () {
             this.clearContent();
             this.unbindModel(this.model);
 
@@ -268,7 +270,7 @@
             this.hide();
         },
 
-        hide: function() {
+        hide: function () {
             this.$el.removeClass('left');
             this.$el.removeClass('right');
             this.$el.removeClass('bottom');
@@ -280,18 +282,18 @@
             this.$el.hide();
         },
 
-        setTempContent: function(domNode) {
+        setTempContent: function (domNode) {
             this.tempContent = domNode;
             this.hideSubviews();
             this.el.appendChild(domNode);
         },
 
-        removeTempContent: function() {
+        removeTempContent: function () {
             if (this.tempContent) this.el.removeChild(this.tempContent);
             this.showSubviews();
         },
 
-        showSubviews: function() {
+        showSubviews: function () {
             //if(this.widgetClassPickerView) this.widgetClassPickerView.$el.fadeIn();
             if (this.contentEditor) this.contentEditor.$el.fadeIn();
             if (this.layoutEditor) this.layoutEditor.$el.fadeIn();
@@ -306,7 +308,7 @@
             this.$el.find('.section-edit-login-form-btn').fadeIn();
         },
 
-        hideSubviews: function() {
+        hideSubviews: function () {
             if (this.widgetClassPickerView) this.widgetClassPickerView.$el.hide();
             if (this.contentEditor) this.contentEditor.$el.hide();
             if (this.layoutEditor) this.layoutEditor.$el.hide();
@@ -321,7 +323,7 @@
             this.$el.find('.section-pick-style').hide();
         },
 
-        getLocation: function() {
+        getLocation: function () {
             if (this.defaultLocation) return this.defaultLocation;
 
             return "bottom";
@@ -344,21 +346,21 @@
             // return "right";
         },
 
-        clickedDelete: function() {
+        clickedDelete: function () {
             if (this.model) {
                 this.model.remove();
             }
         },
 
-        clicked: function(e) {
+        clicked: function (e) {
             e.stopPropagation();
         },
 
-        mousedown: function(e) {
+        mousedown: function (e) {
             mouseDispatcher.isMousedownActive = true;
         },
 
-        mouseup: function() {
+        mouseup: function () {
             mouseDispatcher.isMousedownActive = false;
         }
 

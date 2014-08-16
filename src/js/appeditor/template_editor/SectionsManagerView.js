@@ -11,15 +11,15 @@ var SectionsManagerView = Backbone.View.extend({
     widgetsContainer: null,
 
     events: {
-        'click #addNewSectionTitle' : 'showSectionOptions',
+        'click #addNewSectionTitle': 'showSectionOptions',
         'click .section-option': 'selectSectionLayout'
     },
 
-    optionsHidden : true,
+    optionsHidden: true,
 
     subviews: [],
 
-    initialize: function(sectionsCollection) {
+    initialize: function (sectionsCollection) {
 
         _.bindAll(this);
 
@@ -35,7 +35,7 @@ var SectionsManagerView = Backbone.View.extend({
         this.listenToModels(this.sectionsCollection, 'stoppedSortingElements', this.unhighlightSections);
     },
 
-    render: function() {
+    render: function () {
 
         this.widgetsContainer = document.body;
 
@@ -44,15 +44,15 @@ var SectionsManagerView = Backbone.View.extend({
         this.$el.html(expanded_uielements.html);
         this.placeNewSectionPanel();
 
-        this.sectionsCollection.each(function(sectionModel) {
+        this.sectionsCollection.each(function (sectionModel) {
             var newWidgetView = this.placeSection(sectionModel, false);
         }, this);
 
-       this.widgetSelectorView.setElement(document).render();
-       this.placeJS(expanded_uielements);
+        this.widgetSelectorView.setElement(document).render();
+        this.placeJS(expanded_uielements);
     },
 
-    placeNewSectionPanel: function() {
+    placeNewSectionPanel: function () {
 
         if (this.$el.find('#addNewSection')) {
             this.$el.find('#addNewSection').remove();
@@ -60,31 +60,31 @@ var SectionsManagerView = Backbone.View.extend({
 
         var temp = [
             '<div class="container editing full-container" id="addNewSection">',
-                '<span id="addNewSectionTitle" style="display:block;">Add A New Section</span>',
-                '<ul class="options" style="display:none;">',
-                    '<li class="section-option" id="opt-12">12</li>',
-                    '<li class="section-option" id="opt-3-3-3-3">3-3-3-3</li>',
-                    '<li class="section-option" id="opt-4-4-4">4-4-4</li>',
-                    '<li class="section-option" id="opt-4-8">4-8</li>',
-                    '<li class="section-option" id="opt-8-4">8-4</li>',
-                    '<li class="section-option" id="opt-navbar">Navbar</li>',
-                    '<li class="section-option" id="opt-footer">Footer</li>',
-                '</ul>',
+            '<span id="addNewSectionTitle" style="display:block;">Add A New Section</span>',
+            '<ul class="options" style="display:none;">',
+            '<li class="section-option" id="opt-12">12</li>',
+            '<li class="section-option" id="opt-3-3-3-3">3-3-3-3</li>',
+            '<li class="section-option" id="opt-4-4-4">4-4-4</li>',
+            '<li class="section-option" id="opt-4-8">4-8</li>',
+            '<li class="section-option" id="opt-8-4">8-4</li>',
+            '<li class="section-option" id="opt-navbar">Navbar</li>',
+            '<li class="section-option" id="opt-footer">Footer</li>',
+            '</ul>',
             '</div>'
         ].join('\n');
 
         $(document.body).append(temp);
     },
 
-    placeJS: function(expanded) {
+    placeJS: function (expanded) {
 
-        if(!expanded.js || expanded.js === '') return;
+        if (!expanded.js || expanded.js === '') return;
 
         var self = this;
         var jsTag = 'custom-js-widget-' + this.model.cid;
         if (jsTag) $(jsTag).remove();
 
-        var appendJSTag = function() {
+        var appendJSTag = function () {
 
             var customJSTemp = [
                 'try {',
@@ -97,7 +97,9 @@ var SectionsManagerView = Backbone.View.extend({
                 jsTag.id = 'custom-js-widget-' + self.model.cid;
                 jsTag.setAttribute("type", "text/javascript");
 
-                jsTag.text = _.template(customJSTemp, { code: expanded.js });
+                jsTag.text = _.template(customJSTemp, {
+                    code: expanded.js
+                });
 
                 console.log(jsTag);
                 document.body.appendChild(jsTag);
@@ -106,21 +108,23 @@ var SectionsManagerView = Backbone.View.extend({
             }
         };
 
-        setTimeout(function() { $(document).ready(appendJSTag); }, 3000);
+        setTimeout(function () {
+            $(document).ready(appendJSTag);
+        }, 3000);
         // this.listenTo(v1, 'editor-loaded', appendJSTag, this);
     },
 
-    showSectionOptions: function() {
+    showSectionOptions: function () {
 
-        if(!this.optionsHidden) return;
+        if (!this.optionsHidden) return;
 
         this.$el.find('#addNewSectionTitle').hide();
         this.$el.find('.options').fadeIn();
         this.optionsHidden = false;
     },
 
-    selectSectionLayout: function(e) {
-        var id = String(e.currentTarget.id).replace('opt-','');
+    selectSectionLayout: function (e) {
+        var id = String(e.currentTarget.id).replace('opt-', '');
         this.sectionsCollection.createSectionWithType(id);
 
         this.$el.find('.options').first().hide();
@@ -128,24 +132,24 @@ var SectionsManagerView = Backbone.View.extend({
         this.optionsHidden = true;
     },
 
-    matchSection: function(model, isNew, extraData) {
+    matchSection: function (model, isNew, extraData) {
         //model.setupPageContext(v1.currentApp.getCurrentPage());
         var sectionView = this.createSubview(SectionView, model);
         sectionView.render();
 
-        this.listenTo(model, 'hovered', function() {
+        this.listenTo(model, 'hovered', function () {
             this.changeCurrentSection(model, sectionView);
         }, this);
 
         return sectionView;
     },
 
-    placeNewSection: function(model) {
+    placeNewSection: function (model) {
 
         var sectionView = this.createSubview(SectionView, model);
         this.$el.append(sectionView.render().el);
 
-        this.listenTo(model, 'hovered', function() {
+        this.listenTo(model, 'hovered', function () {
             this.changeCurrentSection(model, sectionView);
         }, this);
 
@@ -153,19 +157,19 @@ var SectionsManagerView = Backbone.View.extend({
         return sectionView;
     },
 
-    placeSection: function(model, isNew, extraData) {
+    placeSection: function (model, isNew, extraData) {
 
         var sectionView = this.createSubview(SectionView, model);
         sectionView.render();
 
-        this.listenTo(model, 'hovered', function() {
+        this.listenTo(model, 'hovered', function () {
             this.changeCurrentSection(model, sectionView);
         }, this);
 
         return sectionView;
     },
 
-    changeCurrentSection: function(model, view) {
+    changeCurrentSection: function (model, view) {
         this.currentSectionModel = model;
         this.currentSectionView = view;
     },

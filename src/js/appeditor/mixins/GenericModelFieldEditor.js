@@ -28,7 +28,7 @@
 //             var Component = {};
 
 //             if(this.options.radioOptions) {
-                
+
 //                 Component =  React.createClass({
 
 //                     getInitialState: function() {
@@ -44,7 +44,7 @@
 
 //                     render: function() {
 //                         var optionsEls = _.map(options.radioOptions, function(radioOpt) {
-                                
+
 //                                 if(radioOpt === null) return null;
 
 //                                 return React.DOM.li({className: "full-width hi2", children:[

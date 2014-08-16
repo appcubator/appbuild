@@ -9,13 +9,13 @@
         css: 'widget-editor',
 
         events: {
-            'click li'                : 'select',
-            'click .updown-handle'    : 'selectCurrent',
-            'mouseover li'            : 'hovered',
+            'click li': 'select',
+            'click .updown-handle': 'selectCurrent',
+            'mouseover li': 'hovered',
             'mouseover .updown-handle': 'hovered'
         },
 
-        initialize: function(widgetModel) {
+        initialize: function (widgetModel) {
             _.bindAll(this);
 
             this.model = widgetModel;
@@ -25,7 +25,7 @@
 
             var els = top.v1UIEState.getUIEVals(type).toJSON();
 
-            this.list = _.map(els, function(obj, key) {
+            this.list = _.map(els, function (obj, key) {
                 if (obj.class_name == currentClass) {
                     currentVal = key;
                 }
@@ -49,31 +49,31 @@
             this.render();
         },
 
-        render: function() {
+        render: function () {
             WidgetClassPickerView.__super__.render.call(this);
             this.expand();
             this.hide();
         },
 
-        hovered: function(e) {
+        hovered: function (e) {
             if (e.currentTarget.className == "updown-handle" && this.uieVals[this.currentVal.val]) {
-                this.model.set('tagName',   this.uieVals[this.currentVal.val].tagName);
+                this.model.set('tagName', this.uieVals[this.currentVal.val].tagName);
                 this.model.set('className', this.uieVals[this.currentVal.val].class_name);
                 return;
             }
 
-            if(!this.list[ind]) return;
+            if (!this.list[ind]) return;
 
             var ind = String(e.currentTarget.id).replace('li-' + this.cid + '-', '');
             this.model.set('tagName', this.uieVals[this.list[ind].val].tagName);
             this.model.set('className', this.uieVals[this.list[ind].val].class_name);
         },
 
-        show: function() {
+        show: function () {
             this.$el.fadeIn();
         },
 
-        hide: function() {
+        hide: function () {
             this.$el.hide();
         }
     });

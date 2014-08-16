@@ -7,15 +7,15 @@
 
         model: WidgetModel,
 
-        initialize: function() {
+        initialize: function () {
             Backbone.Regrettable.bind(this);
         },
 
-        createElementWithGenPath: function(layout, generatorPath, type, extraData) {
+        createElementWithGenPath: function (layout, generatorPath, type, extraData) {
             this.createUIElement(type, layout, generatorPath, extraData);
         },
 
-        createUIElement: function(type, layout, generatorPath, extraData) {
+        createUIElement: function (type, layout, generatorPath, extraData) {
             var generator = G.getGenerator(generatorPath);
 
             var widget = {};

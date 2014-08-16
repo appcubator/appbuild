@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function (require, exports, module) {
 
     'use strict';
 
@@ -94,16 +94,16 @@ define(function(require, exports, module) {
 
     FormEditorTemplates.template = [
         '<div class="">',
-            '<div class="details-panel panel">',
-            '</div><div class="form-panel panel">',
-            '<small>You can click on field to see the details and drag them to arrange the display order</small>',
-            '<ul class="form-fields-list">',
-            '</ul>',
-            '<% var field = _.last(form.get(\'fields\').models); var sortable = "not-sortable"; %>',
-            '<input type=\"submit\" value=\"Submit\">',
-            '<% %>',
-            '</div>',
-            '<div class="add-field-panel"><div class="btn add-field-button"><span class="icon"></span>Add a New Field</div></div>',
+        '<div class="details-panel panel">',
+        '</div><div class="form-panel panel">',
+        '<small>You can click on field to see the details and drag them to arrange the display order</small>',
+        '<ul class="form-fields-list">',
+        '</ul>',
+        '<% var field = _.last(form.get(\'fields\').models); var sortable = "not-sortable"; %>',
+        '<input type=\"submit\" value=\"Submit\">',
+        '<% %>',
+        '</div>',
+        '<div class="add-field-panel"><div class="btn add-field-button"><span class="icon"></span>Add a New Field</div></div>',
         '</div>',
         '<div class="bottom-sect"><div class="q-mark"></div><div class="btn done">Done</div></div>'
     ].join('\n');
@@ -188,7 +188,7 @@ define(function(require, exports, module) {
             'submit .new-field-form': 'addNewField'
         },
 
-        initialize: function(options) {
+        initialize: function (options) {
             _.bindAll(this);
 
             this.model = options.model;
@@ -215,7 +215,7 @@ define(function(require, exports, module) {
             }
         },
 
-        render: function(text) {
+        render: function (text) {
             var temp_context = {};
             temp_context.form = this.model;
             temp_context.pages = v1.currentApp.model.get('routes').models;
@@ -226,27 +226,27 @@ define(function(require, exports, module) {
             //     return "CurrentUser." + field.name;
             // });
             var html = _.template(FormEditorTemplates.template, temp_context);
-            
+
 
             var formEditorHTML = [
-             '<div class="header">',
+                '<div class="header">',
                 '<div>',
                 '<h2>Form Editor</h2>',
                 '<div class="q-mark-circle"></div>',
                 '</div>',
                 '<ul class="tabs">',
-                    '<li class="fields-li right-icon">',
-                    '<span>Fields</span>',
-                    '</li><li class="actions-li right-icon">',
-                    '<span>Actions</span>',
-                    '</li><li class="code-li right-icon">',
-                    '<span>Code</span>',
-                    '</li>',
+                '<li class="fields-li right-icon">',
+                '<span>Fields</span>',
+                '</li><li class="actions-li right-icon">',
+                '<span>Actions</span>',
+                '</li><li class="code-li right-icon">',
+                '<span>Code</span>',
+                '</li>',
                 '</ul>',
-            '</div>',
-            '<div class="current-content">',
-            html,
-            '</div>'
+                '</div>',
+                '<div class="current-content">',
+                html,
+                '</div>'
             ].join('\n');
 
             this.el.innerHTML = formEditorHTML;
@@ -270,11 +270,11 @@ define(function(require, exports, module) {
             return this;
         },
 
-        renderFields: function() {
+        renderFields: function () {
             var length = this.model.get('fields').length;
-            this.model.get('fields').each(function(field, ind) {
+            this.model.get('fields').each(function (field, ind) {
                 if (ind == (length - 1)) return;
-                
+
                 var fieldRendered = field.expand();
                 var html = _.template(FormEditorTemplates.field, {
                     fieldRendered: fieldRendered,
@@ -285,12 +285,12 @@ define(function(require, exports, module) {
             }, this);
         },
 
-        reRenderFields: function() {
+        reRenderFields: function () {
             this.$el.find('.form-fields-list').html('');
             this.renderFields();
         },
 
-        newFormField: function(val) {
+        newFormField: function (val) {
 
             if (val == "new") {
                 this.renderNewFieldForm();
@@ -328,7 +328,7 @@ define(function(require, exports, module) {
 
         },
 
-        fieldAdded: function(fieldModel) {
+        fieldAdded: function (fieldModel) {
             console.log(fieldModel);
             var fieldRendered = fieldModel.expand();
             var html = _.template(FormEditorTemplates.field, {
@@ -343,11 +343,11 @@ define(function(require, exports, module) {
             });
         },
 
-        fieldRemoved: function(fieldModel) {
+        fieldRemoved: function (fieldModel) {
             this.$el.find('#field-' + fieldModel.cid).remove();
         },
 
-        selectedNew: function(fieldModel) {
+        selectedNew: function (fieldModel) {
             var html = _.template(FormEditorTemplates.details, {
                 field: fieldModel,
                 fieldTypesArr: fieldTypesArr
@@ -390,14 +390,14 @@ define(function(require, exports, module) {
 
         },
 
-        clickedField: function(e) {
+        clickedField: function (e) {
             e.preventDefault();
             var cid = String(e.target.id || e.target.parentNode.id || e.target.parentNode.parentNode.id).replace('field-', '');
             var fieldModel = this.model.get('fields').get(cid);
             this.selectedNew(fieldModel);
         },
 
-        reRenderDisplayType: function() {
+        reRenderDisplayType: function () {
             var field = this.selected;
             $('#field-' + field.cid).find('.form-item').html(_.template(FieldTypes[field.get('displayType')], {
                 field: field,
@@ -405,14 +405,14 @@ define(function(require, exports, module) {
             }));
         },
 
-        reRenderLabel: function() {
+        reRenderLabel: function () {
             var field = this.selected;
             var str = field.get('label');
             if (field.get('required')) str += ' *';
             $('#field-' + field.cid).find('label').html(str);
         },
 
-        changedFieldType: function(e) {
+        changedFieldType: function (e) {
             if (e.target.checked && this.selected) {
                 var newType = e.target.value;
                 this.selected.set('displayType', newType);
@@ -434,29 +434,29 @@ define(function(require, exports, module) {
             }
         },
 
-        changedPlaceholder: function(e) {
+        changedPlaceholder: function (e) {
             this.selected.set('placeholder', e.target.value);
             e.stopPropagation();
         },
 
-        changedRequired: function(e) {
+        changedRequired: function (e) {
             var required = (e.target.value === "yes") ? true : false;
             this.selected.set('required', required);
             e.stopPropagation();
         },
 
-        changedLabel: function(e) {
+        changedLabel: function (e) {
             this.selected.set('label', e.target.value);
             e.stopPropagation();
         },
 
-        changedOptions: function(e) {
+        changedOptions: function (e) {
             var value = String(this.$el.find('.options-input').val()).trim();
             this.selected.set('options', value);
             e.stopPropagation();
         },
 
-        changedOrder: function(e, ui) {
+        changedOrder: function (e, ui) {
             var sortedIDs = $('.form-fields-list').sortable("toArray");
 
             var submitBtn = _.last(this.model.get('fields').models);
@@ -481,7 +481,7 @@ define(function(require, exports, module) {
             this.model.get('fields').trigger('change');
         },
 
-        addNewField: function(e) {
+        addNewField: function (e) {
             e.preventDefault();
 
             var name = this.$el.find('.new-field-name').val();
@@ -524,27 +524,27 @@ define(function(require, exports, module) {
             this.$el.find('.field-text').fadeIn();
         },
 
-        deleteField: function(e) {
+        deleteField: function (e) {
             var id = String(e.target.id).replace('delete-btn-field-', '');
             this.model.get('fields').remove(id);
 
             e.stopPropagation();
         },
 
-        showTutorial: function() {
+        showTutorial: function () {
             new TutorialView([6, 1]);
         },
 
 
-        clickedAddField: function(e) {
+        clickedAddField: function (e) {
             console.log(this);
             console.log(this.entityModel);
-            
-            var list = this.entityModel.get('fields').filter(function(field) {
+
+            var list = this.entityModel.get('fields').filter(function (field) {
                 return !field.isRelatedField();
             });
-            
-            list = _(list).map(function(field) {
+
+            list = _(list).map(function (field) {
                 return {
                     name: field.get('name'),
                     val: field.cid
@@ -562,7 +562,7 @@ define(function(require, exports, module) {
             this.fieldPicker.on('submit', this.newFormField);
         },
 
-        renderNewFieldForm: function() {
+        renderNewFieldForm: function () {
             this.$el.find('.details-panel').html(_.template(FormEditorTemplates.newField, {}));
         }
 

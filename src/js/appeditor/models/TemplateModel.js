@@ -1,31 +1,31 @@
     'use strict';
 
-    var SectionCollection= require('../collections/SectionCollection').SectionCollection;
+    var SectionCollection = require('../collections/SectionCollection').SectionCollection;
 
     var TemplateModel = Backbone.Model.extend({
 
-        initialize: function(bone) {
+        initialize: function (bone) {
             this.set('name', bone.name);
             this.set('head', bone.head || "");
             this.set('uielements', new SectionCollection(bone.uielements || []));
 
-            if(!this.generate) {
+            if (!this.generate) {
                 this.setGenerator('templates.page');
             }
         },
 
-        getSections: function() {
+        getSections: function () {
             return this.get('uielements');
         },
 
-        getUIElements: function() {
-            if(this.widgetsCollection) return this.widgetsCollection;
+        getUIElements: function () {
+            if (this.widgetsCollection) return this.widgetsCollection;
 
             var WidgetCollection = require('../collections/WidgetCollection').WidgetCollection;
             var sections = this.getSections();
             this.widgetsCollection = new WidgetCollection();
 
-            sections.each(function(sectionModel) {
+            sections.each(function (sectionModel) {
                 this.widgetsCollection.add(sectionModel.getWidgetsCollection().models);
                 // this.bindColumn(columnModel);
             }, this);
@@ -36,7 +36,7 @@
 
         },
 
-        toJSON: function(options) {
+        toJSON: function (options) {
 
             var json = _.clone(this.attributes);
             json.uielements = json.uielements.serialize(options);

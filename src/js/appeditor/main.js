@@ -9,7 +9,7 @@ var AppRouter = require('./AppRouter').AppRouter;
 
 if (window) {
 
-    window.onerror = function(){
+    window.onerror = function () {
         //alert("I\'m a bug, please squash me.");
     }
 
@@ -19,7 +19,9 @@ if (window) {
     /* Initialize v1State */
     window.v1State = new Backbone.Model();
     /* Global code generator for this app. */
-    window.G = new Generator(function(){ return v1State.serialize().plugins; });
+    window.G = new Generator(function () {
+        return v1State.serialize().plugins;
+    });
     v1State = new AppModel(appState);
     v1State.set('routes', new RouteCollection(appState.routes || []));
 
@@ -27,7 +29,7 @@ if (window) {
     v1UIEState = new ThemeModel(uieState);
 
     /* Help with debugging */
-    v1State.on('error', function(message) {
+    v1State.on('error', function (message) {
         alert(message);
     });
 
@@ -39,13 +41,13 @@ if (window) {
 
     v1 = {};
     v1 = new AppRouter();
-    v1.appmain(0,0);
+    v1.appmain(0, 0);
     // Backbone.history.start({
     //     pushState: true
     // });
 
     // handle all click events for routing
-    $(document).on('click', 'a[rel!="external"]', function(e) {
+    $(document).on('click', 'a[rel!="external"]', function (e) {
         var href = e.currentTarget.getAttribute('href') || "";
         var appId = appId || {};
         // if internal link, navigate with router

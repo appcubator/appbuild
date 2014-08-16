@@ -13,14 +13,14 @@
                 'click .list-template': 'listSelected'
             },
 
-            initialize: function(options) {
+            initialize: function (options) {
                 _.bindAll(this);
                 this.model = options.model;
                 this.options = options;
                 this.render();
             },
 
-            staticSelected: function(e) {
+            staticSelected: function (e) {
                 var tempId = String(e.currentTarget.id).replace('page-', '');
                 this.model.get('uielements').add(page_templates[tempId].uielements);
 
@@ -28,7 +28,7 @@
                 this.closeModal();
             },
 
-            infoSelected: function(e) {
+            infoSelected: function (e) {
                 var tableId = String(e.currentTarget.id).replace('table-info-', '');
                 var tableModel = v1State.get('tables').get(tableId);
 
@@ -43,7 +43,7 @@
                 this.closeModal();
             },
 
-            listSelected: function(e) {
+            listSelected: function (e) {
                 var tableId = String(e.currentTarget.id).replace('table-list-', '');
                 var tableModel = v1State.get('tables').get(tableId);
 
@@ -54,17 +54,17 @@
                 this.closeModal();
             },
 
-            render: function() {
+            render: function () {
                 var self = this;
                 this.el.innerHTML = "<h2>Pick A Template</h2><p>Looks like this page is blank. Would you like to start with one of the templates?</p>";
 
                 var list = document.createElement('ul');
                 list.className = 'template-icons';
-                _(page_templates).each(function(page, ind) {
+                _(page_templates).each(function (page, ind) {
                     list.innerHTML += '<li class="page-template static-template" id="page-' + ind + '"><img src="/static/img/page_templates/' + page.icon + '"><span>' + page.name + '</span></li>';
                 });
 
-                v1State.get('tables').each(function(tableM) {
+                v1State.get('tables').each(function (tableM) {
                     list.innerHTML += '<li class="page-template info-template" id="table-info-' + tableM.cid + '"><img src="/static/img/page_templates/info-page-icon.png"><span>' + tableM.get('name') + ' Info Page</span></li>';
                     list.innerHTML += '<li class="page-template list-template" id="table-list-' + tableM.cid + '"><img src="/static/img/page_templates/list-page-icon.png"><span>' + tableM.get('name') + ' List Page</span></li>';
                 });
@@ -73,7 +73,7 @@
                 return this;
             },
 
-            closeModal: function() {
+            closeModal: function () {
                 if (this.options.callback) {
                     this.options.callback.call();
                 }

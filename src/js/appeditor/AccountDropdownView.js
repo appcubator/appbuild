@@ -9,11 +9,11 @@ exports.AccountDropdownView = Backbone.DropdownView.extend({
     },
     subviews: [],
 
-    initialize: function() {
+    initialize: function () {
 
     },
 
-    render: function() {
+    render: function () {
         return this;
     }
 });

@@ -31009,7 +31009,7 @@ require.define("/libs/BackboneRegrettable.js",function(require,module,exports,__
 
 });
 
-require.define("/appeditor/mixins/BackboneConvenience.js",function(require,module,exports,__dirname,__filename,process,global){        Backbone.View.prototype.close = function() {
+require.define("/appeditor/mixins/BackboneConvenience.js",function(require,module,exports,__dirname,__filename,process,global){        Backbone.View.prototype.close = function () {
 
             this.undelegateEvents();
             this.$el.removeData().unbind();
@@ -31017,14 +31017,14 @@ require.define("/appeditor/mixins/BackboneConvenience.js",function(require,modul
             this.unbind();
 
             if (this.subviews) {
-                _(this.subviews).each(function(subview) {
+                _(this.subviews).each(function (subview) {
                     subview.close();
                 });
                 this.subviews = null;
             }
         };
 
-        Backbone.View.prototype._ensureElement = function() {
+        Backbone.View.prototype._ensureElement = function () {
             if (!this.el) {
                 var attrs = {};
                 if (this.id) attrs.id = _.result(this, 'id');
@@ -31040,61 +31040,63 @@ require.define("/appeditor/mixins/BackboneConvenience.js",function(require,modul
             }
         };
 
-        Backbone.isModel = function(obj) {
+        Backbone.isModel = function (obj) {
             if (obj && obj.attributes) return true;
             return false;
         };
 
-        Backbone.isCollection = function(obj) {
+        Backbone.isCollection = function (obj) {
             if (obj && obj.models) return true;
             return false;
         };
 
-        Backbone.isString = function(obj) {
+        Backbone.isString = function (obj) {
             return toString.call(obj) == '[object String]';
         };
 
-        Backbone.View.prototype.deepListenTo = function(obj, event, handler) {
+        Backbone.View.prototype.deepListenTo = function (obj, event, handler) {
             if (Backbone.isModel(obj)) {
                 this.listenTo(obj, event, handler);
-                _.each(obj.attributes, function(val, key) {
+                _.each(obj.attributes, function (val, key) {
                     this.deepListenTo(val, event, handler);
                 }, this);
             } else if (Backbone.isCollection(obj)) {
                 this.listenTo(obj, event, handler);
-                _.each(obj.models, function(model) {
+                _.each(obj.models, function (model) {
                     this.deepListenTo(model, event, handler);
                 }, this);
             }
         };
 
-        Backbone.View.prototype.listenToModels = function(coll, event, handler) {
+        Backbone.View.prototype.listenToModels = function (coll, event, handler) {
 
-            coll.each(function(model) {
-                this.listenTo(model, event, function() {
+            coll.each(function (model) {
+                this.listenTo(model, event, function () {
                     handler(model);
                 });
             }, this);
 
             var self = this;
-            this.listenTo(coll, 'add', function(model) {
+            this.listenTo(coll, 'add', function (model) {
                 self.listenTo(model, event, handler);
             });
         };
 
-        Backbone.View.prototype.createSubview = function(cls, data) {
+        Backbone.View.prototype.createSubview = function (cls, data) {
 
             var view = new cls(data);
             view.superview = this;
             this.subviews = this.subviews || [];
             this.subviews.push(view);
 
-            if(this.topview) { view.topview = this.topview; }
+            if (this.topview) {
+                view.topview = this.topview;
+            }
 
             return view;
         };
 
-        Backbone.Collection.prototype.add = function(models, options) {
+        Backbone.Collection.prototype.add = function (models, options) {
             /* make things validate by default*/
             models = _.isArray(models) ? models : [models];
             options = _.extend({
@@ -31110,10 +31112,10 @@ require.define("/appeditor/mixins/BackboneConvenience.js",function(require,modul
             if (this.uniqueKeys) {
                 if (!_.isArray(models)) models = models ? [models] : [];
 
-                _.each(models, function(model) {
-                    this.each(function(_model) {
+                _.each(models, function (model) {
+                    this.each(function (_model) {
                         var dupe = null;
-                        _.each(this.uniqueKeys, function(key) {
+                        _.each(this.uniqueKeys, function (key) {
                             var _modelVal = _model.attributes ? _model.get(key) : _model[key];
                             if (_modelVal === model.get(key) ||
                                 (Backbone.isString(_modelVal) && Backbone.isString(model.get(key)) &&
@@ -31139,14 +31141,14 @@ require.define("/appeditor/mixins/BackboneConvenience.js",function(require,modul
             return this.set(models, _.defaults(options || {}, addOptions));
         };
 
-        Backbone.Collection.prototype.push = function(model, options) {
+        Backbone.Collection.prototype.push = function (model, options) {
             model = this._prepareModel(model, options);
             var dupe = null;
             if (this.uniqueKeys) {
 
-                this.each(function(_model) {
+                this.each(function (_model) {
 
-                    _.each(this.uniqueKeys, function(key) {
+                    _.each(this.uniqueKeys, function (key) {
 
                         if (_model.get(key) === model.get(key)) {
                             dupe = _model;
@@ -31169,11 +31171,11 @@ require.define("/appeditor/mixins/BackboneConvenience.js",function(require,modul
             return model;
         };
 
-        Backbone.Model.prototype.setGenerator = function(generatorStr) {
+        Backbone.Model.prototype.setGenerator = function (generatorStr) {
             this.generate = generatorStr;
         };
 
-        Backbone.Model.prototype.serialize = function(options) {
+        Backbone.Model.prototype.serialize = function (options) {
             var options = options || {};
             var json = {};
             var data = this.toJSON(options);
@@ -31181,7 +31183,7 @@ require.define("/appeditor/mixins/BackboneConvenience.js",function(require,modul
             if (this.generate) {
                 json.generate = this.generate;
                 json.data = data;
-                if(options.generate) json.data.cid = this.cid;
+                if (options.generate) json.data.cid = this.cid;
             } else {
                 json = data;
             }
@@ -31189,15 +31191,15 @@ require.define("/appeditor/mixins/BackboneConvenience.js",function(require,modul
             return json;
         };
 
-        Backbone.Collection.prototype.setGenerator = function(generatorStr) {
+        Backbone.Collection.prototype.setGenerator = function (generatorStr) {
             this.generate = generatorStr;
         };
 
-        Backbone.Collection.prototype.serialize = function(options) {
+        Backbone.Collection.prototype.serialize = function (options) {
             options = options || {};
             var json = {};
 
-            var data = this.map(function(model) {
+            var data = this.map(function (model) {
                 return model.serialize(options);
             });
 
@@ -31211,10 +31213,12 @@ require.define("/appeditor/mixins/BackboneConvenience.js",function(require,modul
             return json;
         };
 
-        Backbone.Model.prototype.expand = function(options) {
-        	var options = options || {};
+        Backbone.Model.prototype.expand = function (options) {
+            var options = options || {};
             if (this.generate && options.generate !== false) {
-                var data = this.toJSON({ generate: true });
+                var data = this.toJSON({
+                    generate: true
+                });
                 data.cid = this.cid;
                 return G.generate(this.generate, data);
             } else {
@@ -31224,23 +31228,29 @@ require.define("/appeditor/mixins/BackboneConvenience.js",function(require,modul
             return null;
         };
 
-        Backbone.Model.prototype.updateJSON = function(bone) {
+        Backbone.Model.prototype.updateJSON = function (bone) {
 
-            this.set(bone, {silent: true});
+            this.set(bone, {
+                silent: true
+            });
 
-            _.each(this.attributes, function(val, key) {
-                if(!bone[key]) {
-                    this.unset(key, {silent: true});
+            _.each(this.attributes, function (val, key) {
+                if (!bone[key]) {
+                    this.unset(key, {
+                        silent: true
+                    });
                 }
             }, this);
 
             this.trigger('change');
         };
 
-        Backbone.Collection.prototype.expand = function() {
+        Backbone.Collection.prototype.expand = function () {
 
             if (this.generate) {
-                var data = this.serialize({ generate: true });
+                var data = this.serialize({
+                    generate: true
+                });
                 data = data.data;
                 return G.generate(this.generate, data);
             } else {
@@ -31254,92 +31264,92 @@ require.define("/appeditor/mixins/BackboneConvenience.js",function(require,modul
 
 require.define("/appeditor/mixins/BackboneUI.js",function(require,module,exports,__dirname,__filename,process,global){  Backbone.UIView = Backbone.View.extend({
 
-    resizableAndDraggable: function() {
-      var self = this;
+      resizableAndDraggable: function () {
+          var self = this;
 
-      $(self.el).resizable({
-        handles: "n, e, s, w, nw, ne, sw, se",
-        // grid: [80, 15],
-        containment: "parent",
-        resize: self.resizing,
-        stop  : self.resized
-      });
+          $(self.el).resizable({
+              handles: "n, e, s, w, nw, ne, sw, se",
+              // grid: [80, 15],
+              containment: "parent",
+              resize: self.resizing,
+              stop: self.resized
+          });
 
-      self.$el.draggable({
-        containment: "parent",
-        //grid: [80, 15],
-        drag: self.moving,
-        stop: self.moved,
-        snapMode : "outer"
-      });
+          self.$el.draggable({
+              containment: "parent",
+              //grid: [80, 15],
+              drag: self.moving,
+              stop: self.moved,
+              snapMode: "outer"
+          });
 
-      this.setPosition("absolute");
-    },
+          this.setPosition("absolute");
+      },
 
-    draggable: function() {
-      var self = this;
-      self.$el.draggable({
-        containment: parent,
-        grid: [80, 15],
-        drag: self.moving,
-        stop: self.moved
-      });
-    },
+      draggable: function () {
+          var self = this;
+          self.$el.draggable({
+              containment: parent,
+              grid: [80, 15],
+              drag: self.moving,
+              stop: self.moved
+          });
+      },
 
-    resizable: function() {
-      var self = this;
-      self.$el.resizable({
-        handles: "n, e, s, w, se",
-        grid: 30,
-        resize: self.resizing,
-        stop: self.resized
-      });
+      resizable: function () {
+          var self = this;
+          self.$el.resizable({
+              handles: "n, e, s, w, se",
+              grid: 30,
+              resize: self.resizing,
+              stop: self.resized
+          });
 
-      this.setPosition("absolute");
-    },
+          this.setPosition("absolute");
+      },
 
-    disableResizeAndDraggable: function() {
-      if(this.$el.hasClass('ui-resizable')) {
-        $(this.el).resizable("disable");
+      disableResizeAndDraggable: function () {
+          if (this.$el.hasClass('ui-resizable')) {
+              $(this.el).resizable("disable");
+          }
+          if (this.$el.hasClass('ui-draggable')) {
+              $(this.el).draggable("disable");
+          }
+      },
+
+      clear: function () {
+          this.disableResizeAndDraggable();
+          this.el.className = this.className;
+          this.el.innerHTML = '';
+      },
+
+      setLeft: function (val) {
+          this.el.style.left = val + "px";
+      },
+
+      setRight: function (val) {
+          this.el.style.right = val + "px";
+      },
+
+      setTop: function (val) {
+          this.el.style.top = val + "px";
+      },
+
+      setHeight: function (val) {
+          this.el.style.height = val + "px";
+      },
+
+      setWidth: function (val) {
+          this.el.style.width = val + "px";
+      },
+
+      setBottom: function (val) {
+          this.el.style.bottom = val + "px";
+      },
+
+      setPosition: function (val) {
+          this.el.style.position = val;
       }
-      if(this.$el.hasClass('ui-draggable')) {
-        $(this.el).draggable("disable");
-      }
-    },
-
-    clear : function() {
-      this.disableResizeAndDraggable();
-      this.el.className = this.className;
-      this.el.innerHTML = '';
-    },
-
-    setLeft : function(val) {
-      this.el.style.left = val + "px";
-    },
-
-    setRight : function(val) {
-      this.el.style.right = val + "px";
-    },
-
-    setTop: function(val) {
-      this.el.style.top = val + "px";
-    },
-
-    setHeight: function(val) {
-      this.el.style.height = val + "px";
-    },
-
-    setWidth: function(val) {
-      this.el.style.width = val + "px";
-    },
-
-    setBottom: function(val) {
-      this.el.style.bottom = val + "px";
-    },
-
-    setPosition: function(val) {
-      this.el.style.position = val;
-    }
 
   });
 

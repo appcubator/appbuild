@@ -7,43 +7,46 @@
         subviews: [],
 
         events: {
-            "keyup #scripts-content" : "scriptsChanged",
-            "keyup #header-content"  : "headerChanged"
+            "keyup #scripts-content": "scriptsChanged",
+            "keyup #header-content": "headerChanged"
         },
 
-        initialize: function() {
+        initialize: function () {
             _.bindAll(this);
             this.model = v1State;
         },
 
-        render: function() {
+        render: function () {
 
             var template = [
                 '<div class="" id="settings-page">',
-                    '<h2 class="pheader">App Settings</h2>',
-                    '<ul id="list-tables">',
-                    '<li>',
-                        '<h3>Header</h3>',
-                        '<textarea id="header-content"><%= header_content %></textarea>',
-                    '</li>',
-                    '<li>',
-                        '<h3>Scripts</h3>',
-                        '<textarea id="scripts-content"><%= scripts_content %></textarea>',
-                    '</li>',
-                    '</ul>',
-                '</div>'].join('\n');
+                '<h2 class="pheader">App Settings</h2>',
+                '<ul id="list-tables">',
+                '<li>',
+                '<h3>Header</h3>',
+                '<textarea id="header-content"><%= header_content %></textarea>',
+                '</li>',
+                '<li>',
+                '<h3>Scripts</h3>',
+                '<textarea id="scripts-content"><%= scripts_content %></textarea>',
+                '</li>',
+                '</ul>',
+                '</div>'
+            ].join('\n');
 
-            this.el.innerHTML = _.template(template, { header_content: this.model.get("header") || "",
-                                                       scripts_content: this.model.get("scripts") || ""});
+            this.el.innerHTML = _.template(template, {
+                header_content: this.model.get("header") || "",
+                scripts_content: this.model.get("scripts") || ""
+            });
             return this;
         },
 
-        scriptsChanged: function(e) {
+        scriptsChanged: function (e) {
             console.log(e.currentTarget.value);
             this.model.set("scripts", e.currentTarget.value);
         },
 
-        headerChanged: function(e) {
+        headerChanged: function (e) {
             this.model.set("header", e.currentTarget.value);
         }
 

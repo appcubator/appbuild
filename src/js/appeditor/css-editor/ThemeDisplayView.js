@@ -9,7 +9,7 @@
             },
             theme: null,
 
-            initialize: function(data) {
+            initialize: function (data) {
                 _.bindAll(this);
 
                 this.info = data.themeInfo;
@@ -17,7 +17,7 @@
                 this.render();
             },
 
-            render: function() {
+            render: function () {
                 var template = ['<h2 class="span30"><%= name %></h2>',
                     '<p class="designed-by hoff1">Designed by <%= designer %></p>',
                     '<div class="span12"><img src="<%= image %>"></div>',
@@ -26,7 +26,7 @@
                 this.el.innerHTML = _.template(template, this.info);
             },
 
-            loadTheme: function() {
+            loadTheme: function () {
                 var url = '/app/' + appId + '/uiestate/';
                 var newState = uieState;
                 if (this.info.web_or_mobile == "M") {
@@ -43,9 +43,9 @@
                     data: {
                         uie_state: JSON.stringify(newState)
                     },
-                    success: function(data) {
+                    success: function (data) {
                         self.$el.find('.load').append('<div class="hoff1"><h4 class="text-success"><strong>Loaded!</strong></h4></div>');
-                        setTimeout(function() {
+                        setTimeout(function () {
                             self.closeModal();
                         }, 800);
                     }
@@ -56,21 +56,21 @@
                 $.ajax({
                     type: "GET",
                     url: '/theme/' + self.info.id + '/static/',
-                    success: function(data) {
-                        _(data).each(function(static_file) {
+                    success: function (data) {
+                        _(data).each(function (static_file) {
                             $.ajax({
                                 type: "POST",
                                 url: '/app/' + appId + '/static/',
                                 data: JSON.stringify(static_file),
-                                success: function(data) {}
+                                success: function (data) {}
                             });
                         });
                     }
                 });
             },
 
-            switchToV2: function() {
-                v1State.get('pages').each(function(pageM) {
+            switchToV2: function () {
+                v1State.get('pages').each(function (pageM) {
                     pageM.get('navbar').set('version', 2);
                     pageM.get('footer').set('version', 2);
                 });

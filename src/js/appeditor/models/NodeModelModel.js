@@ -10,7 +10,7 @@
             //new FieldsCollection()
         },
 
-        initialize: function(bone) {
+        initialize: function (bone) {
 
             if (typeof bone === "string") {
                 if (bone === "User") {
@@ -36,12 +36,14 @@
             });
             this.set('functions', new NodeModelCodeCollection(bone.functions || []));
 
-            if(!this.generate) { this.setGenerator("models.model"); }
+            if (!this.generate) {
+                this.setGenerator("models.model");
+            }
 
             this.isUser = false;
         },
 
-        toJSON: function() {
+        toJSON: function () {
             var json = {};
             json = _.clone(this.attributes);
             json.fields = this.get('fields').serialize();
@@ -49,40 +51,40 @@
             return json;
         },
 
-        addFieldsWithNames: function(nameArr) {
-            _(nameArr).each(function(name) {
+        addFieldsWithNames: function (nameArr) {
+            _(nameArr).each(function (name) {
                 this.get('fields').push({
                     name: name
                 });
             }, this);
         },
 
-        getFieldsColl: function() {
+        getFieldsColl: function () {
             var arr = this.get('fields');
             return arr;
         },
 
-        getNormalFields: function() {
-            var normalFields = this.get('fields').filter(function(field) {
+        getNormalFields: function () {
+            var normalFields = this.get('fields').filter(function (field) {
                 return !field.isRelatedField();
             });
             return normalFields;
         },
 
-        getRelationalFields: function() {
-            var relationalFields = this.get('fields').filter(function(field) {
+        getRelationalFields: function () {
+            var relationalFields = this.get('fields').filter(function (field) {
                 return field.isRelatedField();
             });
             return relationalFields;
         },
 
-        hasMoneyField: function() {
+        hasMoneyField: function () {
             return (this.getMoneyField() !== null);
         },
 
-        getMoneyField: function() {
+        getMoneyField: function () {
             var moneyField = null;
-            this.getFieldsColl().each(function(_fieldM) {
+            this.getFieldsColl().each(function (_fieldM) {
                 if (_fieldM.get('type') == "money") {
                     moneyField = _fieldM;
                     return;

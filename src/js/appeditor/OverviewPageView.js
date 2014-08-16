@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function (require, exports, module) {
     'use strict';
 
     var SimpleModalView = require('mixins/SimpleModalView');
@@ -11,8 +11,7 @@ define(function(require, exports, module) {
     require('util');
     require('util.filepicker');
 
-    var template = [
-    ].join('\n');
+    var template = [].join('\n');
 
     var OverviewPageView = Backbone.View.extend({
 
@@ -25,10 +24,10 @@ define(function(require, exports, module) {
             'click #share': 'share',
             'click .edit-btn': 'settings',
             'click .logo': 'changeLogo',
-            'click .delete-app' : 'deleteApp'
+            'click .delete-app': 'deleteApp'
         },
 
-        initialize: function(options) {
+        initialize: function (options) {
             _.bindAll(this);
 
             options = (options || {});
@@ -43,10 +42,10 @@ define(function(require, exports, module) {
             this.title = "The Garage";
         },
 
-        render: function() {
+        render: function () {
             this.settingsPane.setElement($([
                 '<ul class="dropdown-view settings-pane">',
-                    '<li class="delete-app"><a>DELETE APP</a></li>',
+                '<li class="delete-app"><a>DELETE APP</a></li>',
                 '</ul>'
             ].join('\n')));
 
@@ -57,31 +56,31 @@ define(function(require, exports, module) {
             this.el.appendChild(this.settingsPane.render().el);
         },
 
-        deploy: function() {
+        deploy: function () {
             var threeDots = util.threeDots();
             $('#deploy').find('h4').html('Publishing').append(threeDots.el);
 
-            v1.deploy(function() {
+            v1.deploy(function () {
                 $('#deploy').find('h4').html('Go To App');
                 clearInterval(threeDots.timer);
             });
         },
 
-        share: function() {
+        share: function () {
             new ShareModalView();
         },
 
-        download: function() {
+        download: function () {
             new DownloadModalView();
         },
 
-        browse: function() {
+        browse: function () {
             new AdminPanelView();
         },
 
-        changeLogo: function() {
+        changeLogo: function () {
             var self = this;
-            util.filepicker.openSinglePick(function(file) {
+            util.filepicker.openSinglePick(function (file) {
                 app.info.logo = file.url;
                 self.setLogoImage();
                 $.ajax({
@@ -94,21 +93,21 @@ define(function(require, exports, module) {
             });
         },
 
-        setLogoImage: function() {
+        setLogoImage: function () {
             if (!app.info) app.info = {};
             app.info.logo = app.info.logo || "https://www.filepicker.io/api/file/ZJDTP6ZWTkORSHrvjGZZ"
             if (app.info.logo) {
-                this.$el.find('.logo').css('backgroundImage', 'url(' + app.info.logo|| + ')');
+                this.$el.find('.logo').css('backgroundImage', 'url(' + app.info.logo || +')');
             }
         },
 
-        deleteApp: function() {
+        deleteApp: function () {
             var r = confirm("Are you sure you want to delete this App?");
             if (r === true) {
                 $.ajax({
                     type: "POST",
                     url: '/app/' + this.appId + '/delete/',
-                    complete: function() {
+                    complete: function () {
                         var url = '/app/';
                         window.location.href = url;
                     },

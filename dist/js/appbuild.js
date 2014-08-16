@@ -434,15 +434,17 @@ process.binding = function (name) {
 
 require.define("/Generator.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var Generator = function(pluginsGetter) {
+    var Generator = function (pluginsGetter) {
         /* Pass either an object of the plugins to use, or pass a function which when called returns the plugins. */
         this.expander = initExpander();
         var expander = this.expander;
 
-        if (typeof(pluginsGetter) === 'function') {
+        if (typeof (pluginsGetter) === 'function') {
             this._getPlugins = pluginsGetter;
         } else {
-            this._getPlugins = function() { return pluginsGetter; };
+            this._getPlugins = function () {
+                return pluginsGetter;
+            };
         }
 
         var self = this;
@@ -454,21 +456,20 @@ require.define("/Generator.js",function(require,module,exports,__dirname,__filen
                 var genID = this.parseGenID(genData.generate);
                 var generatedObj = expander.constructGen(expander.findGenData(generators, genID))(generators, genData.data);
                 obj = generatedObj;
-            }
-            catch(e) {
-                console.log('Error in call to expandOnce for '+JSON.stringify(genID, null, 3)+':');
+            } catch (e) {
+                console.log('Error in call to expandOnce for ' + JSON.stringify(genID, null, 3) + ':');
                 console.log(e);
                 throw e;
             }
 
-            if(obj.html && genData.data && genData.data.cid) {
+            if (obj.html && genData.data && genData.data.cid) {
 
                 var div = document.createElement('div');
                 div.innerHTML = obj.html;
                 var elements = div.childNodes;
                 var element = div;
 
-                if(elements.length == 1) {
+                if (elements.length == 1) {
                     element = elements[0];
                 }
 
@@ -482,12 +483,15 @@ require.define("/Generator.js",function(require,module,exports,__dirname,__filen
 
     };
 
-    Generator.prototype.generate = function(generatorPath, data) {
+    Generator.prototype.generate = function (generatorPath, data) {
         var plugins = this._getPlugins();
-        return this.expander.expand(plugins, {generate: generatorPath, data: data});
+        return this.expander.expand(plugins, {
+            generate: generatorPath,
+            data: data
+        });
     };
 
-    Generator.prototype.getGenerator = function(generatorPath) {
+    Generator.prototype.getGenerator = function (generatorPath) {
         var plugins = this._getPlugins();
         return this.expander.findGenData(plugins, this.expander.parseGenID(generatorPath));
     };
@@ -510,7 +514,7 @@ require.define("/models/AppModel.js",function(require,module,exports,__dirname,_
         currentPage: null,
         lazy: {},
 
-        initialize: function(aState) {
+        initialize: function (aState) {
             if (!aState) return;
 
             this.set('info', new AppInfoModel(aState.info));
@@ -525,22 +529,22 @@ require.define("/models/AppModel.js",function(require,module,exports,__dirname,_
 
         },
 
-        getTableModelWithName: function(nameStr) {
+        getTableModelWithName: function (nameStr) {
             var tableM = this.get('models').getTableWithName(nameStr);
             return tableM;
         },
 
-        getTableModelWithCid: function(cid) {
+        getTableModelWithCid: function (cid) {
             var tableM = this.get('models').get(cid);
             return tableM;
         },
 
-        lazySet: function(key, coll) {
+        lazySet: function (key, coll) {
             this.lazy[key] = coll;
             this.set(key, new Backbone.Collection([]));
         },
 
-        get: function(key) {
+        get: function (key) {
             if (this.lazy[key]) {
                 this.set(key, this.lazy[key]);
                 delete this.lazy[key];
@@ -549,7 +553,7 @@ require.define("/models/AppModel.js",function(require,module,exports,__dirname,_
             return AppModel.__super__.get.call(this, key);
         },
 
-        serialize: function(options) {
+        serialize: function (options) {
             var json = _.clone(this.attributes);
             json.info = json.info.serialize(options);
             json.models = json.models.serialize(options);
@@ -566,14 +570,15 @@ require.define("/models/AppModel.js",function(require,module,exports,__dirname,_
 });
 
 require.define("/models/AppInfoModel.js",function(require,module,exports,__dirname,__filename,process,global){  var AppInfoModel = Backbone.Model.extend({
-    initialize: function(bone) {
-      // this.set("name", bone.name);
-      this.set("description", bone.description||"");
-      this.set("keywords", bone.keywords||"");
-    }
+      initialize: function (bone) {
+          // this.set("name", bone.name);
+          this.set("description", bone.description || "");
+          this.set("keywords", bone.keywords || "");
+      }
   });
 
   exports.AppInfoModel = AppInfoModel;
+
 });
 
 require.define("/collections/NodeModelCollection.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -584,23 +589,23 @@ require.define("/collections/NodeModelCollection.js",function(require,module,exp
         model: NodeModelModel,
         uniqueKeys: ["name"],
 
-        createTableWithName: function(nameStr) {
+        createTableWithName: function (nameStr) {
             return this.push({
                 name: nameStr
             });
         },
 
-        getTableWithName: function(tableNameStr) {
+        getTableWithName: function (tableNameStr) {
             var table = this.where({
                 name: tableNameStr
             })[0];
             return table;
         },
 
-        getRelationsWithEntityName: function(tableNameStr) {
+        getRelationsWithEntityName: function (tableNameStr) {
             var arrFields = [];
-            this.each(function(table) {
-                table.get('fields').each(function(fieldModel) {
+            this.each(function (table) {
+                table.get('fields').each(function (fieldModel) {
                     if (fieldModel.has('entity_name') && fieldModel.get('entity_name') == tableNameStr) {
                         var obj = fieldModel.serialize();
                         obj.cid = fieldModel.cid;
@@ -614,8 +619,8 @@ require.define("/collections/NodeModelCollection.js",function(require,module,exp
             return arrFields;
         },
 
-        getAllRelations: function() {
-            return this.reduce(function(memo, model) {
+        getAllRelations: function () {
+            return this.reduce(function (memo, model) {
                 return _.union(memo, model.getRelationalFields());
             }, []);
         },
@@ -623,7 +628,6 @@ require.define("/collections/NodeModelCollection.js",function(require,module,exp
     });
 
     exports.NodeModelCollection = NodeModelCollection;
-
 
 });
 
@@ -639,7 +643,7 @@ require.define("/models/NodeModelModel.js",function(require,module,exports,__dir
             //new FieldsCollection()
         },
 
-        initialize: function(bone) {
+        initialize: function (bone) {
 
             if (typeof bone === "string") {
                 if (bone === "User") {
@@ -665,12 +669,14 @@ require.define("/models/NodeModelModel.js",function(require,module,exports,__dir
             });
             this.set('functions', new NodeModelCodeCollection(bone.functions || []));
 
-            if(!this.generate) { this.setGenerator("models.model"); }
+            if (!this.generate) {
+                this.setGenerator("models.model");
+            }
 
             this.isUser = false;
         },
 
-        toJSON: function() {
+        toJSON: function () {
             var json = {};
             json = _.clone(this.attributes);
             json.fields = this.get('fields').serialize();
@@ -678,40 +684,40 @@ require.define("/models/NodeModelModel.js",function(require,module,exports,__dir
             return json;
         },
 
-        addFieldsWithNames: function(nameArr) {
-            _(nameArr).each(function(name) {
+        addFieldsWithNames: function (nameArr) {
+            _(nameArr).each(function (name) {
                 this.get('fields').push({
                     name: name
                 });
             }, this);
         },
 
-        getFieldsColl: function() {
+        getFieldsColl: function () {
             var arr = this.get('fields');
             return arr;
         },
 
-        getNormalFields: function() {
-            var normalFields = this.get('fields').filter(function(field) {
+        getNormalFields: function () {
+            var normalFields = this.get('fields').filter(function (field) {
                 return !field.isRelatedField();
             });
             return normalFields;
         },
 
-        getRelationalFields: function() {
-            var relationalFields = this.get('fields').filter(function(field) {
+        getRelationalFields: function () {
+            var relationalFields = this.get('fields').filter(function (field) {
                 return field.isRelatedField();
             });
             return relationalFields;
         },
 
-        hasMoneyField: function() {
+        hasMoneyField: function () {
             return (this.getMoneyField() !== null);
         },
 
-        getMoneyField: function() {
+        getMoneyField: function () {
             var moneyField = null;
-            this.getFieldsColl().each(function(_fieldM) {
+            this.getFieldsColl().each(function (_fieldM) {
                 if (_fieldM.get('type') == "money") {
                     moneyField = _fieldM;
                     return;
@@ -728,14 +734,17 @@ require.define("/models/NodeModelModel.js",function(require,module,exports,__dir
 require.define("/collections/FieldsCollection.js",function(require,module,exports,__dirname,__filename,process,global){  var FieldModel = ('../models/FieldModel').FieldModel;
 
   var FieldsCollection = Backbone.Collection.extend({
-    model : FieldModel,
-    uniqueKeys: ["name"],
-    getImageFields: function() {
-      return this.filter(function(fieldM) { return fieldM.get('type') == "image"; });
-    }
+      model: FieldModel,
+      uniqueKeys: ["name"],
+      getImageFields: function () {
+          return this.filter(function (fieldM) {
+              return fieldM.get('type') == "image";
+          });
+      }
   });
 
   exports.FieldsCollection = FieldsCollection;
+
 });
 
 require.define("/models/NodeModelMethodModel.js",function(require,module,exports,__dirname,__filename,process,global){    var WhereCollection = require('../collections/WhereCollection');
@@ -745,11 +754,11 @@ require.define("/models/NodeModelMethodModel.js",function(require,module,exports
     var NodeModelMethodModel = Backbone.Model.extend({
         /* Note that this may have name/code or it may be a generator */
 
-        isGenerator: function() {
+        isGenerator: function () {
             return this.generate !== undefined;
         },
 
-        getGenerated: function() {
+        getGenerated: function () {
             // TODO stop making objects of Generator every time
             if (this.isGenerator()) {
                 return G.generate(this.generate, this.toJSON());
@@ -758,7 +767,7 @@ require.define("/models/NodeModelMethodModel.js",function(require,module,exports
             }
         },
 
-        getCode: function() {
+        getCode: function () {
             if (this.isGenerator()) {
                 return String(G.generate(this.generate, this.toJSON()).code);
             } else {
@@ -767,7 +776,7 @@ require.define("/models/NodeModelMethodModel.js",function(require,module,exports
         },
 
         /* mutating the type */
-        getType: function() {
+        getType: function () {
             var obj = this.getGenerated();
             if (obj.instancemethod)
                 return 'instancemethod';
@@ -776,17 +785,19 @@ require.define("/models/NodeModelMethodModel.js",function(require,module,exports
             else
                 return 'staticmethod';
         },
-        setType: function(type) {
+        setType: function (type) {
             if (this.isGenerator()) {
                 alert('cant set type of a plugin\'s function');
                 return;
             }
             var enableAPI = type === 'enableAPI' ? true : undefined;
             var instancemethod = type === 'instancemethod' ? true : undefined;
-            this.set('enableAPI', enableAPI, {silent: true}); // only need to fire one change event
+            this.set('enableAPI', enableAPI, {
+                silent: true
+            }); // only need to fire one change event
             this.set('instancemethod', instancemethod);
         },
-        toggleType: function() {
+        toggleType: function () {
             var currType = this.getType();
             var newType;
             if (currType === 'staticmethod')
@@ -815,77 +826,79 @@ require.define("/models/NodeModelMethodModel.js",function(require,module,exports
 
 require.define("/collections/WhereCollection.js",function(require,module,exports,__dirname,__filename,process,global){var WhereModel = require("../models/WhereModel").WhereModel;
 
-  var WhereCollection = Backbone.Collection.extend({
+var WhereCollection = Backbone.Collection.extend({
     model: WhereModel,
     removeClauseWithName: function (keyStr) {
-      this.each(function(clause) {
-        if(clause.get('field_name') == keyStr) {
-          this.remove(clause);
-        }
-      });
+        this.each(function (clause) {
+            if (clause.get('field_name') == keyStr) {
+                this.remove(clause);
+            }
+        });
     }
-  });
+});
 
 exports.WhereCollection = WhereCollection;
 
 });
 
 require.define("/models/WhereModel.js",function(require,module,exports,__dirname,__filename,process,global){  var WhereModel = Backbone.Model.extend({
-    initialize: function(bone) { }
+      initialize: function (bone) {}
   });
 
   exports.WhereModel = WhereModel;
+
 });
 
 require.define("/collections/TemplateCollection.js",function(require,module,exports,__dirname,__filename,process,global){var TemplateModel = require('../models/TemplateModel').TemplateModel;
 
-        var TemplateCollection = Backbone.Collection.extend({
-            model: TemplateModel,
+var TemplateCollection = Backbone.Collection.extend({
+    model: TemplateModel,
 
-            getTemplateWithName: function(name) {
-                var page = null;
+    getTemplateWithName: function (name) {
+        var page = null;
 
-                this.each(function(templateModel) {
-                    if (templateModel.get('name') == name) {
-                        page = templateModel;
-                    }
-                });
-
-                return page;
+        this.each(function (templateModel) {
+            if (templateModel.get('name') == name) {
+                page = templateModel;
             }
         });
 
-        exports.TemplateCollection = TemplateCollection;
+        return page;
+    }
+});
+
+exports.TemplateCollection = TemplateCollection;
+
 });
 
 require.define("/models/TemplateModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var SectionCollection= require('../collections/SectionCollection').SectionCollection;
+    var SectionCollection = require('../collections/SectionCollection').SectionCollection;
 
     var TemplateModel = Backbone.Model.extend({
 
-        initialize: function(bone) {
+        initialize: function (bone) {
             this.set('name', bone.name);
             this.set('head', bone.head || "");
             this.set('uielements', new SectionCollection(bone.uielements || []));
 
-            if(!this.generate) {
+            if (!this.generate) {
                 this.setGenerator('templates.page');
             }
         },
 
-        getSections: function() {
+        getSections: function () {
             return this.get('uielements');
         },
 
-        getUIElements: function() {
-            if(this.widgetsCollection) return this.widgetsCollection;
+        getUIElements: function () {
+            if (this.widgetsCollection) return this.widgetsCollection;
 
             var WidgetCollection = require('../collections/WidgetCollection').WidgetCollection;
             var sections = this.getSections();
             this.widgetsCollection = new WidgetCollection();
 
-            sections.each(function(sectionModel) {
+            sections.each(function (sectionModel) {
                 this.widgetsCollection.add(sectionModel.getWidgetsCollection().models);
                 // this.bindColumn(columnModel);
             }, this);
@@ -896,7 +909,7 @@ require.define("/models/TemplateModel.js",function(require,module,exports,__dirn
 
         },
 
-        toJSON: function(options) {
+        toJSON: function (options) {
 
             var json = _.clone(this.attributes);
             json.uielements = json.uielements.serialize(options);
@@ -905,6 +918,7 @@ require.define("/models/TemplateModel.js",function(require,module,exports,__dirn
     });
 
     exports.TemplateModel = TemplateModel;
+
 });
 
 require.define("/collections/SectionCollection.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -916,84 +930,84 @@ require.define("/collections/SectionCollection.js",function(require,module,expor
 
         model: SectionModel,
 
-        initialize: function() {
+        initialize: function () {
             Backbone.Regrettable.bind(this);
 
-            if(!this.generate) {
+            if (!this.generate) {
                 this.setGenerator('templates.layoutSections');
             }
         },
 
-        createSectionWithType: function(type) {
+        createSectionWithType: function (type) {
 
-            switch(type) {
+            switch (type) {
 
-                case "navbar":
-                    var sectionModel = new SectionModel();
-                    sectionModel.setGenerator('templates.navbar');
-                    this.add(sectionModel);
-                    break;
+            case "navbar":
+                var sectionModel = new SectionModel();
+                sectionModel.setGenerator('templates.navbar');
+                this.add(sectionModel);
+                break;
 
-                case "footer":
-                    var sectionModel = new SectionModel();
-                    sectionModel.setGenerator('templates.footer');
-                    this.add(sectionModel);
-                    break;
+            case "footer":
+                var sectionModel = new SectionModel();
+                sectionModel.setGenerator('templates.footer');
+                this.add(sectionModel);
+                break;
 
-                default:
-                    var sectionsLayouts = type.split('-');
-                    var sectionModel = new SectionModel();
-                    sectionModel.setupColumns();
+            default:
+                var sectionsLayouts = type.split('-');
+                var sectionModel = new SectionModel();
+                sectionModel.setupColumns();
 
-                    _.each(sectionsLayouts, function(columnLayout) {
-                        var columnM = new ColumnModel();
-                        columnM.set('layout', columnLayout);
-                        sectionModel.get('columns').push(columnM);
-                    }, this);
+                _.each(sectionsLayouts, function (columnLayout) {
+                    var columnM = new ColumnModel();
+                    columnM.set('layout', columnLayout);
+                    sectionModel.get('columns').push(columnM);
+                }, this);
 
-                    this.add(sectionModel);
-                    return;
-                    break;
+                this.add(sectionModel);
+                return;
+                break;
             }
 
         },
 
-        getAllWidgets: function(argument) {
+        getAllWidgets: function (argument) {
             if (!this.allWidgets) this.allWidgets = this.constructWidgetCollection();
             return this.allWidgets;
         },
 
-        arrangeSections: function(fromInd, toInd) {
+        arrangeSections: function (fromInd, toInd) {
             this.models.splice(toInd, 0, this.models.splice(fromInd, 1)[0]);
             this.trigger('rearranged');
         },
 
-        constructWidgetCollection: function() {
+        constructWidgetCollection: function () {
             var widgetCollection = new WidgetCollection();
 
-            this.each(function(sectionModel) {
+            this.each(function (sectionModel) {
                 if (!sectionModel.has('columns')) return;
                 var collection = sectionModel.get('columns');
-                collection.each(function(columnModel) {
+                collection.each(function (columnModel) {
 
                     var widgetColl = columnModel.get('uielements');
                     widgetCollection.add(widgetColl.models);
-                    widgetColl.on('add', function(model) {
+                    widgetColl.on('add', function (model) {
                         widgetCollection.add(model);
                     });
 
                 });
             }, this);
 
-            this.on('add', function(sectionModel) {
-                if(!sectionModel.has('columns')) return;
+            this.on('add', function (sectionModel) {
+                if (!sectionModel.has('columns')) return;
 
                 var collection = sectionModel.get('columns');
-                collection.each(function(columnModel) {
+                collection.each(function (columnModel) {
 
                     var widgetColl = columnModel.get('uielements');
                     widgetCollection.add(widgetColl.models);
-                    widgetColl.on('add', function(model) {
+                    widgetColl.on('add', function (model) {
                         widgetCollection.add(model);
                     });
 
@@ -1017,42 +1031,48 @@ require.define("/models/SectionModel.js",function(require,module,exports,__dirna
 
     var SectionModel = Backbone.Model.extend({
 
-        initialize: function(bone) {
+        initialize: function (bone) {
 
             var bone = bone || {};
-           
+
             if (bone.columns) {
-                var ColumnCollection = Backbone.Collection.extend({ model: ColumnModel });
+                var ColumnCollection = Backbone.Collection.extend({
+                    model: ColumnModel
+                });
                 var columnsColl = new ColumnCollection();
                 columnsColl.add(bone.columns || []);
                 this.set("columns", columnsColl);
             }
 
-            if(!this.generate) {
+            if (!this.generate) {
                 this.generate = "templates.layoutSection";
             }
         },
 
-        setupColumns: function() {
-            var ColumnCollection = Backbone.Collection.extend({ model: ColumnModel });
+        setupColumns: function () {
+            var ColumnCollection = Backbone.Collection.extend({
+                model: ColumnModel
+            });
             var columnsColl = new ColumnCollection();
             this.set("columns", columnsColl);
         },
 
-        updateJSON: function(bone) {
+        updateJSON: function (bone) {
 
             var cleanBone = _.omit(bone, ['layout', 'data', 'context', 'fields']);
             this.set(cleanBone);
 
             if (bone.columns) {
-                var ColumnCollection = Backbone.Collection.extend({ model: ColumnModel });
+                var ColumnCollection = Backbone.Collection.extend({
+                    model: ColumnModel
+                });
                 var columnsColl = new ColumnCollection();
                 columnsColl.add(bone.columns || []);
                 this.set("columns", columnsColl);
             }
 
-            _.each(this.attributes, function(val, key) {
-                if(!bone[key]) {
+            _.each(this.attributes, function (val, key) {
+                if (!bone[key]) {
                     this.unset(key);
                 }
             }, this);
@@ -1060,15 +1080,17 @@ require.define("/models/SectionModel.js",function(require,module,exports,__dirna
         },
 
         getWidgetsCollection: function () {
-            if (this.widgetsCollection) { return this.widgetsCollection; }
+            if (this.widgetsCollection) {
+                return this.widgetsCollection;
+            }
 
             this.widgetsCollection = new Backbone.Collection();
 
             if (this.has('columns')) {
 
-                this.get('columns').each(function(columnModel) {
+                this.get('columns').each(function (columnModel) {
                     this.widgetsCollection.add(columnModel.get('uielements').models);
-                    columnModel.get('uielements').each(function(widgetModel) {
+                    columnModel.get('uielements').each(function (widgetModel) {
                         widgetModel.collection = columnModel.get('uielements');
                     });
                     this.bindColumn(columnModel);
@@ -1082,20 +1104,20 @@ require.define("/models/SectionModel.js",function(require,module,exports,__dirna
 
         bindColumn: function (columnModel) {
 
-            columnModel.get('uielements').on('remove', function(widgetModel) {
+            columnModel.get('uielements').on('remove', function (widgetModel) {
                 this.widgetsCollection.remove(widgetModel, columnModel);
             }, this);
 
-            columnModel.get('uielements').on('add', function(widgetModel) {
+            columnModel.get('uielements').on('add', function (widgetModel) {
                 this.widgetsCollection.add(widgetModel, columnModel);
             }, this);
 
         },
 
-        toJSON: function(options) {
+        toJSON: function (options) {
             var options = options || {};
             var json = _.clone(this.attributes);
-            if(json.columns) {
+            if (json.columns) {
                 json.columns = json.columns.serialize(options);
             }
             return json;
@@ -1115,15 +1137,15 @@ require.define("/collections/WidgetCollection.js",function(require,module,export
 
         model: WidgetModel,
 
-        initialize: function() {
+        initialize: function () {
             Backbone.Regrettable.bind(this);
         },
 
-        createElementWithGenPath: function(layout, generatorPath, type, extraData) {
+        createElementWithGenPath: function (layout, generatorPath, type, extraData) {
             this.createUIElement(type, layout, generatorPath, extraData);
         },
 
-        createUIElement: function(type, layout, generatorPath, extraData) {
+        createUIElement: function (type, layout, generatorPath, extraData) {
             var generator = G.getGenerator(generatorPath);
 
             var widget = {};
@@ -1162,7 +1184,7 @@ require.define("/models/WidgetModel.js",function(require,module,exports,__dirnam
         /* idAttribute as cid allows duplicate widgets to be stored in the collection */
         idAttribute: 'cid',
 
-        initialize: function(bone, isNew) {
+        initialize: function (bone, isNew) {
 
             if (bone.layout) {
                 this.set('layout', new LayoutModel(bone.layout || {}));
@@ -1170,63 +1192,73 @@ require.define("/models/WidgetModel.js",function(require,module,exports,__dirnam
 
             this.set('context', new Backbone.Collection(bone.context || []));
 
-            if (bone.fields) { this.set('fields', new FormFieldCollection(bone.fields || [])); }
+            if (bone.fields) {
+                this.set('fields', new FormFieldCollection(bone.fields || []));
+            }
             if (bone.row) {
-                var RowModel    = require('../models/RowModel');
+                var RowModel = require('../models/RowModel');
                 this.set('row', new RowModel(bone.row || {}));
             }
 
-            this.bind('editModeOn', function() {
+            this.bind('editModeOn', function () {
                 this.editMode = true;
             }, this);
-            this.bind('editModeOff', function() {
+            this.bind('editModeOff', function () {
                 this.editMode = false;
             }, this);
 
         },
 
-        updateJSON: function(bone) {
+        updateJSON: function (bone) {
 
             var cleanBone = _.omit(bone, ['data', 'layout', 'fields']);
-            this.set(cleanBone, {silent: true});
-            
+            this.set(cleanBone, {
+                silent: true
+            });
+
             if (this.has('layout') && bone.layout) {
                 console.log(bone.layout);
-                this.get('layout').set(bone.layout, {silent: true});
+                this.get('layout').set(bone.layout, {
+                    silent: true
+                });
             }
 
             if (this.has('fields') && bone.fields) {
-                this.get('fields').set(bone.fields, {silent: true});
+                this.get('fields').set(bone.fields, {
+                    silent: true
+                });
             }
 
-            _.each(this.attributes, function(val, key) {
-                if(!bone[key]) {
-                    this.unset(key, {silent: true});
+            _.each(this.attributes, function (val, key) {
+                if (!bone[key]) {
+                    this.unset(key, {
+                        silent: true
+                    });
                 }
             }, this);
 
             this.trigger('change');
         },
 
-        remove: function() {
+        remove: function () {
             if (this.get('deletable') === false) return;
             if (this.collection) {
                 this.collection.remove(this);
             }
         },
 
-        isFullWidth: function() {
+        isFullWidth: function () {
             return this.get('layout').get('isFull') === true;
         },
 
-        moveLeft: function() {
+        moveLeft: function () {
             if (this.isFullWidth()) return;
 
             if (this.get('layout').get('left') < 1 || this.collection.editMode) return;
             this.get('layout').set('left', this.get('layout').get('left') - 1);
         },
 
-        moveRight: function() {
+        moveRight: function () {
             if (this.isFullWidth()) return;
 
             var maxWidth = this.collection.grid.maxWidth;
@@ -1234,23 +1266,23 @@ require.define("/models/WidgetModel.js",function(require,module,exports,__dirnam
             this.get('layout').set('left', this.get('layout').get('left') + 1);
         },
 
-        moveUp: function() {
+        moveUp: function () {
             if (this.get('layout').get('top') < 1 || this.collection.editMode) return;
             this.get('layout').set('top', this.get('layout').get('top') - 1);
         },
 
-        moveDown: function() {
+        moveDown: function () {
             if (this.collection.editMode) return;
             this.get('layout').set('top', this.get('layout').get('top') + 1);
         },
 
-        setupPageContext: function(pageModel) {
+        setupPageContext: function (pageModel) {
             // TODO: Fix this
             //var entityList = pageModel.getContextEntities();
             var entityList = [];
             var contextList = this.get('context');
 
-            _(entityList).each(function(entity) {
+            _(entityList).each(function (entity) {
                 contextList.push({
                     entity: entity,
                     context: 'Page.' + entity
@@ -1260,14 +1292,14 @@ require.define("/models/WidgetModel.js",function(require,module,exports,__dirnam
             return this;
         },
 
-        setupLoopContext: function(entityModel) {
+        setupLoopContext: function (entityModel) {
             var newContext = {
                 entity: entityModel.get('name'),
                 context: 'loop.' + entityModel.get('name')
             };
             var isUnique = true;
 
-            this.get('context').each(function(context) {
+            this.get('context').each(function (context) {
                 if (_.isEqual(context.serialize(), newContext)) {
                     isUnique = false;
                 }
@@ -1283,33 +1315,33 @@ require.define("/models/WidgetModel.js",function(require,module,exports,__dirnam
             return this;
         },
 
-        getAction: function() {
+        getAction: function () {
             if (this.get('data').has('container_info')) return this.get('data').get('container_info').get('action');
             else return this.get('data').get('action');
 
             return;
         },
 
-        getRow: function() {
+        getRow: function () {
             if (!this.has('row')) return null;
             return this.get('row');
         },
 
-        getContent: function() {
+        getContent: function () {
             return this.get('content');
         },
 
-        getForm: function() {
+        getForm: function () {
             if (!this.get('data').has('container_info')) return null;
             return this.get('data').get('container_info').get('form');
         },
 
-        hasForm: function() {
+        hasForm: function () {
             if (this.has('fields')) return true;
             return false;
         },
 
-        getLoginRoutes: function() {
+        getLoginRoutes: function () {
 
             if (this.get('data').has('loginRoutes')) {
                 return this.get('data').get('loginRoutes');
@@ -1324,67 +1356,67 @@ require.define("/models/WidgetModel.js",function(require,module,exports,__dirnam
         },
 
 
-        getSearchQuery: function() {
+        getSearchQuery: function () {
             return this.get('data').get('searchQuery');
         },
 
-        isNode: function() {
+        isNode: function () {
             return this.get('type') == "node";
         },
 
-        isImage: function() {
+        isImage: function () {
             return (this.isNode() && this.get('data').get('nodeType') == "images");
         },
 
-        isBox: function() {
+        isBox: function () {
             return (this.isNode() && this.get('data').get('nodeType') == "boxes");
         },
 
-        isBgElement: function() {
+        isBgElement: function () {
             if ((this.get('type') == "node" && this.get('data').get('nodeType') == "boxes") ||
                 (this.get('type') == "imageslider")) return true;
             return false;
         },
 
-        isForm: function() {
+        isForm: function () {
             return this.get('type') == "form";
         },
 
-        isLoginForm: function() {
+        isLoginForm: function () {
             return false;
             //return (this.isForm() && this.get('data').get('container_info').get('action') == "login") || (this.get('type') == "thirdpartylogin");
         },
 
-        isList: function() {
+        isList: function () {
             if (this.get('type') == "loop") return true;
             return false;
         },
 
-        isCustomWidget: function() {
+        isCustomWidget: function () {
             if (this.get('type') == "custom" ||
                 this.get('data').has('cssC') ||
                 this.get('data').has('jsC') ||
                 this.get('data').has('htmlC')) return true;
         },
 
-        isBuyButton: function() {
+        isBuyButton: function () {
             return this.get('type') === "buybutton";
         },
 
-        isSearchList: function() {
+        isSearchList: function () {
             return this.get('data').has('container_info') && this.get('data').get('container_info').get('action') == "searchlist";
         },
 
-        getBottom: function() {
+        getBottom: function () {
             return this.get('layout').get('height') + this.get('layout').get('top');
         },
 
         getWidgetsCollection: function () {
-            if(this.widgetsCollection) return this.widgetsCollection;
+            if (this.widgetsCollection) return this.widgetsCollection;
             var WidgetCollection = require('../collections/WidgetCollection');
             this.widgetsCollection = new WidgetCollection();
 
-            this.get('row').get('columns').each(function(columnModel) {
+            this.get('row').get('columns').each(function (columnModel) {
                 this.widgetsCollection.add(columnModel.get('uielements').models);
                 this.bindColumn(columnModel);
             }, this);
@@ -1397,37 +1429,45 @@ require.define("/models/WidgetModel.js",function(require,module,exports,__dirnam
 
         bindColumn: function (columnModel) {
 
-            columnModel.get('uielements').on('remove', function(widgetModel) {
+            columnModel.get('uielements').on('remove', function (widgetModel) {
                 this.widgetsCollection.remove(widgetModel, columnModel);
             }, this);
 
-            columnModel.get('uielements').on('add', function(widgetModel) {
+            columnModel.get('uielements').on('add', function (widgetModel) {
                 this.widgetsCollection.add(widgetModel, columnModel);
             }, this);
 
         },
 
-        toJSON: function(options) {
+        toJSON: function (options) {
             options = options || {};
 
             var json = _.clone(this.attributes);
             json = _.omit(json, 'selected', 'deletable', 'context');
 
-            if (json.layout) { json.layout = this.get('layout').serialize(options); }
-            if (json.fields) { json.fields = json.fields.serialize(options); }
+            if (json.layout) {
+                json.layout = this.get('layout').serialize(options);
+            }
+            if (json.fields) {
+                json.fields = json.fields.serialize(options);
+            }
             // if (json.row) { json.row = json.row.serialize(options); }
             if (json.context) delete json.context;
 
             return json;
         },
 
-        safeExpand: function() {
+        safeExpand: function () {
             try {
                 return this.expand();
             } catch (e) {
                 console.log("Expander error:");
                 console.log(e);
-                return {html: '<img src="http://cdn.memegenerator.net/instances/500x/43563104.jpg">', js: '', css: ''};
+                return {
+                    html: '<img src="http://cdn.memegenerator.net/instances/500x/43563104.jpg">',
+                    js: '',
+                    css: ''
+                };
             }
         }
 
@@ -1437,30 +1477,31 @@ require.define("/models/WidgetModel.js",function(require,module,exports,__dirnam
 
 });
 
-require.define("/models/LayoutModel.js",function(require,module,exports,__dirname,__filename,process,global){
-    var LayoutModel = Backbone.Model.extend({
-        
-        defaults: {
-            'alignment': 'left'
-        }
+require.define("/models/LayoutModel.js",function(require,module,exports,__dirname,__filename,process,global){var LayoutModel = Backbone.Model.extend({
 
-    });
+    defaults: {
+        'alignment': 'left'
+    }
 
-    exports.LayoutModel = LayoutModel;
+});
+
+exports.LayoutModel = LayoutModel;
+
 });
 
 require.define("/collections/FormFieldCollection.js",function(require,module,exports,__dirname,__filename,process,global){var FormFieldModel = require('../models/FormFieldModel').FormFieldModel;
 
 
-    var FormFieldCollection = Backbone.Collection.extend({
-      model: FormFieldModel
-    });
+var FormFieldCollection = Backbone.Collection.extend({
+    model: FormFieldModel
+});
 
-    exports.FormFieldCollection = FormFieldCollection;
+exports.FormFieldCollection = FormFieldCollection;
+
 });
 
 require.define("/models/FormFieldModel.js",function(require,module,exports,__dirname,__filename,process,global){        var FormFieldModel = Backbone.Model.extend({
-            initialize: function(bone) {
+            initialize: function (bone) {
                 this.set('field_name', bone.field_name);
                 if (bone.type) {
                     this.set('type', bone.type);
@@ -1475,7 +1516,7 @@ require.define("/models/FormFieldModel.js",function(require,module,exports,__dir
                 }
             },
 
-            toJSON: function() {
+            toJSON: function () {
                 var json = _.clone(this.attributes);
                 if (json.displayType == "button") {
                     json = _.omit(json, 'options');
@@ -1493,21 +1534,21 @@ require.define("/models/RowModel.js",function(require,module,exports,__dirname,_
     var ColumnModel = require('./ColumnModel');
     var RowModel = Backbone.Model.extend({
 
-        initialize: function(bone) {
+        initialize: function (bone) {
 
             var columnCollection = Backbone.Collection.extend({
                 model: ColumnModel
             });
-            
+
             var columnsColl = new columnCollection();
             columnsColl.add(bone.columns || []);
             this.set("columns", columnsColl);
 
         },
 
-        toJSON: function(options) {
+        toJSON: function (options) {
             var json = _.clone(this.attributes);
-            if(json.columns) json.columns = json.columns.serialize(options);
+            if (json.columns) json.columns = json.columns.serialize(options);
 
             return json;
         }
@@ -1515,6 +1556,7 @@ require.define("/models/RowModel.js",function(require,module,exports,__dirname,_
     });
 
     exports.RowModel = RowModel;
+
 });
 
 require.define("/models/ColumnModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -1522,9 +1564,9 @@ require.define("/models/ColumnModel.js",function(require,module,exports,__dirnam
 
     var ColumnModel = Backbone.Model.extend({
 
-        initialize: function(bone) {
+        initialize: function (bone) {
             var bone = bone || {};
-            this.set("uielements", new WidgetCollection(bone.uielements||[]));
+            this.set("uielements", new WidgetCollection(bone.uielements || []));
 
             if (!this.generate) {
                 this.generate = "templates.layoutColumn";
@@ -1533,22 +1575,22 @@ require.define("/models/ColumnModel.js",function(require,module,exports,__dirnam
             Backbone.Regrettable.bind(this);
         },
 
-        addElement: function(type, extraData) {
-            var layout = {  };
+        addElement: function (type, extraData) {
+            var layout = {};
             this.get('uielements').createElement(layout, className, id);
         },
 
         addElementWithPath: function (type, generatorPath, extraData) {
-            var layout = {  };
+            var layout = {};
             this.get('uielements').createElementWithGenPath(layout, generatorPath, type, extraData);
         },
 
-        toJSON: function(options) {
+        toJSON: function (options) {
             options = options || {};
 
             var json = _.clone(this.attributes);
             json.uielements = json.uielements.serialize(options);
-            if(options.generate) {
+            if (options.generate) {
                 json.cid = this.cid;
             }
             return json;
@@ -1567,9 +1609,9 @@ require.define("/models/PluginsModel.js",function(require,module,exports,__dirna
     /* Contains metadata and convenience methods for Plugins */
     var PluginsModel = Backbone.Model.extend({
 
-        initialize: function(bone) {
+        initialize: function (bone) {
 
-            _.each(bone, function(val, key) {
+            _.each(bone, function (val, key) {
 
                 /* Help initialize plugins that don't have proper metadata. */
                 /* TODO put this in the initialize method of the PluginModel instead. */
@@ -1583,17 +1625,17 @@ require.define("/models/PluginsModel.js",function(require,module,exports,__dirna
         },
 
         /* builtin plugins are not in the model by default,
-         * so this fn includes them in its return value 
-         * 
+         * so this fn includes them in its return value
+         *
          * returns { pluginName1: plugingModel1, ... } */
-        getAllPlugins: function() {
+        getAllPlugins: function () {
 
             var plugins = {};
             plugins = _.extend(plugins, _.clone(this.attributes)); // pluginName : pluginModel object
 
             /* Start with local plugins and merge builtin plugins in, not overwriting local plugins. */
 
-            _.each(G.expander.builtinGenerators, function(builtInPlugin, pluginName) {
+            _.each(G.expander.builtinGenerators, function (builtInPlugin, pluginName) {
                 var pluginModel = new PluginModel(builtInPlugin);
 
                 if (!plugins[pluginName]) {
@@ -1603,15 +1645,15 @@ require.define("/models/PluginsModel.js",function(require,module,exports,__dirna
                     var localCopy = new PluginModel();
 
                     // app-state copy of the package 
-                    _.each(plugins[pluginName].attributes, function(val, key) {
+                    _.each(plugins[pluginName].attributes, function (val, key) {
                         localCopy.set(key, _.clone(val));
-                    }); 
+                    });
 
                     // iterating over the builtin ones and mergins the gens
-                    _.each(builtInPlugin, function(gens, moduleName) {
+                    _.each(builtInPlugin, function (gens, moduleName) {
                         if (moduleName === 'metadata')
                             return;
-                        if(!localCopy.has(moduleName)) {
+                        if (!localCopy.has(moduleName)) {
                             localCopy.set(moduleName, gens);
                         } else {
                             localCopy.set(moduleName, _.union(localCopy.get(moduleName), gens));
@@ -1625,81 +1667,87 @@ require.define("/models/PluginsModel.js",function(require,module,exports,__dirna
             return plugins;
         },
 
-        getAllPluginsSerialized: function() {
+        getAllPluginsSerialized: function () {
             var plugins = this.getAllPlugins();
             var serializedPlugins = {};
 
-            _.each(plugins, function(val, key) {
+            _.each(plugins, function (val, key) {
                 serializedPlugins[key] = val.serialize();
             });
 
             return util.deepCopy(serializedPlugins);
         },
 
-        install: function(plugin) {
+        install: function (plugin) {
             if (!plugin.metadata || !plugin.metadata.name)
                 alert('not installing because this plugin doesn\'t have metadata.');
             var pluginModel = new PluginModel(plugin);
             this.set(plugin.metadata.name, pluginModel);
         },
 
-        uninstall: function(pluginName) {
+        uninstall: function (pluginName) {
             this.unset(pluginName);
             // TODO do something about generator references to this plugin?
         },
 
-        getPluginsWithModule: function(moduleName) {
-            return _.filter(this.getAllPlugins(), function(pluginModel, pluginName) {
+        getPluginsWithModule: function (moduleName) {
+            return _.filter(this.getAllPlugins(), function (pluginModel, pluginName) {
                 pluginModel.name = pluginName;
                 return pluginModel.has(moduleName);
             });
         },
 
-        getAllPluginsWithModule: function(moduleName) {
+        getAllPluginsWithModule: function (moduleName) {
             var plugins = this.getAllPlugins();
-            return _.filter(plugins, function(pluginModel) {
+            return _.filter(plugins, function (pluginModel) {
                 return pluginModel.has(moduleName);
             });
         },
 
-        getGeneratorsWithModule: function(generatorModule) {
-            var generators = _.flatten(_.map(this.getAllPlugins(), function(pluginModel, packageName) {
+        getGeneratorsWithModule: function (generatorModule) {
+            var generators = _.flatten(_.map(this.getAllPlugins(), function (pluginModel, packageName) {
                 return pluginModel.getGensByModule(generatorModule);
             }));
 
             return generators;
         },
 
-        getAllGeneratorsWithModule: function(moduleName) {
+        getAllGeneratorsWithModule: function (moduleName) {
             var plugins = this.getAllPluginsWithModule(moduleName);
-            plugins = _.filter(plugins, function(pluginModel, key) {
+            plugins = _.filter(plugins, function (pluginModel, key) {
                 return pluginModel.has(moduleName);
             });
 
-            var generators = _.flatten(_.map(plugins, function(pluginModel) {
+            var generators = _.flatten(_.map(plugins, function (pluginModel) {
                 var gens = pluginModel.get(moduleName);
-                _.each(gens, function(gen) { gen.package = pluginModel.getName(); });
+                _.each(gens, function (gen) {
+                    gen.package = pluginModel.getName();
+                });
                 return gens;
             }));
 
             return generators;
         },
 
-        isPluginInstalledToModel: function(pluginModel, nodeModelModel) {
+        isPluginInstalledToModel: function (pluginModel, nodeModelModel) {
             var gens = pluginModel.getGensByModule('model_methods');
-            var genNames = _.map(gens, function(g) { return pluginModel.getName() + '.model_methods.' + g.name; });
-            var functions = nodeModelModel.get('functions').map(function(fn) { return fn.generate; });
+            var genNames = _.map(gens, function (g) {
+                return pluginModel.getName() + '.model_methods.' + g.name;
+            });
+            var functions = nodeModelModel.get('functions').map(function (fn) {
+                return fn.generate;
+            });
             return _.intersection(genNames, functions).length > 0 ? true : false;
         },
 
-        installPluginToModel: function(pluginModel, nodeModelModel) {
+        installPluginToModel: function (pluginModel, nodeModelModel) {
             if (!pluginModel) {
                 alert('yo, what are you doing.');
                 return;
             }
             var gens = pluginModel.getGensByModule('model_methods');
 
-            _.each(gens, function(gen) {
+            _.each(gens, function (gen) {
                 var methodModel = new NodeModelMethodModel();
                 var genIDStr = pluginModel.getName() + '.model_methods.' + gen.name;
                 methodModel.setGenerator(genIDStr);
@@ -1709,11 +1757,11 @@ require.define("/models/PluginsModel.js",function(require,module,exports,__dirna
             });
         },
 
-        uninstallPluginToModel: function(plugin, nodeModelModel) {
+        uninstallPluginToModel: function (plugin, nodeModelModel) {
             var gens = [];
 
-            nodeModelModel.get('functions').each(function(fn) {
-                if(fn.isInPackage(plugin.getName())) {
+            nodeModelModel.get('functions').each(function (fn) {
+                if (fn.isInPackage(plugin.getName())) {
                     gens.push(fn);
                 }
             });
@@ -1731,7 +1779,11 @@ require.define("/models/PluginsModel.js",function(require,module,exports,__dirna
 
             if (!this.has(genID.package)) {
                 // NOTE this only happens when builtin generator is forked
-                this.set(genID.package, new PluginModel({metadata: {name: genID.package}}));
+                this.set(genID.package, new PluginModel({
+                    metadata: {
+                        name: genID.package
+                    }
+                }));
             }
 
             if (!this.get(genID.package).has(genID.module)) {
@@ -1746,13 +1798,13 @@ require.define("/models/PluginsModel.js",function(require,module,exports,__dirna
             return [genID.package, genID.module, genID.name].join('.');
         },
 
-        assertWeHaveGenerator: function(generatorPath) {
+        assertWeHaveGenerator: function (generatorPath) {
             // ensures the plugin is either builin or in the app state
-                // throws an error if for some reason the generatorPath refers to a nonexistant generator
+            // throws an error if for some reason the generatorPath refers to a nonexistant generator
             util.findGenerator(this.serialize(), generatorPath);
         },
 
-        isGeneratorBuiltin: function(generatorPath) {
+        isGeneratorBuiltin: function (generatorPath) {
             this.assertWeHaveGenerator(generatorPath);
 
             var genID = util.packageModuleName(generatorPath);
@@ -1763,17 +1815,19 @@ require.define("/models/PluginsModel.js",function(require,module,exports,__dirna
             }
 
             // let's try to find the generator in the app state.
-            var localGen = _.find(this.get(genID.package).getGensByModule(genID.module), function(gen) { return gen.name === genID.name; });
+            var localGen = _.find(this.get(genID.package).getGensByModule(genID.module), function (gen) {
+                return gen.name === genID.name;
+            });
 
             // expect it to not be found if it's builtin.
             return localGen === undefined;
         },
 
-        isGeneratorEditable: function(generatorPath) {
+        isGeneratorEditable: function (generatorPath) {
             return !this.isGeneratorBuiltin(generatorPath);
         },
 
-        isNameUnique: function(newPackageModuleName) {
+        isNameUnique: function (newPackageModuleName) {
             // TODO FIXME
             // 1. this doesn't include builtins
             // 2. shouldn't you do a has check before doing get?
@@ -1791,7 +1845,7 @@ require.define("/models/PluginsModel.js",function(require,module,exports,__dirna
             return true;
         },
 
-        toJSON: function() {
+        toJSON: function () {
             var json = _.clone(this.attributes);
 
             _.each(json, function (val, key) {
@@ -1809,7 +1863,7 @@ require.define("/models/PluginsModel.js",function(require,module,exports,__dirna
 
 require.define("/models/PluginModel.js",function(require,module,exports,__dirname,__filename,process,global){    var PluginModel = Backbone.Model.extend({
 
-        getName: function() {
+        getName: function () {
             return this.get('metadata').name;
         },
 
@@ -1834,12 +1888,12 @@ require.define("/collections/RouteCollection.js",function(require,module,exports
         model: RouteModel,
         uniqueKeys: ["name"],
 
-        getRouteWithTemplate: function(templateModel) {
+        getRouteWithTemplate: function (templateModel) {
 
             var templateName = templateModel.get('name');
             var routeM = null;
-            this.each(function(routeModel) {
-                if(routeModel.get('name') == templateName) {
+            this.each(function (routeModel) {
+                if (routeModel.get('name') == templateName) {
                     routeM = routeModel;
                 }
             });
@@ -1847,9 +1901,9 @@ require.define("/collections/RouteCollection.js",function(require,module,exports
             return routeM;
         },
 
-        removePagesWithContext: function(tableM) {
+        removePagesWithContext: function (tableM) {
             var arr = this.getPageModelsWithEntityName(tableM.get('name'));
-            _.each(arr, function(pageM) {
+            _.each(arr, function (pageM) {
                 this.remove(pageM);
             }, this);
         }
@@ -1868,7 +1922,7 @@ require.define("/models/RouteModel.js",function(require,module,exports,__dirname
                 "name": "default-page"
             },
 
-            initialize: function(bone) {
+            initialize: function (bone) {
                 bone = bone || {};
                 if (bone.url && bone.url.length === 0) {
                     // homepage shouldn't have a customizable url
@@ -1882,36 +1936,36 @@ require.define("/models/RouteModel.js",function(require,module,exports,__dirname
                 this.set('url', new UrlModel(bone.url || {}));
             },
 
-            getUrlString: function() {
+            getUrlString: function () {
                 return '/' + this.get('url').toJSON().join('/');
             },
 
-            addToContext: function(tableM) {
+            addToContext: function (tableM) {
                 this.get('url').get('urlparts').push({
                     value: '{{' + tableM.get('name') + '}}'
                 });
             },
 
-            hasContext: function(tableM) {
+            hasContext: function (tableM) {
                 return this.doesContainEntityName(tableM.get('name'));
             },
 
-            doesContainEntityName: function(entityName) {
+            doesContainEntityName: function (entityName) {
                 return _.contains(this.get('url').get('urlparts').pluck('value'), '{{' + entityName + '}}');
             },
 
-            getContextEntities: function() {
+            getContextEntities: function () {
                 var entities = [];
-                this.get('url').get('urlparts').each(function(urlPart) {
+                this.get('url').get('urlparts').each(function (urlPart) {
                     var part = urlPart.get('value');
                     if (/{{([^\}]+)}}/g.exec(part)) entities.push(/\{\{([^\}]+)\}\}/g.exec(part)[1]);
                 });
                 return entities;
             },
 
-            getContextSentence: function() {
+            getContextSentence: function () {
                 var entities = [];
-                this.get('url').get('urlparts').each(function(urlPart) {
+                this.get('url').get('urlparts').each(function (urlPart) {
                     if (/{{([^\}]+)}}/g.exec(urlPart.get('value'))) entities.push(/\{\{([^\}]+)\}\}/g.exec(urlPart.get('value'))[1]);
                 });
 
@@ -1921,7 +1975,7 @@ require.define("/models/RouteModel.js",function(require,module,exports,__dirname
                     return "Page has a " + entities[0];
                 } else {
                     var str = "Page has ";
-                    _(entities).each(function(val, ind) {
+                    _(entities).each(function (val, ind) {
                         if (ind == entities.length - 1) {
                             str += "and a " + val;
                         } else {
@@ -1933,7 +1987,7 @@ require.define("/models/RouteModel.js",function(require,module,exports,__dirname
                 }
             },
 
-            getFields: function() {
+            getFields: function () {
                 // TODO: fix this
                 // var access = this.get('access_level');
 
@@ -1950,11 +2004,11 @@ require.define("/models/RouteModel.js",function(require,module,exports,__dirname
                 return [];
             },
 
-            updatePageName: function(urlModel, newPageName) {
+            updatePageName: function (urlModel, newPageName) {
                 this.set('page_name', newPageName);
             },
 
-            getLinkLang: function(contextArgs) {
+            getLinkLang: function (contextArgs) {
                 var str = "internal://" + this.get('name');
                 var entities = this.getContextEntities();
                 if (entities.length) {
@@ -1963,17 +2017,17 @@ require.define("/models/RouteModel.js",function(require,module,exports,__dirname
                 return str;
             },
 
-            getDataLang: function() {
+            getDataLang: function () {
                 var str = "internal://" + this.get('name');
                 return str;
             },
 
-            getPageContextDatalang: function() {
+            getPageContextDatalang: function () {
                 var entities = this.getContextEntities();
                 return "Page." + entities[0];
             },
 
-            validate: function() {
+            validate: function () {
                 var valid = true;
                 var name = this.get('name');
                 if (!util.isAlphaNumeric(name) || util.doesStartWithKeywords(name)) {
@@ -1981,30 +2035,36 @@ require.define("/models/RouteModel.js",function(require,module,exports,__dirname
                 }
             },
 
-            setupUrl: function(name) {
+            setupUrl: function (name) {
                 name = name.toLowerCase().replace(/ /g, '_');
                 name = name.replace(/[^a-zA-Z0-9\s]+/g, '_');
-                var urlparts = { value: name.toLowerCase().replace(/ /g, '_') };
+                var urlparts = {
+                    value: name.toLowerCase().replace(/ /g, '_')
+                };
                 this.get('url').get('urlparts').reset([urlparts]);
             },
 
-            isContextFree: function() {
-                return (!this.get('url').get('urlparts').some(function(part) { return (/\{\{([^\}]+)\}\}/g).test(part.get('value')); }));
+            isContextFree: function () {
+                return (!this.get('url').get('urlparts').some(function (part) {
+                    return (/\{\{([^\}]+)\}\}/g).test(part.get('value'));
+                }));
             },
 
-            hasSearchList: function(searchOn) {
+            hasSearchList: function (searchOn) {
                 var hasSearchList = false;
-                this.get('uielements').each(function(widgetM) {
-                    if(widgetM.isSearchList() && widgetM.get('data').get('container_info').get('entity').get('name') == searchOn) {
+                this.get('uielements').each(function (widgetM) {
+                    if (widgetM.isSearchList() && widgetM.get('data').get('container_info').get('entity').get('name') == searchOn) {
                         hasSearchList = true;
                     }
                 });
                 return hasSearchList;
             },
 
-            toJSON: function() {
+            toJSON: function () {
                 var json = _.clone(this.attributes);
-                if(json.url) { json.url = this.get('url').serialize(); }
+                if (json.url) {
+                    json.url = this.get('url').serialize();
+                }
                 // json.navbar = this.get('navbar').serialize();
                 // json.footer = this.get('footer').serialize();
                 // json.uielements = this.get('uielements').serialize();
@@ -2016,47 +2076,45 @@ require.define("/models/RouteModel.js",function(require,module,exports,__dirname
 
 });
 
-require.define("/models/UrlModel.js",function(require,module,exports,__dirname,__filename,process,global){
-  var UrlModel = Backbone.Model.extend({
-    defaults : {
+require.define("/models/UrlModel.js",function(require,module,exports,__dirname,__filename,process,global){var UrlModel = Backbone.Model.extend({
+    defaults: {},
+
+    initialize: function (bone) {
+        var urlparts = [];
+
+        if (bone) {
+            urlparts = _(bone).map(function (value) {
+                return {
+                    value: value
+                };
+            });
+        }
+        this.set('urlparts', new Backbone.Collection(urlparts));
     },
 
-    initialize: function(bone) {
-      var urlparts = [];
-
-      if(bone) {
-        urlparts = _(bone).map(function(value) {
-          return {
-            value: value
-          };
-        });
-      }
-      this.set('urlparts', new Backbone.Collection(urlparts));
+    getAppendixString: function () {
+        return this.get('urlparts').pluck('value').join('/');
     },
 
-    getAppendixString: function() {
-      return this.get('urlparts').pluck('value').join('/');
+    getUrlString: function (appSubdomain) {
+        return (appUrl || 'http://yourapp.com') + this.getAppendixString();
     },
 
-    getUrlString: function(appSubdomain) {
-      return (appUrl||'http://yourapp.com') + this.getAppendixString();
+    addUrlPart: function (value) {
+        this.get('urlparts').push(value);
     },
 
-    addUrlPart: function(value) {
-      this.get('urlparts').push(value);
+    removeUrlPart: function (value) {
+        var value = this.get('urlparts').remove(value);
     },
 
-    removeUrlPart: function(value) {
-      var value = this.get('urlparts').remove(value);
-    },
-
-    toJSON: function() {
-      var json = this.get('urlparts').pluck('value');
-      return json;
+    toJSON: function () {
+        var json = this.get('urlparts').pluck('value');
+        return json;
     }
-  });
+});
 
-  exports.UrlModel = UrlModel;
+exports.UrlModel = UrlModel;
 
 });
 
@@ -2066,7 +2124,7 @@ require.define("/models/ThemeModel.js",function(require,module,exports,__dirname
 
     var ThemeModel = Backbone.Model.extend({
 
-        initialize: function(themeState) {
+        initialize: function (themeState) {
             this.set('basecss', themeState.basecss || "font-size:14px;");
             //this.set('pages', new PageDesignCollection(themeState.pages));
 
@@ -2086,25 +2144,25 @@ require.define("/models/ThemeModel.js",function(require,module,exports,__dirname
             this.set('fonts', new Backbone.Collection(themeState["fonts"] || []));
         },
 
-        getUIElementCollections: function() {
+        getUIElementCollections: function () {
 
             return [this.get('buttons'), this.get('images'), this.get('headerTexts'),
                 this.get('texts'), this.get('links'), this.get('textInputs'),
                 this.get('passwords'), this.get('textAreas'), this.get('lines'),
                 this.get('dropdowns'), this.get('boxes'), this.get('forms'),
-                this.get('lists')];
+                this.get('lists')
+            ];
         },
 
-        getStyleWithClassAndType: function(className, type) {
+        getStyleWithClassAndType: function (className, type) {
             var model = null;
 
-            if (!this.has(type))
-            {
+            if (!this.has(type)) {
                 type = this.rectifier(type);
                 if (!this.has(type)) return null;
             }
 
-            this.get(type).each(function(styleModel) {
+            this.get(type).each(function (styleModel) {
                 if (styleModel.get('class_name') == className) {
                     model = styleModel;
                 }
@@ -2113,49 +2171,49 @@ require.define("/models/ThemeModel.js",function(require,module,exports,__dirname
             return model;
         },
 
-        getUIEVals: function(type) {
+        getUIEVals: function (type) {
 
-            if(this.has(type)) {
+            if (this.has(type)) {
                 return this.get(type);
             }
 
-            switch(type) {
-                case "button":
-                    return this.getUIEVals("buttons");
-                case "header":
-                    return this.getUIEVals("headerTexts");
-                case "image":
-                    return this.getUIEVals("images");
-                case "text":
-                    return this.getUIEVals("texts");
-                case "link":
-                    return this.getUIEVals("links");
-                case "line":
-                    return this.getUIEVals("lines");
-                case "box":
-                    return this.getUIEVals("boxes");
-                case "create-form":
-                case "form":
-                    return this.getUIEVals("forms");
+            switch (type) {
+            case "button":
+                return this.getUIEVals("buttons");
+            case "header":
+                return this.getUIEVals("headerTexts");
+            case "image":
+                return this.getUIEVals("images");
+            case "text":
+                return this.getUIEVals("texts");
+            case "link":
+                return this.getUIEVals("links");
+            case "line":
+                return this.getUIEVals("lines");
+            case "box":
+                return this.getUIEVals("boxes");
+            case "create-form":
+            case "form":
+                return this.getUIEVals("forms");
             }
 
             return this.getUIEVals("texts");
         },
 
         getBaseClass: function (type) {
-            if(this.has(type)) {
+            if (this.has(type)) {
                 return this.get(type).first().get('class_name');
             }
             return null;
         },
 
-        getBaseStyleOf: function(type) {
+        getBaseStyleOf: function (type) {
 
-            if(this.has(type)) {
+            if (this.has(type)) {
                 return this.get(type).first();
             }
 
-            if(this.has(this.rectifier(type))) {
+            if (this.has(this.rectifier(type))) {
                 return this.get(this.rectifier(type)).first();
             }
 
@@ -2163,29 +2221,29 @@ require.define("/models/ThemeModel.js",function(require,module,exports,__dirname
         },
 
         rectifier: function (falseType) {
-            switch(falseType) {
-                case "button":
-                    return "buttons";
-                case "header":
-                    return "headerTexts";
-                case "image":
-                    return "images";
-                case "text":
-                    return "texts";
-                case "link":
-                    return "links";
-                case "line":
-                    return "lines";
-                case "box":
-                    return "boxes";
-                case "form":
-                    return "forms";
+            switch (falseType) {
+            case "button":
+                return "buttons";
+            case "header":
+                return "headerTexts";
+            case "image":
+                return "images";
+            case "text":
+                return "texts";
+            case "link":
+                return "links";
+            case "line":
+                return "lines";
+            case "box":
+                return "boxes";
+            case "form":
+                return "forms";
             }
 
             return null;
         },
 
-        serialize: function() {
+        serialize: function () {
             var json = _.clone(this.attributes);
 
             json["buttons"] = this.get('buttons').serialize();
@@ -2214,87 +2272,94 @@ require.define("/models/ThemeModel.js",function(require,module,exports,__dirname
 
 require.define("/collections/UIElementCollection.js",function(require,module,exports,__dirname,__filename,process,global){var UIElementModel = require('../models/UIElementModel').UIElementModel;
 
-  var UIElementCollection = Backbone.Collection.extend({
-    model : UIElementModel,
+var UIElementCollection = Backbone.Collection.extend({
+    model: UIElementModel,
 
     initialize: function (models, type) {
-      this.type = type;
+        this.type = type;
     }
-  });
+});
 
-  exports.UIElementCollection = UIElementCollection;
+exports.UIElementCollection = UIElementCollection;
 
 });
 
 require.define("/models/UIElementModel.js",function(require,module,exports,__dirname,__filename,process,global){  var UIElementModel = Backbone.Model.extend({
-    initialize: function(bone) {
+      initialize: function (bone) {
 
-      this.set('style', bone.style||'');
-      this.set('hoverStyle', bone.hoverStyle||'');
-      this.set('activeStyle', bone.activeStyle||'');
+          this.set('style', bone.style || '');
+          this.set('hoverStyle', bone.hoverStyle || '');
+          this.set('activeStyle', bone.activeStyle || '');
 
-    }
+      }
   });
 
   exports.UIElementModel = UIElementModel;
+
 });
 
-require.define("/template_editor/KeyDispatcher.js",function(require,module,exports,__dirname,__filename,process,global){  var KeyDispatcher = function() {
-    
-    this.bindings = {};
-    this.environments  = [ document ];
-    this.store = [];
+require.define("/template_editor/KeyDispatcher.js",function(require,module,exports,__dirname,__filename,process,global){  var KeyDispatcher = function () {
 
-    this.addEnvironment = function(env) {
-      this.environments.push(env);
-      this.initializeEnvironment(env);
-    };
+      this.bindings = {};
+      this.environments = [document];
+      this.store = [];
 
-    this.bind = function(keyComb, fn, type) {
-      _.each(this.environments, function(env) {
-        $(env).bind('keydown', keyComb, fn);
-      });
-    };
+      this.addEnvironment = function (env) {
+          this.environments.push(env);
+          this.initializeEnvironment(env);
+      };
 
-    this.bindComb = function(keyComb, fn, type) {
-      this.store.push({keyComb: keyComb, fn: fn, type: type });
-      _.each(this.environments, function(env) {
-        $(env).bind('keydown', keyComb, fn);
-      });
-    };
+      this.bind = function (keyComb, fn, type) {
+          _.each(this.environments, function (env) {
+              $(env).bind('keydown', keyComb, fn);
+          });
+      };
 
-    this.unbind = function(keyComb, fn, type) {
-      _.each(this.environments, function(env) {
-        $(env).unbind('keydown', keyComb, fn);
-      });
-      this.removeFromStore(keyComb, fn, type);
-    };
+      this.bindComb = function (keyComb, fn, type) {
+          this.store.push({
+              keyComb: keyComb,
+              fn: fn,
+              type: type
+          });
+          _.each(this.environments, function (env) {
+              $(env).bind('keydown', keyComb, fn);
+          });
+      };
 
-    this.removeFromStore = function(keyComb, fn, type) {
-      var indToRemove = [];
-      _.each(this.store, function(binding, ind) {
-        if(binding.keyComb == keyComb && binding.fn == fn) {
-          intToRemove.push(ind);
-        }
-      });
-    };
+      this.unbind = function (keyComb, fn, type) {
+          _.each(this.environments, function (env) {
+              $(env).unbind('keydown', keyComb, fn);
+          });
+          this.removeFromStore(keyComb, fn, type);
+      };
 
-    this.initializeEnvironment = function(env) {
-      _.each(this.store, function(binding) {
-        $(env).bind('keydown', binding.keyComb, binding.fn);
-      });
-    };
+      this.removeFromStore = function (keyComb, fn, type) {
+          var indToRemove = [];
+          _.each(this.store, function (binding, ind) {
+              if (binding.keyComb == keyComb && binding.fn == fn) {
+                  intToRemove.push(ind);
+              }
+          });
+      };
+
+      this.initializeEnvironment = function (env) {
+          _.each(this.store, function (binding) {
+              $(env).bind('keydown', binding.keyComb, binding.fn);
+          });
+      };
 
   };
 
   exports.KeyDispatcher = KeyDispatcher;
+
 });
 
-require.define("/template_editor/MouseDispatcher.js",function(require,module,exports,__dirname,__filename,process,global){  var MouseDispatcher = function() {
-    this.isMousedownActive = false;
+require.define("/template_editor/MouseDispatcher.js",function(require,module,exports,__dirname,__filename,process,global){  var MouseDispatcher = function () {
+      this.isMousedownActive = false;
   };
 
   exports.MouseDispatcher = MouseDispatcher;
+
 });
 
 require.define("/AppRouter.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -2307,30 +2372,30 @@ require.define("/AppRouter.js",function(require,module,exports,__dirname,__filen
     var AppRouter = Backbone.Router.extend({
 
         routes: {
-            "app/new/"                     : "newapp",
-            "app/:appid/info/*tutorial"    : "info",
-            "app/:appid/tables/*tutorial"  : "tables",
-            "app/:appid/gallery/*tutorial" : "themes",
-            "app/:appid/template/:pageid/" : "appmain",
-            "app/:appid/plugins/*tutorial" : "plugins",
+            "app/new/": "newapp",
+            "app/:appid/info/*tutorial": "info",
+            "app/:appid/tables/*tutorial": "tables",
+            "app/:appid/gallery/*tutorial": "themes",
+            "app/:appid/template/:pageid/": "appmain",
+            "app/:appid/plugins/*tutorial": "plugins",
             "app/:appid/mobile-editor/:pageid/": "mobileEditor",
-            "app/:appid/emails/*tutorial"  : "emails",
-            "/"                            : "appmain",
-            "*anything"                    : "appmain",
-            "account"                      : "accountPage",
+            "app/:appid/emails/*tutorial": "emails",
+            "/": "appmain",
+            "*anything": "appmain",
+            "account": "accountPage",
         },
 
         tutorialPage: 0,
 
-        initialize: function() {
+        initialize: function () {
             var self = this;
             v1.view = null;
 
             this.currentApp = null;
         },
 
-        configApp: function() {
-            if(this.currentApp) return;
+        configApp: function () {
+            if (this.currentApp) return;
 
             this.currentApp = new AppView({
                 model: v1State,
@@ -2359,28 +2424,28 @@ require.define("/AppRouter.js",function(require,module,exports,__dirname,__filen
             v1.currentApp.themes(tutorial);
         },
 
-        pages: function(appId, tutorial) {
+        pages: function (appId, tutorial) {
             v1.configApp();
             v1.currentApp.pages(tutorial);
         },
 
-        appmain: function(appId, pageId) {
+        appmain: function (appId, pageId) {
             v1.configApp();
             if (!pageId) pageId = 0;
             v1.currentApp.pageWithIndex(pageId);
         },
 
-        emails: function(appId, tutorial) {
+        emails: function (appId, tutorial) {
             v1.configApp();
             v1.currentApp.emails(tutorial);
         },
 
-        plugins: function(appId, tutorial) {
+        plugins: function (appId, tutorial) {
             v1.configApp();
             //v1.currentApp.plugins(tutorial);
         },
 
-        showTutorial: function(dir) {
+        showTutorial: function (dir) {
             var inp = (dir) ? dir : this.tutorialPage;
             if (this.tutorialIsVisible) {
                 this.tutorial.chooseSlide(inp);
@@ -2392,11 +2457,11 @@ require.define("/AppRouter.js",function(require,module,exports,__dirname,__filen
             }
         },
 
-        accountPage: function() {
-            var PaymentsMain = function() {
+        accountPage: function () {
+            var PaymentsMain = function () {
                 var striper = new Striper();
                 striper.bindChangeCard('.change-card', 'change-card-form');
-                striper.onSuccess = function() {
+                striper.onSuccess = function () {
                     window.location = "/account/";
                 };
 
@@ -2410,7 +2475,7 @@ require.define("/AppRouter.js",function(require,module,exports,__dirname,__filen
             this.$nav = $('.navigator .left-nav');
 
             // make left nav links scroll page
-            this.$nav.find('a').click(function() {
+            this.$nav.find('a').click(function () {
                 var elem = this.getAttribute('href');
                 var topPos = $(elem).offset().top - 75;
                 $('html,body').animate({
@@ -2423,25 +2488,25 @@ require.define("/AppRouter.js",function(require,module,exports,__dirname,__filen
                 offset: 0
             });
 
-            $('#add-key-btn').on('click', function() {
+            $('#add-key-btn').on('click', function () {
                 $('#add-key-btn').hide();
                 $('#add-key-panel').fadeIn();
             });
 
             // @ksikka's code
-            $(document).ready(function() {
-                $('form').not('.no-ajax').each(function(ind, node) {
-                    $(node).submit(function(e) {
+            $(document).ready(function () {
+                $('form').not('.no-ajax').each(function (ind, node) {
+                    $(node).submit(function (e) {
                         var self = this;
                         var ajax_info = {
                             type: $(node).attr('method'),
                             url: $(node).attr('action'),
                             data: $(node).serialize(),
-                            success: function(data, statusStr, xhr) {
-                                if (typeof(data.redirect_to) !== 'undefined') {
+                            success: function (data, statusStr, xhr) {
+                                if (typeof (data.redirect_to) !== 'undefined') {
                                     location.href = data.redirect_to;
                                 } else {
-                                    _.each(data, function(val, key, ind) {
+                                    _.each(data, function (val, key, ind) {
                                         if (key === '__all__') {
                                             $(self).find('.form-error.field-all').html(val.join('<br />')).show();
                                         } else {
@@ -2459,39 +2524,39 @@ require.define("/AppRouter.js",function(require,module,exports,__dirname,__filen
             });
         },
 
-        newapp: function() {
+        newapp: function () {
 
-            $('#skip-racoon').hover(function() {
+            $('#skip-racoon').hover(function () {
                 $('#mascot').addClass('happy');
-            }, function() {
+            }, function () {
                 $('#mascot').removeClass('happy');
             });
 
         },
 
-        dashboard: function() {
+        dashboard: function () {
             console.log("DASHBOARD");
 
             var dboard = new DashboardsView();
 
-            $( document ).tooltip({
-              position: {
-                my: "center bottom-10",
-                at: "center top",
-                using: function( position, feedback ) {
-                  $( this ).css( position );
-                  $( "<div>" )
-                    .addClass( "arrow" )
-                    .addClass( feedback.vertical )
-                    .addClass( feedback.horizontal )
-                    .appendTo( this );
+            $(document).tooltip({
+                position: {
+                    my: "center bottom-10",
+                    at: "center top",
+                    using: function (position, feedback) {
+                        $(this).css(position);
+                        $("<div>")
+                            .addClass("arrow")
+                            .addClass(feedback.vertical)
+                            .addClass(feedback.horizontal)
+                            .appendTo(this);
+                    }
                 }
-              }
             });
 
         },
 
-        changeTitle: function(title) {
+        changeTitle: function (title) {
             var newTitle = "";
             if (title) {
                 newTitle = " | " + title;
@@ -2508,851 +2573,860 @@ require.define("/AppRouter.js",function(require,module,exports,__dirname,__filen
 require.define("/mixins/SimpleModalView.js",function(require,module,exports,__dirname,__filename,process,global){  require('./BackboneModal');
 
   var SimpleModalView = Backbone.ModalView.extend({
-    tagName: 'div',
-    className: 'deployed',
+      tagName: 'div',
+      className: 'deployed',
 
-    initialize: function(data) {
-      this.render(data.img, data.text);
-    },
+      initialize: function (data) {
+          this.render(data.img, data.text);
+      },
 
-    render : function(img, text) {
-      if(img) {
-        this.el.innerHTML += '<img height="300" src="/static/img/'+img+'">';
+      render: function (img, text) {
+          if (img) {
+              this.el.innerHTML += '<img height="300" src="/static/img/' + img + '">';
+          }
+
+          if (text) {
+              this.el.innerHTML += '<h4>' + text + '</h4>';
+          }
+          return this;
       }
-
-      if(text) {
-        this.el.innerHTML += '<h4>'+text+'</h4>';
-      }
-      return this;
-    }
   });
 
   exports.SimpleModalView = SimpleModalView;
+
 });
 
 require.define("/mixins/BackboneModal.js",function(require,module,exports,__dirname,__filename,process,global){  Backbone.ModalView = Backbone.View.extend({
-    width: 500,
-    padding: 30,
+      width: 500,
+      padding: 30,
 
-    bodyEl: null,
+      bodyEl: null,
 
-    events : {
-      'click .modal-bg' : 'closeModal',
-      'keydown'         : 'handleKey',
-      'click .done' : 'closeModal'
-    },
+      events: {
+          'click .modal-bg': 'closeModal',
+          'keydown': 'handleKey',
+          'click .done': 'closeModal'
+      },
 
-    _configure: function(options) {
-      Backbone.ModalView.__super__._configure.call(this, options);
-      if(options.height) {
-        this.height = options.height;
+      _configure: function (options) {
+          Backbone.ModalView.__super__._configure.call(this, options);
+          if (options.height) {
+              this.height = options.height;
+          }
+          this.bodyEl = document.body;
+          this.backgroundDiv = this.setupModal();
+          this.modalWindow = this.setupModalWindow();
+          _.bindAll(this);
+      },
+
+      _ensureElement: function (options) {
+          Backbone.ModalView.__super__._ensureElement.call(this, options);
+      },
+
+      setBodyEl: function (el) {
+          this.bodyEl = el;
+      },
+
+      setupModal: function () {
+          var self = this;
+          var div = document.createElement('div');
+          div.className = "modal-bg fadeIn";
+          div.style.position = 'fixed';
+          div.style.width = '100%';
+          div.style.height = '100%';
+          div.style.top = '0';
+          div.style.left = '0';
+          div.style.backgroundColor = '#222';
+          div.style.opacity = '0.7';
+          div.style.zIndex = 3000;
+          this.bodyEl.appendChild(div);
+
+          var closeHandler = function (e) {
+              if (e.keyCode == 27) {
+                  self.closeModal(closeHandler);
+              }
+          };
+
+          $(div).on('click', function () {
+              self.closeModal(closeHandler);
+          });
+
+
+          $(window).on('keydown', closeHandler);
+
+          return div;
+      },
+
+      setupModalWindow: function () {
+          var self = this;
+
+          var div = document.createElement('div');
+          div.style.position = 'fixed';
+          div.className = 'modal ' + this.className;
+          div.style.width = this.width + 'px';
+          if (this.height) {
+              div.style.height = this.height + 'px';
+          } else {
+              div.style.minHeight = '300px';
+              div.style.maxHeight = '630px';
+          }
+          div.style.top = '50%';
+          div.style.left = '50%';
+          div.style.marginLeft = '-' + (this.width / 2) + 'px';
+          div.style.marginTop = '-300px';
+          div.style.zIndex = 3001;
+          div.style.padding = 0;
+
+          if (this.title) {
+              var title = document.createElement('h3');
+              title.innerText = this.title;
+              div.appendChild(title);
+          }
+          if (this.doneButton) {
+              var qMark = '';
+              if (this.address) {
+                  qMark = '<div class="q-mark"></div>';
+              }
+              $(div).append('<div class="bottom-sect">' + qMark + '<div class="btn done">Done</div></div>');
+              $(div).find('.done').on('click', function () {
+                  self.closeModal();
+              });
+          }
+
+          var span = document.createElement('span');
+          span.className = 'modal-cross';
+          span.style.position = 'absolute';
+          span.style.right = '15px';
+          span.style.top = '15px';
+          span.innerText = '×';
+          span.style.zIndex = '1000';
+          div.appendChild(span);
+
+          var content = document.createElement('div');
+          content.style.width = '100%';
+          if (!this.title) content.style.height = (this.contentHeight || '100%');
+          content.style.position = "relative";
+          content.style.padding = (this.padding || 0) + 'px';
+          div.appendChild(content);
+
+          this.bodyEl.appendChild(div);
+
+          $(span).on('click', function () {
+              self.closeModal();
+          });
+
+          this.el = content;
+          return div;
+      },
+
+      closeModal: function (closeHandlerFn) {
+          var self = this;
+          this.undelegateEvents();
+          if (this.callback) this.callback();
+          if (this.onClose) this.onClose();
+          $(self.modalWindow).fadeOut(100);
+          $(self.backgroundDiv).hide();
+
+          setTimeout(function () {
+              self.$el.remove();
+              self.remove();
+              $(self.modalWindow).remove();
+              $(self.backgroundDiv).remove();
+          }, 550);
+
+          if (closeHandlerFn) {
+              $(window).unbind('keydown', closeHandlerFn);
+          }
+
+          this.close();
+      },
+
+      handleKey: function (e) {
+          if (e.keyCode == 27) { //escape
+              this.closeModal();
+              e.stopPropagation();
+          }
       }
-      this.bodyEl = document.body;
-      this.backgroundDiv = this.setupModal();
-      this.modalWindow = this.setupModalWindow();
-      _.bindAll(this);
-    },
-
-    _ensureElement: function(options) {
-      Backbone.ModalView.__super__._ensureElement.call(this, options);
-    },
-
-    setBodyEl: function(el) {
-      this.bodyEl = el;
-    },
-
-    setupModal: function() {
-      var self = this;
-      var div = document.createElement('div');
-      div.className = "modal-bg fadeIn";
-      div.style.position = 'fixed';
-      div.style.width = '100%';
-      div.style.height = '100%';
-      div.style.top = '0';
-      div.style.left = '0';
-      div.style.backgroundColor = '#222';
-      div.style.opacity = '0.7';
-      div.style.zIndex = 3000;
-      this.bodyEl.appendChild(div);
-
-      var closeHandler = function(e) {
-        if(e.keyCode == 27) {
-          self.closeModal(closeHandler);
-        }
-      };
-
-      $(div).on('click', function() {
-        self.closeModal(closeHandler);
-      });
-
-
-      $(window).on('keydown', closeHandler);
-
-      return div;
-    },
-
-    setupModalWindow: function() {
-      var self = this;
-
-      var div = document.createElement('div');
-      div.style.position = 'fixed';
-      div.className = 'modal ' + this.className;
-      div.style.width = this.width + 'px';
-      if(this.height) {
-        div.style.height = this.height + 'px';
-      }
-      else {
-        div.style.minHeight = '300px';
-        div.style.maxHeight = '630px';
-      }
-      div.style.top = '50%';
-      div.style.left = '50%';
-      div.style.marginLeft= '-'+ (this.width/2) +'px';
-      div.style.marginTop = '-300px';
-      div.style.zIndex = 3001;
-      div.style.padding = 0;
-
-      if(this.title) {
-        var title = document.createElement('h3');
-        title.innerText = this.title;
-        div.appendChild(title);
-      }
-      if(this.doneButton) {
-        var qMark = '';
-        if(this.address) { qMark = '<div class="q-mark"></div>'; }
-        $(div).append('<div class="bottom-sect">'+ qMark+'<div class="btn done">Done</div></div>');
-        $(div).find('.done').on('click', function() {
-          self.closeModal();
-        });
-      }
-
-      var span = document.createElement('span');
-      span.className = 'modal-cross';
-      span.style.position = 'absolute';
-      span.style.right = '15px';
-      span.style.top = '15px';
-      span.innerText = '×';
-      span.style.zIndex = '1000';
-      div.appendChild(span);
-
-      var content = document.createElement('div');
-      content.style.width = '100%';
-      if(!this.title) content.style.height = (this.contentHeight || '100%');
-      content.style.position = "relative";
-      content.style.padding = (this.padding||0) + 'px';
-      div.appendChild(content);
-
-      this.bodyEl.appendChild(div);
-
-      $(span).on('click', function(){
-        self.closeModal();
-      });
-
-      this.el = content;
-      return div;
-    },
-
-    closeModal: function(closeHandlerFn) {
-      var self = this;
-      this.undelegateEvents();
-      if(this.callback) this.callback();
-      if(this.onClose) this.onClose();
-      $(self.modalWindow).fadeOut(100);
-      $(self.backgroundDiv).hide();
-
-      setTimeout(function(){
-        self.$el.remove();
-        self.remove();
-        $(self.modalWindow).remove();
-        $(self.backgroundDiv).remove();
-      }, 550);
-
-      if(closeHandlerFn) {
-        $(window).unbind('keydown', closeHandlerFn);
-      }
-
-      this.close();
-    },
-
-    handleKey: function(e) {
-      if(e.keyCode == 27) { //escape
-        this.closeModal();
-        e.stopPropagation();
-      }
-    }
 
   });
 
 });
 
-require.define("/mixins/ErrorDialogueView.js",function(require,module,exports,__dirname,__filename,process,global){
-  require('./BackboneModal');
+require.define("/mixins/ErrorDialogueView.js",function(require,module,exports,__dirname,__filename,process,global){require('./BackboneModal');
 
-  var ErrorDialogueView = Backbone.ModalView.extend({
+var ErrorDialogueView = Backbone.ModalView.extend({
     tagName: 'div',
     className: 'error-dialogue',
-    events : {
-      'click .btn.done' : 'closeModal'
+    events: {
+        'click .btn.done': 'closeModal'
     },
 
     doneButton: true,
 
-    initialize: function(data, callback) {
-      this.render(data.img, data.text);
-      this.callback = callback;
+    initialize: function (data, callback) {
+        this.render(data.img, data.text);
+        this.callback = callback;
     },
 
-    _countdownToRefresh : function() {
+    _countdownToRefresh: function () {
         /* This only works for the DeployView, because there is a span w ID = countdown-ksikka. */
         var cntEl = document.getElementById("countdown-ksikka");
+
         function countdown() {
-          var n = parseInt(cntEl.innerHTML);
-          if (n == 0) {
-            window.location.reload(true);
-          } else {
-            cntEl.innerHTML = n-1;
-            window.setTimeout(countdown, 1000);
-          }
+            var n = parseInt(cntEl.innerHTML);
+            if (n == 0) {
+                window.location.reload(true);
+            } else {
+                cntEl.innerHTML = n - 1;
+                window.setTimeout(countdown, 1000);
+            }
         }
         window.setTimeout(countdown, 1000);
     },
 
-    render : function(img, text) {
-      if(img) { this.el.innerHTML += '<img src="/static/img/'+img+'">'; }
-      if(text) { this.el.innerHTML += '<p>'+text+'</p>'; }
+    render: function (img, text) {
+        if (img) {
+            this.el.innerHTML += '<img src="/static/img/' + img + '">';
+        }
+        if (text) {
+            this.el.innerHTML += '<p>' + text + '</p>';
+        }
 
-      return this;
+        return this;
     }
-  });
+});
 
-  exports.ErrorDialogueView = ErrorDialogueView;
+exports.ErrorDialogueView = ErrorDialogueView;
 
 });
 
 require.define("/mixins/SimpleDialogueView.js",function(require,module,exports,__dirname,__filename,process,global){  require('./BackboneDialogue');
 
   var SimpleDialogueView = Backbone.DialogueView.extend({
-    tagName: 'div',
-    className: 'normal-dialogue',
-    padding: 0,
-    events : {
-      'click .btn.done' : 'closeModal'
-    },
+      tagName: 'div',
+      className: 'normal-dialogue',
+      padding: 0,
+      events: {
+          'click .btn.done': 'closeModal'
+      },
 
-    initialize: function(data) {
-      this.render(data.img, data.text);
-    },
+      initialize: function (data) {
+          this.render(data.img, data.text);
+      },
 
-    render : function(img, text) {
-      if(img) {
-        this.el.innerHTML += '<img src="/static/img/'+img+'">';
+      render: function (img, text) {
+          if (img) {
+              this.el.innerHTML += '<img src="/static/img/' + img + '">';
+          }
+
+          if (text) {
+              this.el.innerHTML += '<p>' + text + '</p>';
+          }
+
+          this.el.innerHTML += '<div class="bottom-sect"><div class="btn done">Done</div></div>';
+
+          return this;
       }
-
-      if(text) {
-        this.el.innerHTML += '<p>'+text+'</p>';
-      }
-
-      this.el.innerHTML += '<div class="bottom-sect"><div class="btn done">Done</div></div>';
-
-      return this;
-    }
   });
 
   exports.SimpleDialogueView = SimpleDialogueView;
 
-
 });
 
 require.define("/mixins/BackboneDialogue.js",function(require,module,exports,__dirname,__filename,process,global){  Backbone.DialogueView = Backbone.View.extend({
-    width: 500,
-    height: 160,
-    padding: 0,
-    css: 'dialogue',
+      width: 500,
+      height: 160,
+      padding: 0,
+      css: 'dialogue',
 
-    events : {
-      'click .modal-bg' : 'closeModal',
-      'keydown'         : 'handleKey'
-    },
+      events: {
+          'click .modal-bg': 'closeModal',
+          'keydown': 'handleKey'
+      },
 
-    _configure: function(options) {
-      Backbone.DialogueView.__super__._configure.call(this, options);
-      this.backgroundDiv = this.setupModal();
-      this.modalWindow = this.setupModalWindow();
-      util.loadCSS(this.css);
-      _.bindAll(this);
-    },
+      _configure: function (options) {
+          Backbone.DialogueView.__super__._configure.call(this, options);
+          this.backgroundDiv = this.setupModal();
+          this.modalWindow = this.setupModalWindow();
+          util.loadCSS(this.css);
+          _.bindAll(this);
+      },
 
-    _ensureElement: function(options) {
-      Backbone.DialogueView.__super__._ensureElement.call(this, options);
-    },
+      _ensureElement: function (options) {
+          Backbone.DialogueView.__super__._ensureElement.call(this, options);
+      },
 
-    setupModal: function() {
-      var self = this;
-      var div = document.createElement('div');
-      div.className = "modal-bg fadeIn";
-      div.style.position = 'fixed';
-      div.style.width = '100%';
-      div.style.height = '100%';
-      div.style.top = '0';
-      div.style.left = '0';
-      div.style.backgroundColor = '#222';
-      div.style.opacity = '0.4';
-      div.style.zIndex = 3000;
-      document.body.appendChild(div);
+      setupModal: function () {
+          var self = this;
+          var div = document.createElement('div');
+          div.className = "modal-bg fadeIn";
+          div.style.position = 'fixed';
+          div.style.width = '100%';
+          div.style.height = '100%';
+          div.style.top = '0';
+          div.style.left = '0';
+          div.style.backgroundColor = '#222';
+          div.style.opacity = '0.4';
+          div.style.zIndex = 3000;
+          document.body.appendChild(div);
 
-      var closeHandler = function(e) {
-        if(e.keyCode == 27) {
-          self.closeModal(closeHandler);
-        }
-      };
+          var closeHandler = function (e) {
+              if (e.keyCode == 27) {
+                  self.closeModal(closeHandler);
+              }
+          };
 
-      $(div).on('click', function() {
-        self.closeModal(closeHandler);
-      });
+          $(div).on('click', function () {
+              self.closeModal(closeHandler);
+          });
 
 
-      $(window).on('keydown', closeHandler);
+          $(window).on('keydown', closeHandler);
 
-      return div;
-    },
+          return div;
+      },
 
-    setupModalWindow: function() {
-      var self = this;
+      setupModalWindow: function () {
+          var self = this;
 
-      var div = document.createElement('div');
-      div.style.position = 'fixed';
-      div.className = 'modal ' + this.className;
-      div.style.width = this.width + 'px';
-      div.style.minHeight = '300px';
-      div.style.padding = this.padding + 'px';
-      
-      if(this.height) div.style.height = this.height;
-      
-      div.style.top = '50%';
-      div.style.left = '50%';
-      div.style.marginLeft= '-'+ (this.width/2) +'px';
-      div.style.marginTop = '-240px';
-      div.style.zIndex = 3001;
+          var div = document.createElement('div');
+          div.style.position = 'fixed';
+          div.className = 'modal ' + this.className;
+          div.style.width = this.width + 'px';
+          div.style.minHeight = '300px';
+          div.style.padding = this.padding + 'px';
 
-      var span = document.createElement('span');
-      span.className = 'modal-cross';
-      span.style.position = 'absolute';
-      span.style.right = '15px';
-      span.style.top = '15px';
-      span.innerText = '×';
-      div.appendChild(span);
+          if (this.height) div.style.height = this.height;
 
-      var content = document.createElement('div');
-      content.style.width = '100%';
-      div.appendChild(content);
+          div.style.top = '50%';
+          div.style.left = '50%';
+          div.style.marginLeft = '-' + (this.width / 2) + 'px';
+          div.style.marginTop = '-240px';
+          div.style.zIndex = 3001;
 
-      document.body.appendChild(div);
+          var span = document.createElement('span');
+          span.className = 'modal-cross';
+          span.style.position = 'absolute';
+          span.style.right = '15px';
+          span.style.top = '15px';
+          span.innerText = '×';
+          div.appendChild(span);
 
-      $(span).on('click', function(){
-        self.closeModal();
-      });
+          var content = document.createElement('div');
+          content.style.width = '100%';
+          div.appendChild(content);
 
-      this.el = content;
-      return div;
-    },
+          document.body.appendChild(div);
 
-    closeModal: function(closeHandlerFn) {
-      var self = this;
-      this.undelegateEvents();
-      if(this.callback) this.callback();
-      if(this.onClose) this.onClose();
-      // fadeOut(function() { $(this).remove(); });
-      $(self.modalWindow).fadeOut(100);
-      $(self.backgroundDiv).hide();
+          $(span).on('click', function () {
+              self.closeModal();
+          });
 
-      setTimeout(function(){
-        self.$el.remove();
-        self.remove();
-        $(self.modalWindow).remove();
-        $(self.backgroundDiv).remove();
-      }, 550);
+          this.el = content;
+          return div;
+      },
 
-      if(closeHandlerFn) {
-        $(window).unbind('keydown', closeHandlerFn);
+      closeModal: function (closeHandlerFn) {
+          var self = this;
+          this.undelegateEvents();
+          if (this.callback) this.callback();
+          if (this.onClose) this.onClose();
+          // fadeOut(function() { $(this).remove(); });
+          $(self.modalWindow).fadeOut(100);
+          $(self.backgroundDiv).hide();
+
+          setTimeout(function () {
+              self.$el.remove();
+              self.remove();
+              $(self.modalWindow).remove();
+              $(self.backgroundDiv).remove();
+          }, 550);
+
+          if (closeHandlerFn) {
+              $(window).unbind('keydown', closeHandlerFn);
+          }
+
+          this.stopListening();
+      },
+
+      handleKey: function (e) {
+          if (e.keyCode == 27) { //escape
+              this.closeModal();
+              e.stopPropagation();
+          }
       }
-
-      this.stopListening();
-    },
-
-    handleKey: function(e) {
-      if(e.keyCode == 27) { //escape
-        this.closeModal();
-        e.stopPropagation();
-      }
-    }
 
   });
 
 });
 
-require.define("/AppView.js",function(require,module,exports,__dirname,__filename,process,global){
-    var ToolBarView = require('./template_editor/ToolBarView').ToolBarView;
-    var EditorView = require('./template_editor/EditorView').EditorView;
-    var PluginsView = require('./plugins_view/PluginsView').PluginsView;
-    var SettingsView = require('./SettingsView').SettingsView;
-    var RoutesView = require('./RoutesView').RoutesView;
+require.define("/AppView.js",function(require,module,exports,__dirname,__filename,process,global){var ToolBarView = require('./template_editor/ToolBarView').ToolBarView;
+var EditorView = require('./template_editor/EditorView').EditorView;
+var PluginsView = require('./plugins_view/PluginsView').PluginsView;
+var SettingsView = require('./SettingsView').SettingsView;
+var RoutesView = require('./RoutesView').RoutesView;
 
-    var PluginsModel = require('./models/PluginsModel').PluginsModel;
+var PluginsModel = require('./models/PluginsModel').PluginsModel;
 
-    var SoftErrorView = require("./SoftErrorView").SoftErrorView;
-    var ErrorDialogueView = require('./mixins/ErrorDialogueView').ErrorDialogueView;
-    var NodeModelsView = require('./models_view/NodeModelsView').NodeModelsView;
-
-
-    var AppView = Backbone.View.extend({
-
-        events: {
-            'click #save': 'save',
-            'click #left-menu-toggle': 'toggleTopMenu',
-            'click #deploy': 'deployApp',
-            'click .undo': 'undo',
-            'click .redo': 'redo'
-        },
-
-        el: document.getElementById('app-content'),
-
-        initialize: function(options) {
-            _.bindAll(this);
-
-            this.model = options.model;
-            this.appId = options.appId;
-            this.pageId = options.pageId;
-
-            this.toolBar = this.createSubview(ToolBarView, { pageId: -1 });
-
-            this.routesView = this.createSubview(RoutesView);
-            this.routesView.setToggleEl($('.menu-app-routes'));
-            this.routesView.setPointerPosition("130px");
-
-            this.nodeModelsView = this.createSubview(NodeModelsView);
-            this.nodeModelsView.setToggleEl($('.menu-app-entities'));
-            this.nodeModelsView.setPointerPosition("180px");
-
-            this.pluginsView = this.createSubview(PluginsView);
-            this.pluginsView.setToggleEl($('.menu-app-plugins'));
-            this.pluginsView.setPointerPosition("230px");
-
-            this.settingsView = this.createSubview(SettingsView);
-            this.settingsView.setToggleEl($('.menu-app-settings'));
-            this.settingsView.setPointerPosition("30px");
-
-            this.listenTo(v1State.get('plugins'), 'fork', this.save);
-            //var autoSave = setInterval(this.save, 30000);
-            this.render();
-
-            util.askBeforeLeave();
-
-        },
-
-        render: function() {
-            var pageId = 0;
-            this.pageId = 0;
-
-            this._cleanDiv = document.createElement('div');
-            this._cleanDiv.className = "clean-div test1";
-            var mainContainer = document.getElementById('main-container');
-            mainContainer.appendChild(this._cleanDiv);
-
-            this.toolBar.setPage(this.pageId);
-            this.toolBar.setElement(document.getElementById('tool-bar')).render();
-
-            this.el.appendChild(this.nodeModelsView.render().el);
-            this.el.appendChild(this.pluginsView.render().el);
-            this.el.appendChild(this.settingsView.render().el);
-            this.el.appendChild(this.routesView.render().el);
+var SoftErrorView = require("./SoftErrorView").SoftErrorView;
+var ErrorDialogueView = require('./mixins/ErrorDialogueView').ErrorDialogueView;
+var NodeModelsView = require('./models_view/NodeModelsView').NodeModelsView;
 
 
-            this.$leftMenu = this.$el.find('.left-menu-panel-l1 ');
-            this.setupMenuHeight();
+var AppView = Backbone.View.extend({
 
-            $("html, body").animate({
-                scrollTop: 0
+    events: {
+        'click #save': 'save',
+        'click #left-menu-toggle': 'toggleTopMenu',
+        'click #deploy': 'deployApp',
+        'click .undo': 'undo',
+        'click .redo': 'redo'
+    },
+
+    el: document.getElementById('app-content'),
+
+    initialize: function (options) {
+        _.bindAll(this);
+
+        this.model = options.model;
+        this.appId = options.appId;
+        this.pageId = options.pageId;
+
+        this.toolBar = this.createSubview(ToolBarView, {
+            pageId: -1
+        });
+
+        this.routesView = this.createSubview(RoutesView);
+        this.routesView.setToggleEl($('.menu-app-routes'));
+        this.routesView.setPointerPosition("130px");
+
+        this.nodeModelsView = this.createSubview(NodeModelsView);
+        this.nodeModelsView.setToggleEl($('.menu-app-entities'));
+        this.nodeModelsView.setPointerPosition("180px");
+
+        this.pluginsView = this.createSubview(PluginsView);
+        this.pluginsView.setToggleEl($('.menu-app-plugins'));
+        this.pluginsView.setPointerPosition("230px");
+
+        this.settingsView = this.createSubview(SettingsView);
+        this.settingsView.setToggleEl($('.menu-app-settings'));
+        this.settingsView.setPointerPosition("30px");
+
+        this.listenTo(v1State.get('plugins'), 'fork', this.save);
+        //var autoSave = setInterval(this.save, 30000);
+        this.render();
+
+        util.askBeforeLeave();
+
+    },
+
+    render: function () {
+        var pageId = 0;
+        this.pageId = 0;
+
+        this._cleanDiv = document.createElement('div');
+        this._cleanDiv.className = "clean-div test1";
+        var mainContainer = document.getElementById('main-container');
+        mainContainer.appendChild(this._cleanDiv);
+
+        this.toolBar.setPage(this.pageId);
+        this.toolBar.setElement(document.getElementById('tool-bar')).render();
+
+        this.el.appendChild(this.nodeModelsView.render().el);
+        this.el.appendChild(this.pluginsView.render().el);
+        this.el.appendChild(this.settingsView.render().el);
+        this.el.appendChild(this.routesView.render().el);
+
+
+        this.$leftMenu = this.$el.find('.left-menu-panel-l1 ');
+        this.setupMenuHeight();
+
+        $("html, body").animate({
+            scrollTop: 0
+        });
+
+        this.doKeyBindings();
+        Backbone.Regrettable.reset();
+
+    },
+
+    getCurrentPage: function () {
+        return this.view.getCurrentTemplate();
+    },
+
+    showTemplateWithName: function (templateName) {
+
+    },
+
+    doKeyBindings: function () {
+        keyDispatcher.bindComb('meta+s', this.save);
+        keyDispatcher.bindComb('ctrl+s', this.save);
+        // keyDispatcher.bindComb('meta+c', this.copy);
+        // keyDispatcher.bindComb('ctrl+c', this.copy);
+        // keyDispatcher.bindComb('meta+v', this.paste);
+        // keyDispatcher.bindComb('ctrl+v', this.paste);
+        keyDispatcher.bindComb('meta+z', this.undo);
+        keyDispatcher.bindComb('ctrl+z', this.undo);
+        keyDispatcher.bindComb('meta+y', this.redo);
+        keyDispatcher.bindComb('ctrl+y', this.redo);
+
+    },
+
+    info: function (appId, tutorial) {
+        var self = this;
+        var AppInfoView = require('./AppInfoView');
+        self.tutorialPage = "Application Settings";
+        self.changePage(AppInfoView, {}, tutorial, function () {
+            $('.menu-app-info').addClass('active');
+        });
+    },
+
+    tables: function (tutorial) {
+        var self = this;
+        this.nodeModelsView.expand();
+    },
+
+    pages: function (appId, tutorial) {
+        var self = this;
+        self.tutorialPage = "Pages";
+        var PagesView = require('./pages/PagesView').PagesView;
+
+        $('#page').fadeIn();
+        self.changePage(PagesView, {}, tutorial, function () {
+            self.trigger('pages-loaded');
+            $('.menu-app-pages').addClass('active');
+        });
+    },
+
+    pageWithName: function (pageName) {
+        var templateModel = this.model.get('templates').getTemplateWithName(pageName);
+        this.page(templateModel);
+    },
+
+    pageWithIndex: function (pageId) {
+        var templateModel = this.model.get('templates').models[pageId];
+        this.page(templateModel);
+    },
+
+    page: function (templateModel) {
+
+        if (this.view && templateModel == this.view.templateModel) return;
+        if (!templateModel) templateModel = this.model.get('templates').models[0];
+        this.tutorialPage = "Editor";
+        this.tutorialPage = "Introduction";
+        this.changePage(EditorView, {
+            templateModel: templateModel,
+            appModel: this.model
+        }, "", function () {});
+
+        this.toolBar.setTemplate(templateModel);
+
+        this.$leftMenu = this.$el.find('.left-menu-panel-l1 ');
+        this.setupMenuHeight();
+        this.trigger('editor-loaded');
+    },
+
+    plugins: function (tutorial) {
+        var self = this;
+        this.pluginsView.expand();
+    },
+
+    renderIFrameContent: function (proxy) {
+        this.view.renderIFrameContent(proxy);
+    },
+
+    changePage: function (NewView, options, tutorial, post_render) {
+
+        if (this.view) this.view.close();
+
+        var cleanDiv = this._cleanDiv;
+
+        this.view = this.createSubview(NewView, options);
+        this.view.setElement(cleanDiv).render();
+
+        //v1.changeTitle(this.view.title);
+
+        $("html, body").animate({
+            scrollTop: 0
+        });
+        $('#page').fadeIn();
+        post_render.call();
+
+        if (tutorial && tutorial === 'tutorial/') {
+            this.showTutorial();
+        } else if (tutorial) {
+            // remove random ending string from url path
+            this.navigate(window.location.pathname.replace(tutorial, ''), {
+                replace: true
             });
-
-            this.doKeyBindings();
-            Backbone.Regrettable.reset();
-
-        },
-
-        getCurrentPage: function() {
-            return this.view.getCurrentTemplate();
-        },
-
-        showTemplateWithName: function(templateName) {
-
-        },
-
-        doKeyBindings: function() {
-            keyDispatcher.bindComb('meta+s', this.save);
-            keyDispatcher.bindComb('ctrl+s', this.save);
-            // keyDispatcher.bindComb('meta+c', this.copy);
-            // keyDispatcher.bindComb('ctrl+c', this.copy);
-            // keyDispatcher.bindComb('meta+v', this.paste);
-            // keyDispatcher.bindComb('ctrl+v', this.paste);
-            keyDispatcher.bindComb('meta+z', this.undo);
-            keyDispatcher.bindComb('ctrl+z', this.undo);
-            keyDispatcher.bindComb('meta+y', this.redo);
-            keyDispatcher.bindComb('ctrl+y', this.redo);
-
-        },
-
-        info: function(appId, tutorial) {
-            var self = this;
-            var AppInfoView = require('./AppInfoView');
-                self.tutorialPage = "Application Settings";
-                self.changePage(AppInfoView, {}, tutorial, function() {
-                    $('.menu-app-info').addClass('active');
-                });
-        },
-
-        tables: function(tutorial) {
-            var self = this;
-            this.nodeModelsView.expand();
-        },
-
-        pages: function(appId, tutorial) {
-            var self = this;
-            self.tutorialPage = "Pages";
-            var PagesView = require('./pages/PagesView').PagesView;
-
-                $('#page').fadeIn();
-                self.changePage(PagesView, {}, tutorial, function() {
-                    self.trigger('pages-loaded');
-                    $('.menu-app-pages').addClass('active');
-                });
-        },
-
-        pageWithName: function(pageName) {
-            var templateModel = this.model.get('templates').getTemplateWithName(pageName);
-            this.page(templateModel);
-        },
-
-        pageWithIndex: function(pageId) {
-            var templateModel = this.model.get('templates').models[pageId];
-            this.page(templateModel);
-        },
-
-        page: function(templateModel) {
-
-            if (this.view && templateModel == this.view.templateModel) return;
-            if (!templateModel) templateModel = this.model.get('templates').models[0];
-            this.tutorialPage = "Editor";
-            this.tutorialPage = "Introduction";
-            this.changePage(EditorView, { templateModel: templateModel, appModel: this.model }, "", function() {});
-
-            this.toolBar.setTemplate(templateModel);
-
-            this.$leftMenu = this.$el.find('.left-menu-panel-l1 ');
-            this.setupMenuHeight();
-            this.trigger('editor-loaded');
-        },
-
-        plugins: function(tutorial) {
-            var self = this;
-            this.pluginsView.expand();
-        },
-
-        renderIFrameContent: function(proxy) {
-            this.view.renderIFrameContent(proxy);
-        },
-
-        changePage: function(NewView, options, tutorial, post_render) {
-
-            if (this.view) this.view.close();
-
-            var cleanDiv = this._cleanDiv;
-
-            this.view = this.createSubview(NewView, options);
-            this.view.setElement(cleanDiv).render();
-
-            //v1.changeTitle(this.view.title);
-
-            $("html, body").animate({
-                scrollTop: 0
-            });
-            $('#page').fadeIn();
-            post_render.call();
-
-            if (tutorial && tutorial === 'tutorial/') {
-                this.showTutorial();
-            } else if (tutorial) {
-                // remove random ending string from url path
-                this.navigate(window.location.pathname.replace(tutorial, ''), {
-                    replace: true
-                });
-            } else {
-                if (this.tutorialIsVisible) {
-                    this.tutorial.closeModal();
-                }
+        } else {
+            if (this.tutorialIsVisible) {
+                this.tutorial.closeModal();
             }
-        },
-
-        undo: function() {
-            Backbone.Regrettable.undo();
-        },
-
-        redo: function() {
-            Backbone.Regrettable.redo();
-        },
-
-        deployApp: function() {
-            $('.deploy-text').html('Publishing');
-            var threeDots = util.threeDots();
-            $('.deploy-text').append(threeDots.el);
-
-            var success_callback = function(data) {
-                $('.deploy-text').html('Publish');
-                clearInterval(threeDots.timer);
-            };
-
-            var hold_on_callback = function() {
-                $('.deploy-text').html('Hold On, Still deploying.');
-            };
-
-            this.deployManager.deploy.call(this, success_callback, hold_on_callback);
-        },
-
-        save: function(e, callback) {
-            if (v1.disableSave === true) return;
-            if (appId === 0) return;
-
-            $('#save-icon').attr('src', '/static/img/ajax-loader-white.gif');
-            var $el = $('.menu-button.save');
-            $el.fadeOut().html("<span class='icon'></span><span>Saving...</span>").fadeIn();
-
-            var self = this;
-            appState = v1State.serialize();
-            if(DEBUG) console.log(appState);
-
-            var successHandler = function(data) {
-                util.dontAskBeforeLeave();
-                v1.disableSave = false;
-
-                v1State.set('version_id', data.version_id);
-
-                $('#save-icon').attr('src', '/static/img/checkmark.png').hide().fadeIn();
-                var timer = setTimeout(function() {
-                    $('#save-icon').attr('src', '/static/img/save.png').hide().fadeIn();
-                    clearTimeout(timer);
-                }, 1000);
-                $('.menu-button.save').html("<span class='icon'></span><span>Saved</span>").fadeIn();
-
-                if ((typeof(callback) !== 'undefined') && (typeof(callback) == 'function')) {
-                    callback();
-                }
-
-                var timer2 = setTimeout(function() {
-                    $el.html("<span class='icon'></span><span>Save</span>").fadeIn();
-                    clearTimeout(timer2);
-                }, 3000);
-            };
-            var softErrorHandler = function(jqxhr) {
-                var data = JSON.parse(jqxhr.responseText);
-                v1State.set('version_id', data.version_id);
-                v1.disableSave = true;
-                new SoftErrorView({
-                    text: data.message,
-                    path: data.path
-                }, function() {
-                    v1.disableSave = false;
-                });
-            };
-            var browserConflictHandler = function(jqxhr) {
-                v1.disableSave = true;
-                var content = {
-                    text: "Looks like you (or someone else) made a change to your app in another browser window. Please make sure you only use one window with Appcubator or you may end up overwriting your app with an older version. Please refresh the browser to get the updated version of your app."
-                };
-                if (BROWSER_VERSION_ERROR_HAPPENED_BEFORE) {
-                    content.text += '<br><br><br>Refreshing in <span id="countdown-ksikka">6</span> seconds...\n';
-                }
-                var errorModal = new ErrorDialogueView(content, function() {
-                    v1.disableSave = false;
-                });
-                if (BROWSER_VERSION_ERROR_HAPPENED_BEFORE) {
-                    errorModal._countdownToRefresh();
-                }
-                // global
-                BROWSER_VERSION_ERROR_HAPPENED_BEFORE = true;
-            };
-            var hardErrorHandler = function(jqxhr) {
-                v1.disableSave = true;
-                var content = {};
-                if (DEBUG)
-                    content = {
-                        text: jqxhr.responseText
-                    };
-                else
-                    content = {
-                        text: "There has been a problem. Please refresh your page. We're really sorry for the inconvenience and will be fixing it very soon."
-                    };
-                new ErrorDialogueView(content, function() {
-                    v1.disableSave = false;
-                });
-            };
-
-            // for now, no difference
-            var notFoundHandler = hardErrorHandler;
-            v1.disableSave = true;
-
-            $.ajax({
-                type: "POST",
-                url: '/app/' + this.appId + '/state/',
-                data: JSON.stringify(appState),
-                statusCode: {
-                    200: successHandler,
-                    400: softErrorHandler,
-                    409: browserConflictHandler,
-                    500: hardErrorHandler,
-                    404: notFoundHandler,
-                },
-                dataType: "JSON"
-            });
-
-            if (e) e.preventDefault();
-            return false;
-        },
-
-        toggleTopMenu: function() {
-            return (this.menuExpanded ? this.hideTopMenu : this.expandTopMenu)();
-        },
-
-        expandTopMenu: function() {
-                $('#tool-bar').addClass('open');
-                $('#main-container').addClass('open');
-                this.menuExpanded = true;
-                $('#main-container').on('click', this.hideTopMenu);
-        },
-
-        hideTopMenu: function() {
-                $('#tool-bar').removeClass('open');
-                $('#main-container').removeClass('open');
-                this.menuExpanded = false;
-                $('#main-container').off('click', this.hideTopMenu);
-        },
-
-        fetchPlugins: function(callback) {
-            var self = this;
-            $.ajax({
-                type: "GET",
-                url: '/app/' + appId + '/state/',
-                statusCode: {
-                    200: function(data) {
-
-                        self.refreshPlugins(data.plugins);
-                        callback.call(this);
-                    }
-                },
-                dataType: "JSON"
-            });
-
-        },
-
-        refreshPlugins: function(freshPlugins) {
-
-            var plugins = v1State.get('plugins').toJSON();
-
-            if(!_.isEqual(plugins, freshPlugins)) {
-                console.log("REFRESHED PLUGINS");
-                v1State.set('plugins', new PluginsModel(freshPlugins));
-            }
-        },
-
-        download: function(callback) {
-            var jqxhrToJson = function(jqxhr) {
-                var data = {};
-                try {
-                    data = JSON.parse(jqxhr.responseText);
-                } catch (e) {
-                    data.errors = ["JSON response from server failed to parse", jqxhr.responseText];
-                }
-                return data;
-            };
-
-            // this is copy pasted from the save code. i dont know how to modularize these functions properly. ~ks
-            var softErrorHandler = function(data) {
-                v1State.set('version_id', data.version_id);
-                v1.disableSave = true;
-                new SoftErrorView({
-                    text: data.message,
-                    path: data.path
-                }, function() {
-                    v1.disableSave = false;
-                });
-                return data;
-            };
-
-            var hardErrorHandler = function(data) {
-                var content = {};
-                if (DEBUG) content.text = data.responseText;
-                else content.text = "There has been a problem. Please refresh your page. We're really sorry for the inconvenience and will be fixing it very soon.";
-                new ErrorDialogueView(content);
-                util.log_to_server('deployed app', {
-                    status: 'FAILURE',
-                    deploy_time: data.deploy_time + " seconds",
-                    message: data.errors
-                }, this.appId);
-                return data;
-            };
-
-            var downloadApp = function(callback) {
-                var url = '/app/' + appId + '/zip/';
-                var hiddenIFrameID = 'hiddenDownloader',
-                    iframe = document.getElementById(hiddenIFrameID);
-                if (iframe === null) {
-                    iframe = document.createElement('iframe');
-                    iframe.id = hiddenIFrameID;
-                    iframe.style.display = 'none';
-                    document.body.appendChild(iframe);
-                }
-                iframe.src = url;
-                callback();
-            };
-
-            $.ajax({
-                type: "GET",
-                url: '/app/' + appId + '/zip/',
-                statusCode: {
-                    200: function(data) {
-                        util.log_to_server('code downloaded', {}, appId);
-                        downloadApp(callback);
-                    },
-                    400: function(jqxhr) {
-                        var data = jqxhrToJson(jqxhr);
-                        data = softErrorHandler(data);
-                        data = callback(data);
-                    },
-                    500: function(jqxhr) {
-                        var data = jqxhrToJson(jqxhr);
-                        data = hardErrorHandler(data);
-                        data = callback(data);
-                    },
-                },
-                dataType: "JSON"
-            });
-        },
-
-        setupMenuHeight: function() {
-            var height = $(document).height();
-
-            this.$leftMenu.each(function() {
-                $(this).height(height);
-            });
-
-            var self = this;
-            $( window ).resize(function() {
-                var height = $(document).height();
-                self.$leftMenu.height(height);
-            });
         }
+    },
 
-    });
+    undo: function () {
+        Backbone.Regrettable.undo();
+    },
 
-    exports.AppView = AppView;
+    redo: function () {
+        Backbone.Regrettable.redo();
+    },
+
+    deployApp: function () {
+        $('.deploy-text').html('Publishing');
+        var threeDots = util.threeDots();
+        $('.deploy-text').append(threeDots.el);
+
+        var success_callback = function (data) {
+            $('.deploy-text').html('Publish');
+            clearInterval(threeDots.timer);
+        };
+
+        var hold_on_callback = function () {
+            $('.deploy-text').html('Hold On, Still deploying.');
+        };
+
+        this.deployManager.deploy.call(this, success_callback, hold_on_callback);
+    },
+
+    save: function (e, callback) {
+        if (v1.disableSave === true) return;
+        if (appId === 0) return;
+
+        $('#save-icon').attr('src', '/static/img/ajax-loader-white.gif');
+        var $el = $('.menu-button.save');
+        $el.fadeOut().html("<span class='icon'></span><span>Saving...</span>").fadeIn();
+
+        var self = this;
+        appState = v1State.serialize();
+        if (DEBUG) console.log(appState);
+
+        var successHandler = function (data) {
+            util.dontAskBeforeLeave();
+            v1.disableSave = false;
+
+            v1State.set('version_id', data.version_id);
+
+            $('#save-icon').attr('src', '/static/img/checkmark.png').hide().fadeIn();
+            var timer = setTimeout(function () {
+                $('#save-icon').attr('src', '/static/img/save.png').hide().fadeIn();
+                clearTimeout(timer);
+            }, 1000);
+            $('.menu-button.save').html("<span class='icon'></span><span>Saved</span>").fadeIn();
+
+            if ((typeof (callback) !== 'undefined') && (typeof (callback) == 'function')) {
+                callback();
+            }
+
+            var timer2 = setTimeout(function () {
+                $el.html("<span class='icon'></span><span>Save</span>").fadeIn();
+                clearTimeout(timer2);
+            }, 3000);
+        };
+        var softErrorHandler = function (jqxhr) {
+            var data = JSON.parse(jqxhr.responseText);
+            v1State.set('version_id', data.version_id);
+            v1.disableSave = true;
+            new SoftErrorView({
+                text: data.message,
+                path: data.path
+            }, function () {
+                v1.disableSave = false;
+            });
+        };
+        var browserConflictHandler = function (jqxhr) {
+            v1.disableSave = true;
+            var content = {
+                text: "Looks like you (or someone else) made a change to your app in another browser window. Please make sure you only use one window with Appcubator or you may end up overwriting your app with an older version. Please refresh the browser to get the updated version of your app."
+            };
+            if (BROWSER_VERSION_ERROR_HAPPENED_BEFORE) {
+                content.text += '<br><br><br>Refreshing in <span id="countdown-ksikka">6</span> seconds...\n';
+            }
+            var errorModal = new ErrorDialogueView(content, function () {
+                v1.disableSave = false;
+            });
+            if (BROWSER_VERSION_ERROR_HAPPENED_BEFORE) {
+                errorModal._countdownToRefresh();
+            }
+            // global
+            BROWSER_VERSION_ERROR_HAPPENED_BEFORE = true;
+        };
+        var hardErrorHandler = function (jqxhr) {
+            v1.disableSave = true;
+            var content = {};
+            if (DEBUG)
+                content = {
+                    text: jqxhr.responseText
+                };
+            else
+                content = {
+                    text: "There has been a problem. Please refresh your page. We're really sorry for the inconvenience and will be fixing it very soon."
+                };
+            new ErrorDialogueView(content, function () {
+                v1.disableSave = false;
+            });
+        };
+
+        // for now, no difference
+        var notFoundHandler = hardErrorHandler;
+        v1.disableSave = true;
+
+        $.ajax({
+            type: "POST",
+            url: '/app/' + this.appId + '/state/',
+            data: JSON.stringify(appState),
+            statusCode: {
+                200: successHandler,
+                400: softErrorHandler,
+                409: browserConflictHandler,
+                500: hardErrorHandler,
+                404: notFoundHandler,
+            },
+            dataType: "JSON"
+        });
+
+        if (e) e.preventDefault();
+        return false;
+    },
+
+    toggleTopMenu: function () {
+        return (this.menuExpanded ? this.hideTopMenu : this.expandTopMenu)();
+    },
+
+    expandTopMenu: function () {
+        $('#tool-bar').addClass('open');
+        $('#main-container').addClass('open');
+        this.menuExpanded = true;
+        $('#main-container').on('click', this.hideTopMenu);
+    },
+
+    hideTopMenu: function () {
+        $('#tool-bar').removeClass('open');
+        $('#main-container').removeClass('open');
+        this.menuExpanded = false;
+        $('#main-container').off('click', this.hideTopMenu);
+    },
+
+    fetchPlugins: function (callback) {
+        var self = this;
+        $.ajax({
+            type: "GET",
+            url: '/app/' + appId + '/state/',
+            statusCode: {
+                200: function (data) {
+
+                    self.refreshPlugins(data.plugins);
+                    callback.call(this);
+                }
+            },
+            dataType: "JSON"
+        });
+
+    },
+
+    refreshPlugins: function (freshPlugins) {
+
+        var plugins = v1State.get('plugins').toJSON();
+
+        if (!_.isEqual(plugins, freshPlugins)) {
+            console.log("REFRESHED PLUGINS");
+            v1State.set('plugins', new PluginsModel(freshPlugins));
+        }
+    },
+
+    download: function (callback) {
+        var jqxhrToJson = function (jqxhr) {
+            var data = {};
+            try {
+                data = JSON.parse(jqxhr.responseText);
+            } catch (e) {
+                data.errors = ["JSON response from server failed to parse", jqxhr.responseText];
+            }
+            return data;
+        };
+
+        // this is copy pasted from the save code. i dont know how to modularize these functions properly. ~ks
+        var softErrorHandler = function (data) {
+            v1State.set('version_id', data.version_id);
+            v1.disableSave = true;
+            new SoftErrorView({
+                text: data.message,
+                path: data.path
+            }, function () {
+                v1.disableSave = false;
+            });
+            return data;
+        };
+
+        var hardErrorHandler = function (data) {
+            var content = {};
+            if (DEBUG) content.text = data.responseText;
+            else content.text = "There has been a problem. Please refresh your page. We're really sorry for the inconvenience and will be fixing it very soon.";
+            new ErrorDialogueView(content);
+            util.log_to_server('deployed app', {
+                status: 'FAILURE',
+                deploy_time: data.deploy_time + " seconds",
+                message: data.errors
+            }, this.appId);
+            return data;
+        };
+
+        var downloadApp = function (callback) {
+            var url = '/app/' + appId + '/zip/';
+            var hiddenIFrameID = 'hiddenDownloader',
+                iframe = document.getElementById(hiddenIFrameID);
+            if (iframe === null) {
+                iframe = document.createElement('iframe');
+                iframe.id = hiddenIFrameID;
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+            iframe.src = url;
+            callback();
+        };
+
+        $.ajax({
+            type: "GET",
+            url: '/app/' + appId + '/zip/',
+            statusCode: {
+                200: function (data) {
+                    util.log_to_server('code downloaded', {}, appId);
+                    downloadApp(callback);
+                },
+                400: function (jqxhr) {
+                    var data = jqxhrToJson(jqxhr);
+                    data = softErrorHandler(data);
+                    data = callback(data);
+                },
+                500: function (jqxhr) {
+                    var data = jqxhrToJson(jqxhr);
+                    data = hardErrorHandler(data);
+                    data = callback(data);
+                },
+            },
+            dataType: "JSON"
+        });
+    },
+
+    setupMenuHeight: function () {
+        var height = $(document).height();
+
+        this.$leftMenu.each(function () {
+            $(this).height(height);
+        });
+
+        var self = this;
+        $(window).resize(function () {
+            var height = $(document).height();
+            self.$leftMenu.height(height);
+        });
+    }
+
+});
+
+exports.AppView = AppView;
 
 });
 
@@ -3364,31 +3438,31 @@ require.define("/template_editor/ToolBarView.js",function(require,module,exports
     require('../mixins/BackboneNameBox');
 
     var tempTemplateItem = [
-                '<li class="go-to-page" id="tb-template-<%= templateModel.cid %>">',
-                '<span class="page icon"></span>',
-                '<a><%= templateModel.get("name") %></a>',
-                '</li>'
+        '<li class="go-to-page" id="tb-template-<%= templateModel.cid %>">',
+        '<span class="page icon"></span>',
+        '<a><%= templateModel.get("name") %></a>',
+        '</li>'
     ].join('\n');
 
     var ToolBarView = Backbone.View.extend({
         subviews: [],
 
         events: {
-            'click .go-to-page'    : 'clickedGoToPage',
-            'click a.back'         : 'navigateBack',
+            'click .go-to-page': 'clickedGoToPage',
+            'click a.back': 'navigateBack',
         },
 
-        initialize: function(options) {
+        initialize: function (options) {
             _.bindAll(this);
-            
+
             this.collection = v1State.get('templates');
 
             this.pageId = options.pageId;
             this.nmrFields = v1State.get('templates').length + 1;
-            
+
             if (this.nmrFields > 6) this.nmrFields = 6;
-            
-            this.listenTo(v1State.get('templates'), 'add remove', function() {
+
+            this.listenTo(v1State.get('templates'), 'add remove', function () {
                 this.nmrFields = v1State.get('templates').length + 1;
                 if (this.nmrFields > 6) this.nmrFields = 6;
             }, this);
@@ -3396,28 +3470,27 @@ require.define("/template_editor/ToolBarView.js",function(require,module,exports
             this.listenTo(v1State.get('templates'), 'add', this.newTemplateCreated);
         },
 
-        setPage: function(pageId) {
+        setPage: function (pageId) {
             this.pageId = pageId;
             this.render();
         },
 
-        setTemplate: function(templateModel) {
+        setTemplate: function (templateModel) {
             this.templateModel = templateModel;
             this.render();
         },
 
-        render: function() {
-            if(this.templateModel) {
+        render: function () {
+            if (this.templateModel) {
                 util.get('current-page').innerHTML = this.templateModel.get('name');
-            }
-            else {
+            } else {
                 util.get('current-page').innerHTML = "Pages";
             }
-            
+
             this.pageList = util.get('page-list');
             this.pageList.innerHTML = '';
 
-            this.collection.each(function(template, ind) {
+            this.collection.each(function (template, ind) {
                 if (this.templateModel == template) return;
                 this.renderPageItem(template);
             }, this);
@@ -3433,16 +3506,18 @@ require.define("/template_editor/ToolBarView.js",function(require,module,exports
             return this;
         },
 
-        renderPageItem: function(templateModel) {
-            this.pageList.innerHTML += _.template(tempTemplateItem, { templateModel: templateModel });
+        renderPageItem: function (templateModel) {
+            this.pageList.innerHTML += _.template(tempTemplateItem, {
+                templateModel: templateModel
+            });
         },
 
-        clickedGoToPage: function(e) {
+        clickedGoToPage: function (e) {
             var templateCid = (e.currentTarget.id).replace('tb-template-', '');
             var goToPageId = 0;
             this.collection.each(function (templateM, ind) {
                 if (templateM.cid == templateCid) {
-                    goToPageId =  ind;
+                    goToPageId = ind;
                 }
             });
 
@@ -3451,7 +3526,7 @@ require.define("/template_editor/ToolBarView.js",function(require,module,exports
             });
         },
 
-        createPage: function(name) {
+        createPage: function (name) {
             var routeModel = new RouteModel({
                 name: name
             });
@@ -3459,24 +3534,28 @@ require.define("/template_editor/ToolBarView.js",function(require,module,exports
             routeModel.setGenerator("routes.staticpage");
             v1State.get('routes').push(routeModel);
 
-            var templateModel = new TemplateModel({ name : name });
+            var templateModel = new TemplateModel({
+                name: name
+            });
             templateModel.setGenerator("templates.page");
             this.collection.add(templateModel);
 
             v1.currentApp.save();
         },
 
-        newTemplateCreated: function(templateM) {
-            var str = _.template(tempTemplateItem, { templateModel: templateM });
+        newTemplateCreated: function (templateM) {
+            var str = _.template(tempTemplateItem, {
+                templateModel: templateM
+            });
             this.$el.find('#page-list').append(str);
             util.scrollToBottom(this.$el.find('#page-list'));
         },
 
-        navigateBack: function() {
+        navigateBack: function () {
             window.history.back();
         },
 
-        save: function() {
+        save: function () {
             v1.save();
             return false;
         }
@@ -3484,67 +3563,67 @@ require.define("/template_editor/ToolBarView.js",function(require,module,exports
     });
 
     exports.ToolBarView = ToolBarView;
+
 });
 
 require.define("/mixins/BackboneNameBox.js",function(require,module,exports,__dirname,__filename,process,global){  Backbone.NameBox = Backbone.View.extend({
-    el: null,
-    tagName: 'div',
-    txt: "",
-    events: {
-      'click'               : 'showForm',
-      'submit form'         : 'createFormSubmitted',
-      'keydown input[type="text"]' : 'keyDown'
-    },
+      el: null,
+      tagName: 'div',
+      txt: "",
+      events: {
+          'click': 'showForm',
+          'submit form': 'createFormSubmitted',
+          'keydown input[type="text"]': 'keyDown'
+      },
 
-    initialize: function(inp) {
-      _.bindAll(this, 'render', 'showForm', 'createFormSubmitted');
-      if(inp.txt) {
-        this.txt = inp.txt;
+      initialize: function (inp) {
+          _.bindAll(this, 'render', 'showForm', 'createFormSubmitted');
+          if (inp.txt) {
+              this.txt = inp.txt;
+          }
+          return this;
+      },
+
+      render: function () {
+          if (this.txt) {
+              this.el.innerHTML += '<div class="box-button text">' + this.txt + '</div>';
+          }
+          if (!this.$el.find('form').length) {
+              this.el.innerHTML += "<form style='display:none;'><input type='text' placeholder='Name...'></form>";
+          }
+          return this;
+      },
+
+      showForm: function (e) {
+          this.$el.find('.box-button').hide();
+          this.$el.find('form').fadeIn();
+          this.$el.find('input[type="text"]').focus();
+      },
+
+      createFormSubmitted: function (e) {
+          e.preventDefault();
+          var nameInput = this.$el.find('input[type=text]');
+          var name = nameInput.val();
+          if (name.length > 0) {
+              nameInput.val('');
+              this.$el.find('form').hide();
+              this.$el.find('.box-button').fadeIn();
+              this.trigger('submit', name);
+          } else {
+              this.reset();
+          }
+      },
+
+      keyDown: function (e) {
+          if (e.keyCode === 27) this.reset();
+      },
+
+      reset: function () {
+          var nameInput = this.$el.find('input[type=text]');
+          nameInput.val('');
+          this.$el.find('form').hide();
+          this.$el.find('.box-button').fadeIn();
       }
-      return this;
-    },
-
-    render: function() {
-      if(this.txt) {
-        this.el.innerHTML += '<div class="box-button text">' + this.txt + '</div>';
-      }
-      if(!this.$el.find('form').length) {
-        this.el.innerHTML +="<form style='display:none;'><input type='text' placeholder='Name...'></form>";
-      }
-      return this;
-    },
-
-    showForm: function (e) {
-      this.$el.find('.box-button').hide();
-      this.$el.find('form').fadeIn();
-      this.$el.find('input[type="text"]').focus();
-    },
-
-    createFormSubmitted: function(e) {
-      e.preventDefault();
-      var nameInput = this.$el.find('input[type=text]');
-      var name = nameInput.val();
-      if(name.length > 0) {
-        nameInput.val('');
-        this.$el.find('form').hide();
-        this.$el.find('.box-button').fadeIn();
-        this.trigger('submit', name);
-      }
-      else {
-        this.reset();
-      }
-    },
-
-    keyDown: function (e) {
-      if(e.keyCode === 27) this.reset();
-    },
-
-    reset: function() {
-      var nameInput = this.$el.find('input[type=text]');
-      nameInput.val('');
-      this.$el.find('form').hide();
-      this.$el.find('.box-button').fadeIn();
-    }
 
   });
 
@@ -3577,31 +3656,29 @@ require.define("/template_editor/EditorView.js",function(require,module,exports,
         css: "bootstrap-editor",
 
         events: {
-            'click .menu-button.help'    : 'help',
+            'click .menu-button.help': 'help',
             'click .menu-button.question': 'question',
-            'click .url-field'           : 'clickedUrl',
-            'click .refresh-page'        : 'refreshPage',
-            'click #page-info'           : 'pageInfo',
-            'click #close-page-info'     : 'closePageInfo',
-            'click #design-mode-button'  : 'switchToDesignMode',
-            'click #close-css-editor'    : 'switchOffDesignMode',
-            'click .mobile-preview'      : 'switchToMobileMode'
+            'click .url-field': 'clickedUrl',
+            'click .refresh-page': 'refreshPage',
+            'click #page-info': 'pageInfo',
+            'click #close-page-info': 'closePageInfo',
+            'click #design-mode-button': 'switchToDesignMode',
+            'click #close-css-editor': 'switchOffDesignMode',
+            'click .mobile-preview': 'switchToMobileMode'
         },
 
-        initialize: function(options) {
+        initialize: function (options) {
             _.bindAll(this);
 
             this.appModel = options.appModel;
 
-            if (options && (options.pageId == "0" || options.pageId  >= 0)) {
+            if (options && (options.pageId == "0" || options.pageId >= 0)) {
                 this.pageId = options.pageId;
                 pageId = options.pageId;
                 this.model = this.appModel.get('templates').models[pageId];
-            }
-            else if (options.templateModel) {
+            } else if (options.templateModel) {
                 this.model = options.templateModel;
-            }
-            else {
+            } else {
                 throw "No Template Model Provided.";
             }
 
@@ -3640,7 +3717,7 @@ require.define("/template_editor/EditorView.js",function(require,module,exports,
 
             this.title = "Editor";
 
-            if(this.routeModel) {
+            if (this.routeModel) {
                 this.urlModel = this.routeModel.get('url');
                 this.listenTo(this.routeModel.get('url').get('urlparts'), 'add remove', this.renderUrlBar);
             }
@@ -3649,7 +3726,7 @@ require.define("/template_editor/EditorView.js",function(require,module,exports,
 
         },
 
-        render: function() {
+        render: function () {
 
             this.start = new Date().getTime();
 
@@ -3683,7 +3760,7 @@ require.define("/template_editor/EditorView.js",function(require,module,exports,
                 position: {
                     my: "left+10 center",
                     at: "right center",
-                    using: function(position, feedback) {
+                    using: function (position, feedback) {
                         $(this).css(position);
                         $("<div>")
                             .addClass("arrow")
@@ -3698,7 +3775,7 @@ require.define("/template_editor/EditorView.js",function(require,module,exports,
             return this;
         },
 
-        renderIFrameContent: function(proxy) {
+        renderIFrameContent: function (proxy) {
             var self = this;
             var iframe = document.getElementById('page');
             innerDoc = iframe.contentDocument || iframe.contentWindow.document;
@@ -3748,28 +3825,28 @@ require.define("/template_editor/EditorView.js",function(require,module,exports,
             /* } */
         },
 
-        getCurrentTemplate: function() {
+        getCurrentTemplate: function () {
             return this.templateModel;
         },
 
-        renderUrlBar: function() {
-            if(this.routeModel) {
+        renderUrlBar: function () {
+            if (this.routeModel) {
                 this.$el.find('.url-field').html(this.urlModel.getUrlString());
             }
         },
 
-        help: function(e) {
+        help: function (e) {
             new TutorialView([6]);
         },
 
-        startUIStateUpdater: function(proxy) {
+        startUIStateUpdater: function (proxy) {
             var self = this;
             this.listenTo(v1UIEState, 'synced', proxy.reArrangeCSSTag);
 
-            this.UIStateTimer = setInterval(function() {
-                self.fetchUIState(function(state) {
+            this.UIStateTimer = setInterval(function () {
+                self.fetchUIState(function (state) {
                     /* crappy fix */
-                    _.each(state.texts, function(text) {
+                    _.each(state.texts, function (text) {
                         text.tagName = "div";
                     });
 
@@ -3781,7 +3858,7 @@ require.define("/template_editor/EditorView.js",function(require,module,exports,
             }, 10000);
         },
 
-        fetchUIState: function(callback) {
+        fetchUIState: function (callback) {
             $.ajax({
                 type: "GET",
                 url: '/app/' + appId + '/uiestate/',
@@ -3793,38 +3870,38 @@ require.define("/template_editor/EditorView.js",function(require,module,exports,
             });
         },
 
-        renewUIEState: function(newState, proxy) {
+        renewUIEState: function (newState, proxy) {
             uieState = newState;
             proxy.reArrangeCSSTag();
         },
 
-        question: function(e) {
+        question: function (e) {
             olark('api.box.show');
             olark('api.box.expand');
         },
 
-        clickedUrl: function() {
+        clickedUrl: function () {
             var newView = new UrlView(this.urlModel, this.model);
             newView.onClose = this.renderUrlBar;
         },
 
-        refreshPage: function() {
+        refreshPage: function () {
             this.widgetEditorView.clear();
             this.sectionsManager.close();
             this.sectionsManager = null;
             var self = this;
-            v1.currentApp.fetchPlugins(function() {
+            v1.currentApp.fetchPlugins(function () {
                 self.iframeProxy.reloadPage();
             });
         },
 
-        setupPageWrapper: function() {
+        setupPageWrapper: function () {
             var height = window.innerHeight - 90;
             util.get('page-wrapper').style.height = height + 'px';
             this.$el.find('.page.full').css('height', height - 46);
         },
 
-        scrollTo: function(widget) {
+        scrollTo: function (widget) {
 
             var pageHeight = window.innerHeight - 90 - 46;
             var pageTop = $('#page').scrollTop();
@@ -3838,47 +3915,46 @@ require.define("/template_editor/EditorView.js",function(require,module,exports,
 
         },
 
-        pageInfo: function() {
+        pageInfo: function () {
             this.pageView.expand();
         },
 
-        closePageInfo: function() {
+        closePageInfo: function () {
             this.pageView.hide();
             $('.left-buttons').removeClass('invisible');
             this.$pageContainer.removeClass('packed');
             this.galleryEditor.show();
         },
 
-        switchToDesignMode: function() {
+        switchToDesignMode: function () {
             this.cssEditorView.expand();
             $('.left-buttons').addClass('invisible');
             this.$pageContainer.addClass('packed');
             this.galleryEditor.hide();
         },
 
-        switchOffDesignMode: function() {
+        switchOffDesignMode: function () {
             this.cssEditorView.hide();
             $('.left-buttons').removeClass('invisible');
             this.$pageContainer.removeClass('packed');
             this.galleryEditor.show();
         },
 
-        switchToMobileMode: function() {
-            
+        switchToMobileMode: function () {
+
             if (!this.mobilePreview) {
                 util.get('page-wrapper').style.width = 270 + 'px';
                 this.mobilePreview = true;
                 $('.mobile-preview').addClass('active');
-            }
-            else {
+            } else {
                 util.get('page-wrapper').style.width = "";
                 this.mobilePreview = false;
                 $('.mobile-preview').removeClass('active');
             }
-            
+
         },
 
-        close: function() {
+        close: function () {
 
             g_guides = null;
             window.removeEventListener('resize', this.setupPageWrapper);
@@ -3911,32 +3987,32 @@ require.define("/pages/UrlView.js",function(require,module,exports,__dirname,__f
     var UrlTemplate = {};
 
     UrlTemplate.mainTemplate = [
-    '<h3 class="hi3 hoff1 edit-url">Edit URL</h3>',
-    '<div class="row well well-small">',
-    '<p class="span24 offset2 hoff1"><strong>Full URL: </strong><span class="full-url"></span></p>',
-    '</div>',
-    '<form class="form-horizontal">',
-    '<ul class="row hoff1 url-parts"></ul>',
-    '<div class="row hoff2 hi3 offset2">',
-    '<div class="btn btn-info btn-small offset1 new-suffix">+ Add Custom Text</div>',
-    '</div>',
-    '</form>'
+        '<h3 class="hi3 hoff1 edit-url">Edit URL</h3>',
+        '<div class="row well well-small">',
+        '<p class="span24 offset2 hoff1"><strong>Full URL: </strong><span class="full-url"></span></p>',
+        '</div>',
+        '<form class="form-horizontal">',
+        '<ul class="row hoff1 url-parts"></ul>',
+        '<div class="row hoff2 hi3 offset2">',
+        '<div class="btn btn-info btn-small offset1 new-suffix">+ Add Custom Text</div>',
+        '</div>',
+        '</form>'
     ].join('\n');
 
     UrlTemplate.contextTemp = [
-    '<label class="control-label">Context Data:</label>',
-    '<select class="context-part span16 offset1" id="form-<%= cid %>">',
-    '<% _.each(entities, function(name, i) { %>',
-    '<option value="<%= name %>" <% if(name == value) { %> selected <% } %> > <%= name %> ID</option>',
-    '<% }); %>',
-    '</select>',
-    '<span id="remove-<%= cid %>" class="remove offset1">×</span>',
+        '<label class="control-label">Context Data:</label>',
+        '<select class="context-part span16 offset1" id="form-<%= cid %>">',
+        '<% _.each(entities, function(name, i) { %>',
+        '<option value="<%= name %>" <% if(name == value) { %> selected <% } %> > <%= name %> ID</option>',
+        '<% }); %>',
+        '</select>',
+        '<span id="remove-<%= cid %>" class="remove offset1">×</span>',
     ].join('\n');
 
     UrlTemplate.suffixTemp = [
-    '<label class="control-label">Custom Text:</label>',
-    '<input type="text" id="form-<%= cid %>" class="span16 offset1 suffix-part" placeholder="customtext" value="<%= value %>">',
-    '<span id="remove-<%= cid %>" class="remove offset1">×</span>',
+        '<label class="control-label">Custom Text:</label>',
+        '<input type="text" id="form-<%= cid %>" class="span16 offset1 suffix-part" placeholder="customtext" value="<%= value %>">',
+        '<span id="remove-<%= cid %>" class="remove offset1">×</span>',
     ].join('\n');
 
 
@@ -3954,7 +4030,7 @@ require.define("/pages/UrlView.js",function(require,module,exports,__dirname,__f
             'submit form': 'cancelFormSubmit'
         },
 
-        initialize: function(urlModel, pageModel) {
+        initialize: function (urlModel, pageModel) {
             _.bindAll(this);
 
             this.model = urlModel;
@@ -3967,7 +4043,7 @@ require.define("/pages/UrlView.js",function(require,module,exports,__dirname,__f
             this.render();
         },
 
-        render: function() {
+        render: function () {
             var temp = UrlTemplate.mainTemplate;
             this.el.innerHTML = _.template(temp, this.model.serialize());
             this.renderUrlParts();
@@ -3981,16 +4057,16 @@ require.define("/pages/UrlView.js",function(require,module,exports,__dirname,__f
             return this;
         },
 
-        renderFullUrl: function() {
+        renderFullUrl: function () {
             this.$('.full-url').text(this.model.getUrlString());
         },
 
-        renderUrlParts: function() {
+        renderUrlParts: function () {
             this.$('.url-parts').empty();
             this.model.get('urlparts').each(this.appendUrlPartForm);
         },
 
-        appendUrlPartForm: function(urlpart, index) {
+        appendUrlPartForm: function (urlpart, index) {
             var value = urlpart.get('value');
 
             // render table urlpart
@@ -4020,35 +4096,35 @@ require.define("/pages/UrlView.js",function(require,module,exports,__dirname,__f
             }
         },
 
-        clickedRemove: function(e) {
+        clickedRemove: function (e) {
             var cid = e.currentTarget.id.replace('remove-', '');
             this.model.get('urlparts').remove(cid);
         },
 
-        removeUrlPart: function(urlpart, index) {
+        removeUrlPart: function (urlpart, index) {
             this.$('#urlpart-' + urlpart.cid).remove();
         },
 
-        contextPartChanged: function(e) {
+        contextPartChanged: function (e) {
             var cid = e.target.id.replace('form-', '');
             this.model.get('urlparts').get(cid).set('value', "{{" + e.target.value + "}}");
             return false;
         },
 
-        suffixPartChanged: function(e) {
+        suffixPartChanged: function (e) {
             var cid = e.target.id.replace('form-', '');
             this.model.get('urlparts').get(cid).set('value', e.target.value);
             return false;
         },
 
-        pageNameChanged: function(e) {
+        pageNameChanged: function (e) {
             this.model.set('name', e.currentTarget.value);
             this.renderFullUrl();
         },
 
-        askToAddContext: function() {
+        askToAddContext: function () {
             var self = this;
-            var translateTypetoNL = function(str) {
+            var translateTypetoNL = function (str) {
                 if (str == "node") {
                     str = "Widget";
                 }
@@ -4062,7 +4138,7 @@ require.define("/pages/UrlView.js",function(require,module,exports,__dirname,__f
 
             var widgetsNLString = "";
             if (widgets.length) {
-                var widgetsNL = _.map(widgets, function(widget) {
+                var widgetsNL = _.map(widgets, function (widget) {
                     return translateTypetoNL(widget.widget.get('type')) + ' on ' + widget.pageName;
                 });
                 widgetsNLString = widgetsNL.join('<br>');
@@ -4071,7 +4147,7 @@ require.define("/pages/UrlView.js",function(require,module,exports,__dirname,__f
 
             var linksNLString = "";
             if (links.length) {
-                var linksNL = _.map(links, function(link) {
+                var linksNL = _.map(links, function (link) {
                     return 'Link on ' + link.section + ' of ' + link.pageName;
                 });
                 linksNLString = linksNL.join('<br>');
@@ -4083,13 +4159,13 @@ require.define("/pages/UrlView.js",function(require,module,exports,__dirname,__f
 
                 new DialogueView({
                     text: "The elements listed below will be deleted if you add a context to this URL because they will no longer be valid. Do you want to proceed? <br><br> " + widgetsNLString + linksNLString
-                }, function() {
+                }, function () {
 
-                    _.each(widgets, function(widget) {
+                    _.each(widgets, function (widget) {
                         widget.widget.collection.remove(widget.widget);
                     });
 
-                    _.each(links, function(link) {
+                    _.each(links, function (link) {
                         link.link.collection.remove(link.link);
                     });
 
@@ -4098,98 +4174,99 @@ require.define("/pages/UrlView.js",function(require,module,exports,__dirname,__f
             }
         },
 
-        addNewSuffixPart: function(e) {
+        addNewSuffixPart: function (e) {
             this.model.get('urlparts').push({
                 value: 'customtext'
             });
             this.$('.suffix-part').last().focus();
         },
 
-        changedOrder: function(e, ui) {
+        changedOrder: function (e, ui) {
             var self = this;
             var sortedIDs = $('.url-parts').sortable("toArray");
             console.log(this.model.get('urlparts').serialize());
 
-            var newUrlParts = _(sortedIDs).map(function(id) {
+            var newUrlParts = _(sortedIDs).map(function (id) {
                 return self.model.get('urlparts').get(id.replace('urlpart-', ''));
             });
 
             this.model.get('urlparts').reset(newUrlParts);
             console.log(this.model.get('urlparts').serialize());
         },
-        cancelFormSubmit: function() {
+        cancelFormSubmit: function () {
             return false;
         }
     });
 
     exports.UrlView = UrlView;
+
 });
 
-require.define("/mixins/DialogueView.js",function(require,module,exports,__dirname,__filename,process,global){
-  require('./BackboneDialogue');
+require.define("/mixins/DialogueView.js",function(require,module,exports,__dirname,__filename,process,global){require('./BackboneDialogue');
 
-  var SimpleDialogueView = Backbone.DialogueView.extend({
+var SimpleDialogueView = Backbone.DialogueView.extend({
     tagName: 'div',
     className: 'normal-dialogue',
     padding: 0,
 
-    events : {
-      'click .btn.ok' : 'okCase',
-      'click .btn.cancel' : 'cancelCase'
+    events: {
+        'click .btn.ok': 'okCase',
+        'click .btn.cancel': 'cancelCase'
     },
 
-    initialize: function(data, successCallback) {
-      _.bindAll(this);
-      this.successCallback = successCallback;
-      this.render(data.text);
+    initialize: function (data, successCallback) {
+        _.bindAll(this);
+        this.successCallback = successCallback;
+        this.render(data.text);
     },
 
-    render : function(text) {
-      if(text) {
-        this.el.innerHTML += '<p style="padding:30px;">'+text+'</p>';
-      }
+    render: function (text) {
+        if (text) {
+            this.el.innerHTML += '<p style="padding:30px;">' + text + '</p>';
+        }
 
-      this.el.innerHTML += '<div class="bottom-sect"><div class="btn cancel">Cancel</div><div class="btn ok offset1">Ok</div></div>';
+        this.el.innerHTML += '<div class="bottom-sect"><div class="btn cancel">Cancel</div><div class="btn ok offset1">Ok</div></div>';
 
-      return this;
+        return this;
     },
 
-    okCase: function() {
-      this.successCallback.call(this);
-      this.closeModal();
+    okCase: function () {
+        this.successCallback.call(this);
+        this.closeModal();
     },
 
-    cancelCase: function() {
-      this.closeModal();
+    cancelCase: function () {
+        this.closeModal();
     }
 
-  });
+});
 
-  exports.SimpleDialogueView = SimpleDialogueView;
+exports.SimpleDialogueView = SimpleDialogueView;
+
 });
 
 require.define("/mixins/ErrorModalView.js",function(require,module,exports,__dirname,__filename,process,global){  require('./BackboneModal');
   var ErrorModalView = Backbone.ModalView.extend({
-    tagName: 'div',
-    className: 'deployed',
+      tagName: 'div',
+      className: 'deployed',
 
-    initialize: function(data, callback) {
-      this.render(data.img, data.text);
-      this.callback = callback;
-    },
+      initialize: function (data, callback) {
+          this.render(data.img, data.text);
+          this.callback = callback;
+      },
 
-    render : function(img, text) {
-      if(img) {
-        this.el.innerHTML += '<img src="/static/img/'+img+'">';
+      render: function (img, text) {
+          if (img) {
+              this.el.innerHTML += '<img src="/static/img/' + img + '">';
+          }
+
+          if (text) {
+              text = text.replace('\n', '<br />');
+              text = text.replace(' ', '&nbsp;');
+              this.el.innerHTML += '<h3>' + text + '</h3>';
+          }
+          return this;
       }
-
-      if(text) {
-        text = text.replace('\n', '<br />');
-        text = text.replace(' ', '&nbsp;');
-        this.el.innerHTML += '<h3>'+text+'</h3>';
-      }
-      return this;
-    }
   });
 
   exports.ErrorModalView = ErrorModalView;
@@ -4199,119 +4276,119 @@ require.define("/mixins/ErrorModalView.js",function(require,module,exports,__dir
 require.define("/mixins/DebugOverlay.js",function(require,module,exports,__dirname,__filename,process,global){  require('./BackboneModal');
 
   var ErrorModalView = Backbone.ModalView.extend({
-    tagName: 'div',
-    className: 'deployed',
+      tagName: 'div',
+      className: 'deployed',
 
-    setupModal: function() {
-      var self = this;
-      var div = document.createElement('div');
-      div.className = "modal-bg fadeIn";
-      div.style.position = 'fixed';
-      div.style.width = '100%';
-      div.style.height = '100%';
-      div.style.top = '0';
-      div.style.left = '0';
-      div.style.backgroundColor = '#222';
-      div.style.opacity = '0.6';
-      div.style.zIndex = 3000;
-      document.body.appendChild(div);
+      setupModal: function () {
+          var self = this;
+          var div = document.createElement('div');
+          div.className = "modal-bg fadeIn";
+          div.style.position = 'fixed';
+          div.style.width = '100%';
+          div.style.height = '100%';
+          div.style.top = '0';
+          div.style.left = '0';
+          div.style.backgroundColor = '#222';
+          div.style.opacity = '0.6';
+          div.style.zIndex = 3000;
+          document.body.appendChild(div);
 
-      var closeHandler = function(e) {
-        if(e.keyCode == 27) {
-          self.closeModal(closeHandler);
-        }
-      };
+          var closeHandler = function (e) {
+              if (e.keyCode == 27) {
+                  self.closeModal(closeHandler);
+              }
+          };
 
-      $(div).on('click', function() {
-        self.closeModal(closeHandler);
-      });
+          $(div).on('click', function () {
+              self.closeModal(closeHandler);
+          });
 
 
-      $(window).on('keydown', closeHandler);
+          $(window).on('keydown', closeHandler);
 
-      return div;
-    },
+          return div;
+      },
 
-    setupModalWindow: function() {
-      var self = this;
+      setupModalWindow: function () {
+          var self = this;
 
-      var div = document.createElement('div');
-      div.style.position = 'fixed';
-      div.className = this.className;
-      div.style.width = "85%";
-      div.style.color = "white";
-      div.style.lineHeight = "2em";
-      div.style.fontSize = "16px";
-      if(this.height) div.style.height = this.height;
-      div.style.top = '0';
-      /*
+          var div = document.createElement('div');
+          div.style.position = 'fixed';
+          div.className = this.className;
+          div.style.width = "85%";
+          div.style.color = "white";
+          div.style.lineHeight = "2em";
+          div.style.fontSize = "16px";
+          if (this.height) div.style.height = this.height;
+          div.style.top = '0';
+          /*
       div.style.left = '50%';
       div.style.marginLeft= '-'+ (this.width/2) +'px';
       div.style.marginTop = '-300px';
       */
-      div.style.padding = this.padding + 'px';
-      div.style.zIndex = 3001;
+          div.style.padding = this.padding + 'px';
+          div.style.zIndex = 3001;
 
-      var span = document.createElement('span');
-      span.className = 'modal-cross';
-      span.style.position = 'absolute';
-      span.style.right = '15px';
-      span.style.top = '15px';
-      span.innerText = '×';
-      div.appendChild(span);
+          var span = document.createElement('span');
+          span.className = 'modal-cross';
+          span.style.position = 'absolute';
+          span.style.right = '15px';
+          span.style.top = '15px';
+          span.innerText = '×';
+          div.appendChild(span);
 
-      var content = document.createElement('div');
-      content.style.width = '100%';
-      div.appendChild(content);
+          var content = document.createElement('div');
+          content.style.width = '100%';
+          div.appendChild(content);
 
-      document.body.appendChild(div);
+          document.body.appendChild(div);
 
-      $(span).on('click', function(){
-        self.closeModal();
-      });
+          $(span).on('click', function () {
+              self.closeModal();
+          });
 
-      this.el = content;
-      return div;
-    },
+          this.el = content;
+          return div;
+      },
 
-    closeModal: function(closeHandlerFn) {
-      var self = this;
-      this.undelegateEvents();
-      if(this.callback) this.callback();
-      if(this.onClose) this.onClose();
-      // fadeOut(function() { $(this).remove(); });
-      $(self.modalWindow).fadeOut(100);
-      $(self.backgroundDiv).hide();
+      closeModal: function (closeHandlerFn) {
+          var self = this;
+          this.undelegateEvents();
+          if (this.callback) this.callback();
+          if (this.onClose) this.onClose();
+          // fadeOut(function() { $(this).remove(); });
+          $(self.modalWindow).fadeOut(100);
+          $(self.backgroundDiv).hide();
 
-      setTimeout(function(){
-        self.$el.remove();
-        self.remove();
-        $(self.modalWindow).remove();
-        $(self.backgroundDiv).remove();
-      }, 550);
+          setTimeout(function () {
+              self.$el.remove();
+              self.remove();
+              $(self.modalWindow).remove();
+              $(self.backgroundDiv).remove();
+          }, 550);
 
-      if(closeHandlerFn) {
-        $(window).unbind('keydown', closeHandlerFn);
+          if (closeHandlerFn) {
+              $(window).unbind('keydown', closeHandlerFn);
+          }
+
+          this.stopListening();
+      },
+      initialize: function (data) {
+          this.render(data.img, data.text);
+      },
+
+      render: function (img, text) {
+          if (img) {
+              this.el.innerHTML += '<img src="/static/img/' + img + '">';
+          }
+
+          if (text) {
+              text = text.replace(/\n/g, '</p><p>');
+              text = text.replace(/ /g, '&nbsp;');
+              this.el.innerHTML += '<p>' + text + '</p>';
+          }
+          return this;
       }
-
-      this.stopListening();
-    },
-    initialize: function(data) {
-      this.render(data.img, data.text);
-    },
-
-    render : function(img, text) {
-      if(img) {
-        this.el.innerHTML += '<img src="/static/img/'+img+'">';
-      }
-
-      if(text) {
-        text = text.replace(/\n/g, '</p><p>');
-        text = text.replace(/ /g, '&nbsp;');
-        this.el.innerHTML += '<p>'+text+'</p>';
-      }
-      return this;
-    }
   });
 
   exports.ErrorModalView = ErrorModalView;
@@ -4346,15 +4423,17 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
             'change select': 'mouseup'
         },
 
-        initialize: function() {
+        initialize: function () {
             _.bindAll(this);
             this.subviews = [];
             util.loadCSS(this.css);
             this.model = null;
         },
 
-        setModel: function(widgetModel) {
-            if (this.model) { this.unbindModel(widgetModel); }
+        setModel: function (widgetModel) {
+            if (this.model) {
+                this.unbindModel(widgetModel);
+            }
 
             this.model = widgetModel;
 
@@ -4366,35 +4445,35 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
             return this;
         },
 
-        unbindModel: function(model) {
+        unbindModel: function (model) {
             this.stopListening(model, 'startEditing', this.startedEditing);
             this.stopListening(model, 'stopEditing cancelEditing', this.stoppedEditing);
             this.stopListening(model, 'reselected', this.show);
             this.stopListening(model, 'deselected', this.clear);
         },
 
-        render: function() {
+        render: function () {
             this.hide();
             return this;
         },
 
-        setupScrollEvents: function() {
+        setupScrollEvents: function () {
             var self = this;
             var timer;
-            $(innerDoc).bind('scroll', function() {
+            $(innerDoc).bind('scroll', function () {
                 clearTimeout(timer);
                 timer = setTimeout(refresh, 150);
                 self.hide();
             });
 
-            var refresh = function() {
+            var refresh = function () {
                 if (!self.model) return;
                 self.show();
             };
 
         },
 
-        display: function() {
+        display: function () {
             if (!this.model) return;
 
             this.clearContent();
@@ -4402,7 +4481,7 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
             this.show();
         },
 
-        show: function() {
+        show: function () {
             if (!this.model) return;
             this.stopListening(this.model, 'rendered', this.show);
 
@@ -4428,25 +4507,25 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
             this.$el.find('.arw').remove();
 
             switch (this.location) {
-                case "right":
-                    this.$el.append('<div class="left-arrow arw"></div>');
-                    leftDist += element.getBoundingClientRect().width;
-                    this.$el.addClass('fadeInRight');
+            case "right":
+                this.$el.append('<div class="left-arrow arw"></div>');
+                leftDist += element.getBoundingClientRect().width;
+                this.$el.addClass('fadeInRight');
 
-                    break;
-                case "bottom":
-                    this.$el.append('<div class="top-arrow arw"></div>');
-                    topDist += element.getBoundingClientRect().height;
-                    this.$el.addClass('fadeInUp');
+                break;
+            case "bottom":
+                this.$el.append('<div class="top-arrow arw"></div>');
+                topDist += element.getBoundingClientRect().height;
+                this.$el.addClass('fadeInUp');
 
-                    break;
-                case "left":
-                    this.$el.append('<div class="right-arrow arw"></div>');
-                    this.$el.addClass('fadeInLeft');
-                    break;
-                case "top":
-                    // not supposed to happen
-                    break;
+                break;
+            case "left":
+                this.$el.append('<div class="right-arrow arw"></div>');
+                this.$el.addClass('fadeInLeft');
+                break;
+            case "top":
+                // not supposed to happen
+                break;
             }
             this.$el.show();
 
@@ -4459,7 +4538,7 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
             return this;
         },
 
-        fillContent: function() {
+        fillContent: function () {
             var action = "";
             var type = this.model.get('type');
 
@@ -4485,68 +4564,68 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
             this.el.appendChild(this.renderSettingsAndDelete('edit-custom-widget-btn', 'Edit Custom Widget'));
         },
 
-        clearContent: function() {
-        	this.$el.find('.btn-toolbar').remove();
+        clearContent: function () {
+            this.$el.find('.btn-toolbar').remove();
 
             if (this.contentEditor) {
-				this.contentEditor.clear();
-			}
+                this.contentEditor.clear();
+            }
             if (this.layoutEditor) {
-            	this.layoutEditor.clear();
+                this.layoutEditor.clear();
             }
             if (this.infoEditor) {
-            	this.infoEditor.clear();
+                this.infoEditor.clear();
             }
 
             $('.btn-toolbar').remove();
 
-            _(this.subviews).each(function(subview) {
+            _(this.subviews).each(function (subview) {
                 subview.close();
             });
             this.el.innerHTML = '';
             this.el.style.width = '';
         },
 
-        renderButtonWithText: function(className, buttonText) {
+        renderButtonWithText: function (className, buttonText) {
             return this.renderButtonWithWidthCustomWidth(className, buttonText, 230);
         },
 
-        renderButtonWithWidthCustomWidth: function(className, buttonText, width) {
+        renderButtonWithWidthCustomWidth: function (className, buttonText, width) {
             var li = document.createElement('ul');
             li.className = 'pad w-section section-' + className;
             li.innerHTML += '<span class="option-button tt ' + className + '" style="width:' + width + 'px; display: inline-block;">' + buttonText + '</span>';
             return li;
         },
 
-        renderButtonWithDeleteButtonandText: function(className, buttonText) {
+        renderButtonWithDeleteButtonandText: function (className, buttonText) {
             var li = document.createElement('ul');
             li.className = 'w-section section-' + className;
             li.innerHTML += '<span class="' + className + '  option-button tt" style="width:190px; display: inline-block;">' + buttonText + '</span><span id="delete-widget" class="option-button delete-button tt" style="width:34px;"></span>';
             return li;
         },
 
-        renderSettingsAndDelete: function() {
+        renderSettingsAndDelete: function () {
             var li = document.createElement('ul');
             li.className = 'w-section';
             li.innerHTML += '<span id="delete-widget" class="option-button delete-button tt"></span><span class="option-button tt settings"></span>';
             return li;
         },
 
-        openStylePicker: function(e) {
+        openStylePicker: function (e) {
             this.hideSubviews();
             this.widgetClassPickerView.show();
             this.widgetClassPickerView.expand();
         },
 
-        openCustomWidgetEditor: function() {
+        openCustomWidgetEditor: function () {
             new CustomWidgetEditorModal(this.model);
         },
 
-        openSettingsView: function() {
+        openSettingsView: function () {
             new WidgetSettingsView(this.model).render();
         },
 
-        closeEditingMode: function() {
+        closeEditingMode: function () {
             this.$el.find('.section-done-editing').remove();
             this.el.style.width = '';
             $(this.listGalleryView).remove();
@@ -4556,30 +4635,30 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
             this.model.trigger('unhighlight');
         },
 
-        clickedDoneTextEditing: function() {
+        clickedDoneTextEditing: function () {
             this.model.trigger('stopEditing');
         },
 
-        classChanged: function() {
+        classChanged: function () {
             this.showSubviews();
             this.widgetClassPickerView.$el.hide();
         },
 
-        startedEditing: function() {
+        startedEditing: function () {
             if (this.editingMode) return;
             this.hideSubviews();
             this.el.appendChild(this.renderButtonWithText('done-text-editing', 'Done Editing'));
             this.editingMode = true;
         },
 
-        stoppedEditing: function() {
+        stoppedEditing: function () {
             $('.btn-toolbar').remove();
             $('.section-done-text-editing').remove();
             this.showSubviews();
             this.editingMode = false;
         },
 
-        clear: function() {
+        clear: function () {
             this.clearContent();
             this.unbindModel(this.model);
 
@@ -4588,7 +4667,7 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
             this.hide();
         },
 
-        hide: function() {
+        hide: function () {
             this.$el.removeClass('left');
             this.$el.removeClass('right');
             this.$el.removeClass('bottom');
@@ -4600,18 +4679,18 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
             this.$el.hide();
         },
 
-        setTempContent: function(domNode) {
+        setTempContent: function (domNode) {
             this.tempContent = domNode;
             this.hideSubviews();
             this.el.appendChild(domNode);
         },
 
-        removeTempContent: function() {
+        removeTempContent: function () {
             if (this.tempContent) this.el.removeChild(this.tempContent);
             this.showSubviews();
         },
 
-        showSubviews: function() {
+        showSubviews: function () {
             //if(this.widgetClassPickerView) this.widgetClassPickerView.$el.fadeIn();
             if (this.contentEditor) this.contentEditor.$el.fadeIn();
             if (this.layoutEditor) this.layoutEditor.$el.fadeIn();
@@ -4626,7 +4705,7 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
             this.$el.find('.section-edit-login-form-btn').fadeIn();
         },
 
-        hideSubviews: function() {
+        hideSubviews: function () {
             if (this.widgetClassPickerView) this.widgetClassPickerView.$el.hide();
             if (this.contentEditor) this.contentEditor.$el.hide();
             if (this.layoutEditor) this.layoutEditor.$el.hide();
@@ -4641,7 +4720,7 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
             this.$el.find('.section-pick-style').hide();
         },
 
-        getLocation: function() {
+        getLocation: function () {
             if (this.defaultLocation) return this.defaultLocation;
 
             return "bottom";
@@ -4664,21 +4743,21 @@ require.define("/template_editor/WidgetEditorView.js",function(require,module,ex
             // return "right";
         },
 
-        clickedDelete: function() {
+        clickedDelete: function () {
             if (this.model) {
                 this.model.remove();
             }
         },
 
-        clicked: function(e) {
+        clicked: function (e) {
             e.stopPropagation();
         },
 
-        mousedown: function(e) {
+        mousedown: function (e) {
             mouseDispatcher.isMousedownActive = true;
         },
 
-        mouseup: function() {
+        mouseup: function () {
             mouseDispatcher.isMousedownActive = false;
         }
 
@@ -4696,23 +4775,23 @@ require.define("/template_editor/WidgetSettingsView.js",function(require,module,
     var WidgetModelEditorView = require('./WidgetModelEditorView').WidgetModelEditorView;
 
     var tableTemplate = [
-            '<div class="header">',
-                '<div>',
-                '<h2>Widget Settings Editor</h2>',
-                '<div class="q-mark-circle"></div>',
-                '</div>',
-                '<ul class="tabs">',
-                    '<li class="attributes-li right-icon">',
-                    '<span>Settings</span>',
-                    '</li><li class="code-li right-icon">',
-                    '<span>Generated Code</span>',
-                    '</li><li class="right-icon info-li">',
-                    '<span>More Info</span>',
-                    '</li>',
-                '</ul>',
-            '</div>',
-            '<div class="current-content">',
-            '</div>',
+        '<div class="header">',
+        '<div>',
+        '<h2>Widget Settings Editor</h2>',
+        '<div class="q-mark-circle"></div>',
+        '</div>',
+        '<ul class="tabs">',
+        '<li class="attributes-li right-icon">',
+        '<span>Settings</span>',
+        '</li><li class="code-li right-icon">',
+        '<span>Generated Code</span>',
+        '</li><li class="right-icon info-li">',
+        '<span>More Info</span>',
+        '</li>',
+        '</ul>',
+        '</div>',
+        '<div class="current-content">',
+        '</div>',
     ].join('\n');
 
     var WidgetSettingsView = Backbone.CardView.extend({
@@ -4721,19 +4800,19 @@ require.define("/template_editor/WidgetSettingsView.js",function(require,module,
         subviews: [],
 
         events: {
-            'change .attribs'     : 'changedAttribs',
+            'change .attribs': 'changedAttribs',
             'click .q-mark-circle': 'showTableTutorial',
-            'click .right-icon'   : 'tabClicked',
-            'keyup .attr-input'   : 'attributeChanged'
+            'click .right-icon': 'tabClicked',
+            'keyup .attr-input': 'attributeChanged'
         },
 
 
-        initialize: function(widgetModel) {
+        initialize: function (widgetModel) {
             _.bindAll(this);
             this.model = widgetModel;
         },
 
-        render: function() {
+        render: function () {
             this.el.innerHTML = _.template(tableTemplate, this.model.serialize());
             this.el.id = 'table-' + this.model.cid;
             this.currentContentPane = this.$el.find('.current-content');
@@ -4742,13 +4821,13 @@ require.define("/template_editor/WidgetSettingsView.js",function(require,module,
             return this;
         },
 
-        reRender: function() {
+        reRender: function () {
             this.el.innerHTML = '';
             this.render();
         },
 
-        renderAttributes: function() {
-            
+        renderAttributes: function () {
+
             this.$el.find('.current-content').html('');
 
             var modelEditorView = new WidgetModelEditorView(this.model);
@@ -4757,34 +4836,35 @@ require.define("/template_editor/WidgetSettingsView.js",function(require,module,
             this.$el.find('.attributes-li').addClass('active');
         },
 
-        renderCode: function() {
-            var tableCodeView = new GeneratorEditorView({ generate: this.model.generate, widgetModel: this.model });
+        renderCode: function () {
+            var tableCodeView = new GeneratorEditorView({
+                generate: this.model.generate,
+                widgetModel: this.model
+            });
             this.$el.find('.current-content').html('');
             this.$el.find('.current-content').append(tableCodeView.render().el);
             this.$el.find('.code-li').addClass('active');
         },
 
-        renderInfo: function() {
+        renderInfo: function () {
             this.$el.find('.current-content').html('');
             this.$el.find('.current-content').append('<p>Documentation about this widget would go here</p>');
             this.$el.find('.info-li').addClass('active');
         },
 
-        tabClicked: function(e) {
+        tabClicked: function (e) {
             this.$el.find('.active').removeClass('active');
 
-            if($(e.currentTarget).hasClass('info-li')) {
+            if ($(e.currentTarget).hasClass('info-li')) {
                 this.renderInfo();
-            }
-            else if($(e.currentTarget).hasClass('attributes-li')) {
+            } else if ($(e.currentTarget).hasClass('attributes-li')) {
                 this.renderAttributes();
-            }
-            else if($(e.currentTarget).hasClass('code-li')) {
+            } else if ($(e.currentTarget).hasClass('code-li')) {
                 this.renderCode();
             }
         },
 
-        onClose: function() {
+        onClose: function () {
             this.model.trigger('rerender');
         }
 
@@ -4806,7 +4886,7 @@ require.define("/mixins/BackboneCardView.js",function(require,module,exports,__d
                 'click .done': 'closeModal'
             },
 
-            _configure: function(options) {
+            _configure: function (options) {
                 Backbone.ModalView.__super__._configure.call(this, options);
                 if (options.height) {
                     this.height = options.height;
@@ -4817,15 +4897,15 @@ require.define("/mixins/BackboneCardView.js",function(require,module,exports,__d
                 _.bindAll(this);
             },
 
-            _ensureElement: function(options) {
+            _ensureElement: function (options) {
                 Backbone.ModalView.__super__._ensureElement.call(this, options);
             },
 
-            setBodyEl: function(el) {
+            setBodyEl: function (el) {
                 this.bodyEl = el;
             },
 
-            setupModal: function() {
+            setupModal: function () {
                 var self = this;
                 var div = document.createElement('div');
                 div.className = "modal-bg";
@@ -4839,13 +4919,13 @@ require.define("/mixins/BackboneCardView.js",function(require,module,exports,__d
                 div.style.zIndex = 3000;
                 this.bodyEl.appendChild(div);
 
-                var closeHandler = function(e) {
+                var closeHandler = function (e) {
                     if (e.keyCode == 27) {
                         self.closeModal(closeHandler);
                     }
                 };
 
-                $(div).on('click', function() {
+                $(div).on('click', function () {
                     self.closeModal(closeHandler);
                 });
 
@@ -4855,7 +4935,7 @@ require.define("/mixins/BackboneCardView.js",function(require,module,exports,__d
                 return div;
             },
 
-            setupModalWindow: function() {
+            setupModalWindow: function () {
                 var self = this;
 
                 var div = document.createElement('div');
@@ -4886,7 +4966,7 @@ require.define("/mixins/BackboneCardView.js",function(require,module,exports,__d
                         qMark = '<div class="q-mark"></div>';
                     }
                     $(div).append('<div class="bottom-sect">' + qMark + '<div class="btn done">Done</div></div>');
-                    $(div).find('.done').on('click', function() {
+                    $(div).find('.done').on('click', function () {
                         self.closeModal();
                     });
                 }
@@ -4909,7 +4989,7 @@ require.define("/mixins/BackboneCardView.js",function(require,module,exports,__d
 
                 this.bodyEl.appendChild(div);
 
-                $(span).on('click', function() {
+                $(span).on('click', function () {
                     self.closeModal();
                 });
 
@@ -4917,19 +4997,19 @@ require.define("/mixins/BackboneCardView.js",function(require,module,exports,__d
                 return div;
             },
 
-            closeModal: function(closeHandlerFn) {
+            closeModal: function (closeHandlerFn) {
                 var self = this;
                 this.undelegateEvents();
                 if (this.callback) this.callback();
                 if (this.onClose) this.onClose();
-                
+
                 $(self.modalWindow).addClass('animated');
                 $(self.modalWindow).removeClass('bounceInUp');
                 $(self.modalWindow).addClass('bounceOutDown');
-                
+
                 $(self.backgroundDiv).fadeOut();
 
-                setTimeout(function() {
+                setTimeout(function () {
                     self.$el.remove();
                     self.remove();
                     $(self.modalWindow).remove();
@@ -4943,7 +5023,7 @@ require.define("/mixins/BackboneCardView.js",function(require,module,exports,__d
                 this.close();
             },
 
-            handleKey: function(e) {
+            handleKey: function (e) {
                 if (e.keyCode == 27) { //escape
                     this.closeModal();
                     e.stopPropagation();
@@ -4952,7 +5032,6 @@ require.define("/mixins/BackboneCardView.js",function(require,module,exports,__d
 
         });
 
-     
 });
 
 require.define("/GeneratorEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -4968,47 +5047,50 @@ require.define("/GeneratorEditorView.js",function(require,module,exports,__dirna
         subviews: [],
 
         events: {
-            'click .edit-current' : 'editCurrentGen',
-            'click .fork-current' : 'forkCurrentGen',
-            'click .clone-button' : 'cloneGenerator',
-            'click .edit-code'    : 'editCode'
+            'click .edit-current': 'editCurrentGen',
+            'click .fork-current': 'forkCurrentGen',
+            'click .clone-button': 'cloneGenerator',
+            'click .edit-code': 'editCode'
         },
 
 
-        initialize: function(options) {
+        initialize: function (options) {
             _.bindAll(this);
             this.model = options.widgetModel;
             this.setupGenerator(options.generate || this.model.generate);
         },
 
-        setupGenerator: function(generatorPath) {
+        setupGenerator: function (generatorPath) {
             this.generatorPath = generatorPath;
             this.generator = G.getGenerator(this.generatorPath);
             this.model.setGenerator(generatorPath);
         },
 
-        render: function() {
+        render: function () {
             this.el.innerHTML = _.template([
                 '<div id="name-editor" class="sub-settings">',
-                    '<div style="line-height: 60px; display:inline-block;">Current Generator: <%= name %></div>',
-                    '<div class="btn-group right">',
-                        '<button type="button" class="btn btn-default edit-code">',
-                        'Edit Code',
-                        '</button>',
-                        '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">',
-                        'Change Generator <span class="caret"></span>',
-                        '</button>',
-                        '<ul class="dropdown-menu abs action-menu" role="menu">',
-                            '<li class="fork-current"><a href="#">Fork Current Generator</a></li>',
-                            '<li class="divider"></li>',
-                        '</ul>',
-                    '</div>',
+                '<div style="line-height: 60px; display:inline-block;">Current Generator: <%= name %></div>',
+                '<div class="btn-group right">',
+                '<button type="button" class="btn btn-default edit-code">',
+                'Edit Code',
+                '</button>',
+                '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">',
+                'Change Generator <span class="caret"></span>',
+                '</button>',
+                '<ul class="dropdown-menu abs action-menu" role="menu">',
+                '<li class="fork-current"><a href="#">Fork Current Generator</a></li>',
+                '<li class="divider"></li>',
+                '</ul>',
+                '</div>',
                 '</div>',
                 '<div class="generated-code"><%= generatedCode %></div>'
-            ].join('\n'), { name: this.generatorPath, generatedCode: this.getGeneratedCode() });
+            ].join('\n'), {
+                name: this.generatorPath,
+                generatedCode: this.getGeneratedCode()
+            });
 
 
-            if(!v1State.get('plugins').isGeneratorEditable(this.generatorPath)) {
+            if (!v1State.get('plugins').isGeneratorEditable(this.generatorPath)) {
                 this.$el.find('.edit-code').addClass('disabled');
                 this.$el.find('.edit-code').attr('title', 'Native generators cannot be edited. They need to be forked.');
             }
@@ -5020,87 +5102,86 @@ require.define("/GeneratorEditorView.js",function(require,module,exports,__dirna
             return this;
         },
 
-        renderCloneButtons: function() {
+        renderCloneButtons: function () {
 
             var currentModule = util.packageModuleName(this.generatorPath).module;
             // e.g. if module == uielements, it can only clone uielements
             var generators = v1State.get('plugins').getAllGeneratorsWithModule(currentModule);
 
-            _.each(generators, function(generator) {
+            _.each(generators, function (generator) {
                 var genPath = [generator.package, currentModule, generator.name].join('.');
-                this.$el.find('.action-menu').append('<li class="clone-button" id="'+ genPath +'"><a href="#">Switch Generator to '+  generator.name +'</a></li>');
+                this.$el.find('.action-menu').append('<li class="clone-button" id="' + genPath + '"><a href="#">Switch Generator to ' + generator.name + '</a></li>');
             }, this);
         },
 
-        editCurrentGen: function() {
+        editCurrentGen: function () {
             alert('todo link to the plugin editor');
         },
 
-        forkCurrentGen: function() {
+        forkCurrentGen: function () {
             // alert('Not yet implemented');
 
             var self = this;
             var newName = window.prompt("What do you want to name the new generator?", util.packageModuleName(self.generatorPath).name + "_edited");
 
-            if (newName!=null) {
+            if (newName != null) {
 
                 var newPackageModuleName = util.packageModuleName(self.generatorPath);
                 newPackageModuleName.name = newName;
 
                 // isNameUnique needs work, plz see function
-                if(!v1State.get('plugins').isNameUnique(newPackageModuleName)) { self.forkCurrentGen(); }
+                if (!v1State.get('plugins').isNameUnique(newPackageModuleName)) {
+                    self.forkCurrentGen();
+                }
 
                 var genObj = _.clone(this.generator);
                 var newGenPath = v1State.get('plugins').fork(this.generatorPath, newName);
 
                 self.setupGenerator(newGenPath);
                 self.render();
-            }
-            else {
+            } else {
                 self.forkCurrentGen();
             }
 
         },
 
-        getGeneratedCode: function() {
-            var string  = "";
+        getGeneratedCode: function () {
+            var string = "";
             try {
-                    // This will force it to use defaults in the generator
-                    // console.log('Trying to generate code')
-                    var gPath = this.generatorPath;
-                    var generated = this.model.expand();
-                    console.log(generated);
+                // This will force it to use defaults in the generator
+                // console.log('Trying to generate code')
+                var gPath = this.generatorPath;
+                var generated = this.model.expand();
+                console.log(generated);
 
-                    if(typeof generated === 'object') {
-                        var str = '<div>';
+                if (typeof generated === 'object') {
+                    var str = '<div>';
 
-                        _.each(generated, function(val, key) {
-                            str += '<h4>' + key + '</h4>';
-                            str += '<pre>' + String(val).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</pre>';
-                        });
-                        
-                        string = str;
-                    }
-                    else if (typeof generated === 'string') {
-                        string = '<pre>' + generated.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</pre>';
-                    }
+                    _.each(generated, function (val, key) {
+                        str += '<h4>' + key + '</h4>';
+                        str += '<pre>' + String(val).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</pre>';
+                    });
 
+                    string = str;
+                } else if (typeof generated === 'string') {
+                    string = '<pre>' + generated.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</pre>';
                 }
-                catch (e) {
-                    string = 'Could not be generated: '+ e;
-                }
+
+            } catch (e) {
+                string = 'Could not be generated: ' + e;
+            }
 
             return string;
         },
 
-        editCode: function() {
-            if(v1State.get('plugins').isGeneratorEditable(this.generatorPath)) {
+        editCode: function () {
+            if (v1State.get('plugins').isGeneratorEditable(this.generatorPath)) {
                 var url = "/app/" + appId + "/dev/#" + this.generatorPath;
                 window.open(url, "Generator Editor");
             }
         },
 
-        cloneGenerator: function(e) {
+        cloneGenerator: function (e) {
             var genPath = String(e.currentTarget.id);
             console.log(genPath);
             this.model.setGenerator(genPath);
@@ -5118,206 +5199,218 @@ require.define("/GeneratorEditorView.js",function(require,module,exports,__dirna
 
 });
 
-require.define("/TemplatesEditorView.js",function(require,module,exports,__dirname,__filename,process,global){
-    'use strict';
+require.define("/TemplatesEditorView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
-    var Generator = require('./Generator');
+var Generator = require('./Generator');
 
-    var funcTemplate = [
-        '<div class="code-chunk">',
-            '<span class="title"><%= name %></span>',
-            '<div class="code-editor" id="template-editor-<%= name %>"></div>',
-        '</div>'
-    ].join('\n');
+var funcTemplate = [
+    '<div class="code-chunk">',
+    '<span class="title"><%= name %></span>',
+    '<div class="code-editor" id="template-editor-<%= name %>"></div>',
+    '</div>'
+].join('\n');
 
-    var TemplatesEditorView = Backbone.View.extend({
-        el: null,
-        tagName: 'div',
-        collection: null,
-        parentName: "",
-        className: 'code-view',
-        subviews: [],
+var TemplatesEditorView = Backbone.View.extend({
+    el: null,
+    tagName: 'div',
+    collection: null,
+    parentName: "",
+    className: 'code-view',
+    subviews: [],
 
-        events: {
-            'click .edit-current' : 'editCurrentGen',
-            'click .clone-button' : 'cloneGenerator'
-        },
+    events: {
+        'click .edit-current': 'editCurrentGen',
+        'click .clone-button': 'cloneGenerator'
+    },
 
 
-        initialize: function(options) {
-            _.bindAll(this);
-            this.widgetModel = options.widgetModel;
-            this.generatorName = options.generate;
-            this.generator = G.getGenerator(this.generatorName);
-        },
+    initialize: function (options) {
+        _.bindAll(this);
+        this.widgetModel = options.widgetModel;
+        this.generatorName = options.generate;
+        this.generator = G.getGenerator(this.generatorName);
+    },
 
-        render: function() {
-            var strHTML = _.template([
-                '<div id="name-editor" class="sub-settings">',
-                    '<div style="line-height: 60px; display:inline-block;">Current Generator: <%= name %></div>',
-                    '<div class="btn-group right">',
-                        '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">',
-                        'Edit Code <span class="caret"></span>',
-                        '</button>',
-                        '<ul class="dropdown-menu abs action-menu" role="menu">',
-                            '<li><a href="#" class="edit-current">Edit Current Code</a></li>',
-                            '<li class="divider"></li>',
-                        '</ul>',
-                    '</div>',
-                '</div>'
-            ].join('\n'), { name: this.generatorName });
-            
-            strHTML += '<div class="instance sect">';
-            _.each(this.generator.templates, function(val, key) {
-                strHTML += _.template(funcTemplate, { name: key });
+    render: function () {
+        var strHTML = _.template([
+            '<div id="name-editor" class="sub-settings">',
+            '<div style="line-height: 60px; display:inline-block;">Current Generator: <%= name %></div>',
+            '<div class="btn-group right">',
+            '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">',
+            'Edit Code <span class="caret"></span>',
+            '</button>',
+            '<ul class="dropdown-menu abs action-menu" role="menu">',
+            '<li><a href="#" class="edit-current">Edit Current Code</a></li>',
+            '<li class="divider"></li>',
+            '</ul>',
+            '</div>',
+            '</div>'
+        ].join('\n'), {
+            name: this.generatorName
+        });
+
+        strHTML += '<div class="instance sect">';
+        _.each(this.generator.templates, function (val, key) {
+            strHTML += _.template(funcTemplate, {
+                name: key
             });
+        });
 
-            strHTML += [
-                    '<div id="add-template-box">',
-                        '<form style="display:none;">',
-                            '<input type="text" class="property-name-input" placeholder="Template Name...">',
-                            '<input type="submit" class="done-btn" value="Done">',
-                        '</form>',
-                        '<div class="add-button box-button">+ Create a New Template</div>',
-                    '</div>'
-                ].join('\n');
+        strHTML += [
+            '<div id="add-template-box">',
+            '<form style="display:none;">',
+            '<input type="text" class="property-name-input" placeholder="Template Name...">',
+            '<input type="submit" class="done-btn" value="Done">',
+            '</form>',
+            '<div class="add-button box-button">+ Create a New Template</div>',
+            '</div>'
+        ].join('\n');
 
-            strHTML += '</div>';
+        strHTML += '</div>';
 
-            this.el.innerHTML = strHTML;
+        this.el.innerHTML = strHTML;
 
-            this.$el.find('.dropdown-toggle').dropdown();
-            this.addPropertyBox = new Backbone.NameBox({}).setElement(this.$el.find('#add-template-box')).render();
-            this.addPropertyBox.on('submit', this.createTemplate);
-            
-            this.renderCloneButtons();
-            return this;
-        },
+        this.$el.find('.dropdown-toggle').dropdown();
+        this.addPropertyBox = new Backbone.NameBox({}).setElement(this.$el.find('#add-template-box')).render();
+        this.addPropertyBox.on('submit', this.createTemplate);
 
-        reRender :function() {
-            this.el.innerHTML = '';
-            this.render();
-            this.setupAce();
-        },
+        this.renderCloneButtons();
+        return this;
+    },
 
-        renderCloneButtons: function() {
-            
-            var packageModuleName = expanderfactory(function(code, globals) { }).parseGenID(this.generatorName);
-            var plugins = [];
+    reRender: function () {
+        this.el.innerHTML = '';
+        this.render();
+        this.setupAce();
+    },
 
-            if (packageModuleName.package != "local" &&
-                appState.plugins[packageModuleName.package] &&
-                appState.plugins[packageModuleName.package][packageModuleName.module]) {
-                plugins = _.map(appState.plugins[packageModuleName.package][packageModuleName.module], function(obj) { obj.package = packageModuleName.package; return obj; });
-            }
+    renderCloneButtons: function () {
 
-            if (appState.plugins["local"] &&
-                appState.plugins["local"][packageModuleName.module]) {
-                var localGens = _.map(appState.plugins["local"][packageModuleName.module], function(obj) { obj.package = "local"; return obj; });
-                plugins = _.union(plugins, localGens);
-            }
+        var packageModuleName = expanderfactory(function (code, globals) {}).parseGenID(this.generatorName);
+        var plugins = [];
 
-            plugins = _.reject(plugins, function(generator) {
-                var genName = [packageModuleName.package, packageModuleName.module, generator.name].join('.');
-                return genName == this.generatorName;
-            }, this);
-
-            _.each(plugins, function(generator) {
-                var genName = [generator.package, packageModuleName.module, generator.name].join('.');
-                this.$el.find('.action-menu').append('<li class="clone-button" id="'+ genName +'"><a href="#">Clone '+  generator.name +'X</a></li>');
-            }, this);
-        },
-
-        setupAce: function() {
-            
-            var packageModuleName = expanderfactory(function(code, globals) { }).parseGenID(this.generatorName);
-
-            _.each(this.generator.templates, function(val, key) {
-
-                var self = this;
-                var editor = ace.edit("template-editor-" + key);
-                editor.getSession().setMode("ace/mode/html");
-                editor.setValue(String(val), -1);
-                editor.on("change", function() {
-                    self.keyup(editor, key);
-                });
-
-                if(packageModuleName.package != "local") {
-                    
-                    editor.setReadOnly(true);  // false to make it editable
-                    editor.setHighlightActiveLine(false);
-                    editor.setHighlightGutterLine(false);
-                    editor.renderer.$cursorLayer.element.style.opacity=0;
-
-                }
-                else {
-                    editor.setReadOnly(false);  // false to make it editable
-                }
-
-            }, this);
-
-        },
-
-        editCurrentGen: function() {
-            var genObj = _.clone(this.generator);
-
-            var gensWrapper = v1.currentApp.model.get('plugins');
-            var packageModuleName = expanderfactory(function(code, globals) { }).parseGenID(this.generatorName);
-            packageModuleName.package = 'local';
-            gensWrapper.local = gensWrapper.local || {};
-            gensWrapper.local[packageModuleName.module] = gensWrapper.local[packageModuleName.module] || [];
-
-
-            var i = 2;
-            var newName = packageModuleName.name + '_v' + i;
-            while(!this.isUnique(packageModuleName, newName)) { i++; newName =  packageModuleName.name + '_v' + i;  }
-
-            packageModuleName.name = newName;
-
-            this.generatorName = [  packageModuleName.package,
-                                    packageModuleName.module,
-                                    packageModuleName.name].join('.');
-            
-            this.widgetModel.generate = this.generatorName;
-            genObj.name = packageModuleName.name;
-            this.generator = genObj;
-
-            gensWrapper.local[packageModuleName.module].push(this.generator);
-            this.reRender();
-        },
-
-        isUnique: function(packageModuleName, name) {
-            var gensWrapper = v1.currentApp.model.get('plugins');
-            var isUnique = true;
-            var gens = gensWrapper.local[packageModuleName.module];
-            _.each(gens, function(gen) {
-                if(gen.name == name) isUnique = false;
-            }, this);
-
-            return isUnique;
-        },
-
-        createTemplate: function(name) {
-            this.generator.templates[name] = "";
-            this.reRender();
-        },
-
-        cloneGenerator: function(e) {
-            var genPath = String(e.currentTarget.id);
-            this.widgetModel.generate = genPath;
-            this.generatorName = genPath;
-            this.generator = G.getGenerator(this.generatorName);
-
-            this.reRender();
-        },
-
-        keyup: function(editor, key) {
-            this.generator.templates[key] = editor.getValue();
+        if (packageModuleName.package != "local" &&
+            appState.plugins[packageModuleName.package] &&
+            appState.plugins[packageModuleName.package][packageModuleName.module]) {
+            plugins = _.map(appState.plugins[packageModuleName.package][packageModuleName.module], function (obj) {
+                obj.package = packageModuleName.package;
+                return obj;
+            });
         }
 
-    });
+        if (appState.plugins["local"] &&
+            appState.plugins["local"][packageModuleName.module]) {
+            var localGens = _.map(appState.plugins["local"][packageModuleName.module], function (obj) {
+                obj.package = "local";
+                return obj;
+            });
+            plugins = _.union(plugins, localGens);
+        }
 
-    exports.TemplatesEditorView = TemplatesEditorView;
+        plugins = _.reject(plugins, function (generator) {
+            var genName = [packageModuleName.package, packageModuleName.module, generator.name].join('.');
+            return genName == this.generatorName;
+        }, this);
+
+        _.each(plugins, function (generator) {
+            var genName = [generator.package, packageModuleName.module, generator.name].join('.');
+            this.$el.find('.action-menu').append('<li class="clone-button" id="' + genName + '"><a href="#">Clone ' + generator.name + 'X</a></li>');
+        }, this);
+    },
+
+    setupAce: function () {
+
+        var packageModuleName = expanderfactory(function (code, globals) {}).parseGenID(this.generatorName);
+
+        _.each(this.generator.templates, function (val, key) {
+
+            var self = this;
+            var editor = ace.edit("template-editor-" + key);
+            editor.getSession().setMode("ace/mode/html");
+            editor.setValue(String(val), -1);
+            editor.on("change", function () {
+                self.keyup(editor, key);
+            });
+
+            if (packageModuleName.package != "local") {
+
+                editor.setReadOnly(true); // false to make it editable
+                editor.setHighlightActiveLine(false);
+                editor.setHighlightGutterLine(false);
+                editor.renderer.$cursorLayer.element.style.opacity = 0;
+
+            } else {
+                editor.setReadOnly(false); // false to make it editable
+            }
+
+        }, this);
+
+    },
+
+    editCurrentGen: function () {
+        var genObj = _.clone(this.generator);
+
+        var gensWrapper = v1.currentApp.model.get('plugins');
+        var packageModuleName = expanderfactory(function (code, globals) {}).parseGenID(this.generatorName);
+        packageModuleName.package = 'local';
+        gensWrapper.local = gensWrapper.local || {};
+        gensWrapper.local[packageModuleName.module] = gensWrapper.local[packageModuleName.module] || [];
+
+
+        var i = 2;
+        var newName = packageModuleName.name + '_v' + i;
+        while (!this.isUnique(packageModuleName, newName)) {
+            i++;
+            newName = packageModuleName.name + '_v' + i;
+        }
+
+        packageModuleName.name = newName;
+
+        this.generatorName = [packageModuleName.package,
+            packageModuleName.module,
+            packageModuleName.name
+        ].join('.');
+
+        this.widgetModel.generate = this.generatorName;
+        genObj.name = packageModuleName.name;
+        this.generator = genObj;
+
+        gensWrapper.local[packageModuleName.module].push(this.generator);
+        this.reRender();
+    },
+
+    isUnique: function (packageModuleName, name) {
+        var gensWrapper = v1.currentApp.model.get('plugins');
+        var isUnique = true;
+        var gens = gensWrapper.local[packageModuleName.module];
+        _.each(gens, function (gen) {
+            if (gen.name == name) isUnique = false;
+        }, this);
+
+        return isUnique;
+    },
+
+    createTemplate: function (name) {
+        this.generator.templates[name] = "";
+        this.reRender();
+    },
+
+    cloneGenerator: function (e) {
+        var genPath = String(e.currentTarget.id);
+        this.widgetModel.generate = genPath;
+        this.generatorName = genPath;
+        this.generator = G.getGenerator(this.generatorName);
+
+        this.reRender();
+    },
+
+    keyup: function (editor, key) {
+        this.generator.templates[key] = editor.getValue();
+    }
+
+});
+
+exports.TemplatesEditorView = TemplatesEditorView;
 
 });
 
@@ -5331,13 +5424,13 @@ require.define("/template_editor/WidgetModelEditorView.js",function(require,modu
         subviews: [],
 
         events: {
-            'click .switch-json'  : 'renderJSONAttributes',
-            'click .switch-table' : 'renderAttributes',
-            'click .update-json'  : 'updateJSON'
+            'click .switch-json': 'renderJSONAttributes',
+            'click .switch-table': 'renderAttributes',
+            'click .update-json': 'updateJSON'
         },
 
 
-        initialize: function(model) {
+        initialize: function (model) {
             _.bindAll(this);
             this.model = model;
             // this.listenTo(this.model, 'change', this.changed);
@@ -5350,18 +5443,19 @@ require.define("/template_editor/WidgetModelEditorView.js",function(require,modu
             return this;
         },
 
-        renderAttributes: function() {
-            
+        renderAttributes: function () {
+
             this.$el.find('.current-content').html('');
 
             var template = [
                 '<div id="name-editor" class="sub-settings">',
-                    '<div class="btn-group right">',
-                        '<button type="button" class="btn btn-default switch-json">',
-                        'JSON View',
-                        '</button>',
-                    '</div>',
-                '</div>'].join('\n');
+                '<div class="btn-group right">',
+                '<button type="button" class="btn btn-default switch-json">',
+                'JSON View',
+                '</button>',
+                '</div>',
+                '</div>'
+            ].join('\n');
 
             this.$el.html(template);
 
@@ -5369,28 +5463,28 @@ require.define("/template_editor/WidgetModelEditorView.js",function(require,modu
             this.el.appendChild(modelEditorView.render().el);
         },
 
-        renderJSONAttributes: function() {
+        renderJSONAttributes: function () {
             this.$el.find('.current-content').html('');
 
             var template = [
                 '<div id="name-editor" class="sub-settings">',
-                    '<div class="btn-group">',
-                        '<span class="btn update-json">Update</span>',
-                    '</div>',
-                    '<div class="btn-group right">',
-                        '<button type="button" class="btn btn-default switch-table">',
-                        'Table View',
-                        '</button>',
-                    '</div>',
+                '<div class="btn-group">',
+                '<span class="btn update-json">Update</span>',
+                '</div>',
+                '<div class="btn-group right">',
+                '<button type="button" class="btn btn-default switch-table">',
+                'Table View',
+                '</button>',
+                '</div>',
                 '</div>',
                 '<div id="json-editor-model" style="height:450px; width: 100%; margin-top:0px;"></div>'
-                ].join('\n');
+            ].join('\n');
 
             this.$el.html(template);
             setTimeout(this.setupAce, 300);
         },
 
-        setupAce: function() {
+        setupAce: function () {
             var json = this.model.toJSON();
             var json_str = JSON.stringify(json, {}, 4);
 
@@ -5399,14 +5493,14 @@ require.define("/template_editor/WidgetModelEditorView.js",function(require,modu
             this.editor.setValue(String(json_str), -1);
         },
 
-        updateJSON: function(e) {
+        updateJSON: function (e) {
             var newJSON = this.editor.getValue();
             var obj = jQuery.parseJSON(newJSON);
             this.model.updateJSON(obj);
             e.currentTarget.innerHTML = 'Updated';
-            var timer = setTimeout(function() {
-                 e.currentTarget.innerHTML = 'Update';
-                 clearTimeout(timer);
+            var timer = setTimeout(function () {
+                e.currentTarget.innerHTML = 'Update';
+                clearTimeout(timer);
             }, 2000);
         }
 
@@ -5426,37 +5520,38 @@ require.define("/ModelEditorView.js",function(require,module,exports,__dirname,_
         tagName: 'table',
 
         events: {
-            'change .attribs'     : 'changedAttribs',
-            'click .right-icon'   : 'tabClicked',
-            'keyup .attr-input'   : 'attributeChanged',
-            'click .remove-attr'  : 'removeAttribute'
+            'change .attribs': 'changedAttribs',
+            'click .right-icon': 'tabClicked',
+            'keyup .attr-input': 'attributeChanged',
+            'click .remove-attr': 'removeAttribute'
         },
 
 
-        initialize: function(model) {
+        initialize: function (model) {
             _.bindAll(this);
             this.model = model;
             this.listenTo(this.model, 'change', this.changed);
         },
 
         render: function (argument) {
-        	
 
-            _.each(this.model.attributes, function(val, key) {
-                if(Backbone.isModel(val) || Backbone.isCollection(val)) return;
+
+            _.each(this.model.attributes, function (val, key) {
+                if (Backbone.isModel(val) || Backbone.isCollection(val)) return;
                 this.createRow(val, key);
             }, this);
 
-            this.el.insertRow(-1).innerHTML =[
-                    '<tr><td colspan="3">',
-            			'<div id="add-attribute-box">',
-                        '<form style="display:none;">',
-                            '<input type="text" class="property-name-input" placeholder="Template Name...">',
-                            '<input type="submit" class="done-btn" value="Done">',
-                        '</form>',
-                        '<div class="add-button box-button">+ Add New Attribute</div>',
-                    '</div>',
-                    '</td></tr>'].join('\n');
+            this.el.insertRow(-1).innerHTML = [
+                '<tr><td colspan="3">',
+                '<div id="add-attribute-box">',
+                '<form style="display:none;">',
+                '<input type="text" class="property-name-input" placeholder="Template Name...">',
+                '<input type="submit" class="done-btn" value="Done">',
+                '</form>',
+                '<div class="add-button box-button">+ Add New Attribute</div>',
+                '</div>',
+                '</td></tr>'
+            ].join('\n');
 
 
             this.addAttributeBox = new Backbone.NameBox({}).setElement(this.$el.find('#add-attribute-box')).render();
@@ -5471,8 +5566,9 @@ require.define("/ModelEditorView.js",function(require,module,exports,__dirname,_
             var row = this.el.insertRow(ind);
             row.id = "attr-" + key;
             row.innerHTML = ['<td>' + key + '</td>',
-                    '<td><input type="text" class="attr-input" id="inp-'+ key +'" value="' + val +'"></td>',
-                    '<td class="settings"><span class="remove-attr">-</span></td>'].join('\n');
+                '<td><input type="text" class="attr-input" id="inp-' + key + '" value="' + val + '"></td>',
+                '<td class="settings"><span class="remove-attr">-</span></td>'
+            ].join('\n');
 
             return row;
         },
@@ -5481,38 +5577,39 @@ require.define("/ModelEditorView.js",function(require,module,exports,__dirname,_
 
             var changedAttrib = e.changedAttributes();
 
-            _.each(changedAttrib, function(val, key) {
+            _.each(changedAttrib, function (val, key) {
 
                 // Key is Removed
                 if (!val && val != "") {
-                    this.$el.find('#attr-'+key).remove();
+                    this.$el.find('#attr-' + key).remove();
                 }
                 // Key is New
-                else if (this.$el.find('#attr-'+key).length == 0) {
+                else if (this.$el.find('#attr-' + key).length == 0) {
                     var nmrRows = this.el.getElementsByTagName("tr").length;
-                    this.createRow(val, key, nmrRows-1);                   
+                    this.createRow(val, key, nmrRows - 1);
                 }
 
             }, this);
 
         },
 
-        attributeChanged: function(e) {
-            var attributeKey = String(e.currentTarget.id).replace('inp-','');
+        attributeChanged: function (e) {
+            var attributeKey = String(e.currentTarget.id).replace('inp-', '');
             this.model.set(attributeKey, e.currentTarget.value);
         },
 
-        createAttribute: function(name) {
+        createAttribute: function (name) {
             this.model.set(name, '');
         },
 
         removeAttribute: function (e) {
-            var attributeKey = String(e.currentTarget.parentNode.parentNode.id).replace('attr-','');
+            var attributeKey = String(e.currentTarget.parentNode.parentNode.id).replace('attr-', '');
             this.model.unset(attributeKey);
         }
     });
 
     exports.ModelEditorView = ModelEditorView;
+
 });
 
 require.define("/template_editor/WidgetContentEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -5534,7 +5631,7 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             'submit #external-link-form': 'addExternalLink'
         },
 
-        initialize: function(widgetModel, parentView) {
+        initialize: function (widgetModel, parentView) {
             _.bindAll(this);
 
             this.model = widgetModel;
@@ -5542,7 +5639,7 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             this.render();
         },
 
-        render: function() {
+        render: function () {
             if (this.model.has('src')) {
                 this.el.appendChild(this.renderSrcInfo());
             }
@@ -5551,7 +5648,7 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             }
         },
 
-        renderHrefInfo: function() {
+        renderHrefInfo: function () {
 
 
             // return this.hrefLi;
@@ -5567,7 +5664,7 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             return li;
         },
 
-        renderSrcInfo: function() {
+        renderSrcInfo: function () {
             // var li = document.createElement('li');
             // li.appendChild(new comp().div('Image Source').classN('header-div').el);
 
@@ -5581,7 +5678,7 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             return li;
         },
 
-        inputChanged: function(e) {
+        inputChanged: function (e) {
             e.stopPropagation();
             var hash = e.target.id.replace('prop-', '');
             var info = hash.split('-');
@@ -5593,11 +5690,11 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             }
         },
 
-        changedContent: function(e) {
+        changedContent: function (e) {
             this.model.set("content", e.target.value);
         },
 
-        changeFont: function(e) {
+        changeFont: function (e) {
             if (!this.model.get('content_attribs').has('style')) {
                 this.model.get('content_attribs').set('style', 'font-size:12px;');
             }
@@ -5613,7 +5710,7 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             mouseDispatcher.isMousedownActive = false;
         },
 
-        toggleBold: function(e) {
+        toggleBold: function (e) {
             var curStyle = (this.model.get('content_attribs').get('style') || '');
             if (curStyle.indexOf('font-weight:bold;') < 0) {
                 $('#toggle-bold').addClass('selected');
@@ -5626,8 +5723,8 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             }
         },
 
-        staticsAdded: function(files, self) {
-            _(files).each(function(file) {
+        staticsAdded: function (files, self) {
+            _(files).each(function (file) {
                 file.name = file.filename;
                 statics.push(file);
             });
@@ -5635,10 +5732,10 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             // self.model.get('data').set('content', _.last(files).url);
         },
 
-        clickedChangeSrc: function() {
+        clickedChangeSrc: function () {
             var self = this;
 
-            var statics_list = _.map(statics, function(obj) {
+            var statics_list = _.map(statics, function (obj) {
                 var newObj = {};
                 newObj.val = obj.url;
                 newObj.name = obj.name;
@@ -5666,14 +5763,14 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             this.parentView.setTempContent(selectView.el);
 
             selectView.bind('change', this.changeSrc);
-            selectView.bind('change', function() {
+            selectView.bind('change', function () {
                 self.parentView.removeTempContent();
             });
 
             selectView.expand();
         },
 
-        changeSrc: function(inp) {
+        changeSrc: function (inp) {
             var self = this;
             if (inp == 'new-image') {
                 top.util.filepicker.openFilePick(self.staticsAdded, self, appId);
@@ -5683,10 +5780,13 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             }
         },
 
-        clickedChangeHref: function() {
+        clickedChangeHref: function () {
             var self = this;
-            var listOfPages = v1.currentApp.model.get('routes').map(function(routeModel) {
-                return { name: routeModel.get('name'), val: routeModel.getUrlString() };
+            var listOfPages = v1.currentApp.model.get('routes').map(function (routeModel) {
+                return {
+                    name: routeModel.get('name'),
+                    val: routeModel.getUrlString()
+                };
             });
 
             var href = (this.model.get('href') || null);
@@ -5710,14 +5810,14 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             this.parentView.setTempContent(selectView.el);
 
             selectView.bind('change', this.changeHref);
-            selectView.bind('change', function() {
+            selectView.bind('change', function () {
                 self.parentView.removeTempContent();
             });
 
             selectView.expand();
         },
 
-        changeHref: function(inp) {
+        changeHref: function (inp) {
             var self = this;
             var target = inp;
             if (target == "External Link") {
@@ -5733,7 +5833,7 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             this.renderHrefInfo();
         },
 
-        addExternalLink: function(e) {
+        addExternalLink: function (e) {
             e.preventDefault();
             var page_link = util.get('external-link-input').value;
             this.model.set('href', page_link);
@@ -5742,7 +5842,7 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
             this.renderHrefInfo();
         },
 
-        clear: function() {
+        clear: function () {
             this.el.innerHTML = '';
             this.model = null;
             this.remove();
@@ -5750,97 +5850,102 @@ require.define("/template_editor/WidgetContentEditorView.js",function(require,mo
     });
 
     exports.WidgetContentEditorView = WidgetContentEditorView;
+
 });
 
 require.define("/mixins/SelectView.js",function(require,module,exports,__dirname,__filename,process,global){  SelectView = Backbone.View.extend({
-    tagName: 'div',
-    className : 'select-view',
-    expanded: false,
+      tagName: 'div',
+      className: 'select-view',
+      expanded: false,
 
-    events: {
-      'click'                : 'expand',
-      'click li'             : 'select',
-      'click .updown-handle' : 'toggle'
-    },
+      events: {
+          'click': 'expand',
+          'click li': 'select',
+          'click .updown-handle': 'toggle'
+      },
 
-    initialize: function(list, currentVal, isNameVal, options) {
-      _.bindAll(this);
+      initialize: function (list, currentVal, isNameVal, options) {
+          _.bindAll(this);
 
-      this.list = list;
-      this.currentVal = currentVal;
-      this.isNameVal = isNameVal || false;
-      this.options = (options||{});
-      this.render();
-      return this;
-    },
+          this.list = list;
+          this.currentVal = currentVal;
+          this.isNameVal = isNameVal || false;
+          this.options = (options || {});
+          this.render();
+          return this;
+      },
 
-    render: function() {
-      var self = this;
-      var list = document.createElement('ul');
+      render: function () {
+          var self = this;
+          var list = document.createElement('ul');
 
-      if(this.currentVal) {
-        var currentLi = document.createElement('li');
-        currentLi.innerHTML = this.currentVal;
-        if(self.isNameVal) { currentLi.innerHTML = this.currentVal.name; }
-        currentLi.className = 'selected';
-        list.appendChild(currentLi);
+          if (this.currentVal) {
+              var currentLi = document.createElement('li');
+              currentLi.innerHTML = this.currentVal;
+              if (self.isNameVal) {
+                  currentLi.innerHTML = this.currentVal.name;
+              }
+              currentLi.className = 'selected';
+              list.appendChild(currentLi);
+          }
+
+          _(this.list).each(function (val, ind) {
+              if (val == self.currentVal || _.isEqual(val, self.currentVal)) return;
+              var li = document.createElement('li');
+              li.id = 'li-' + self.cid + '-' + ind;
+              val = val;
+              if (self.isNameVal) {
+                  val = val.name;
+              }
+              li.innerHTML = val;
+              list.appendChild(li);
+          });
+
+          var handle = document.createElement('div');
+          handle.className = "updown-handle";
+          this.handle = handle;
+
+          this.el.appendChild(handle);
+          this.el.appendChild(list);
+
+          return this;
+      },
+
+      expand: function (e) {
+          var length = this.list.length;
+
+          if (this.currentVal && !_.contains(this.list, this.currentVal)) {
+              length += 1;
+          }
+
+          if (this.options.maxHeight && length > this.options.maxHeight) length = this.options.maxHeight;
+
+          this.el.style.height = length * 40 + 'px';
+          this.expanded = true;
+          if (e) e.stopPropagation();
+      },
+
+      shrink: function (e) {
+          this.el.style.height = 40 + 'px';
+          this.expanded = false;
+          e.stopPropagation();
+      },
+
+      select: function (e) {
+          this.shrink(e);
+          if (e.target.className == "selected") return;
+          var ind = String(e.target.id).replace('li-' + this.cid + '-', '');
+          this.trigger('change', this.list[ind].val);
+      },
+
+      selectCurrent: function () {
+          this.trigger('change', this.currentVal);
+      },
+
+      toggle: function (e) {
+          if (this.expanded) this.shrink(e);
+          else this.expand(e);
       }
-
-      _(this.list).each(function(val, ind) {
-        if(val == self.currentVal || _.isEqual(val, self.currentVal)) return;
-        var li = document.createElement('li');
-        li.id = 'li-' + self.cid + '-' + ind;
-        val = val;
-        if(self.isNameVal) { val = val.name; }
-        li.innerHTML = val;
-        list.appendChild(li);
-      });
-
-      var handle = document.createElement('div');
-      handle.className = "updown-handle";
-      this.handle = handle;
-
-      this.el.appendChild(handle);
-      this.el.appendChild(list);
-
-      return this;
-    },
-
-    expand: function(e) {
-      var length = this.list.length;
-
-      if(this.currentVal && !_.contains(this.list, this.currentVal)) {
-        length += 1;
-      }
-
-      if(this.options.maxHeight && length > this.options.maxHeight) length = this.options.maxHeight;
-
-      this.el.style.height = length * 40 + 'px';
-      this.expanded = true;
-      if(e) e.stopPropagation();
-    },
-
-    shrink : function(e) {
-      this.el.style.height = 40 + 'px';
-      this.expanded = false;
-      e.stopPropagation();
-    },
-
-    select: function(e) {
-      this.shrink(e);
-      if(e.target.className == "selected") return;
-      var ind = String(e.target.id).replace('li-' + this.cid + '-', '');
-      this.trigger('change', this.list[ind].val);
-    },
-
-    selectCurrent: function() {
-      this.trigger('change', this.currentVal);
-    },
-
-    toggle: function(e) {
-      if(this.expanded) this.shrink(e);
-      else this.expand(e);
-    }
 
   });
 
@@ -5848,133 +5953,133 @@ require.define("/mixins/SelectView.js",function(require,module,exports,__dirname
 
 });
 
-require.define("/template_editor/WidgetLayoutEditorView.js",function(require,module,exports,__dirname,__filename,process,global){
-    var WidgetClassPickerView = require('./WidgetClassPickerView').WidgetClassPickerView;
+require.define("/template_editor/WidgetLayoutEditorView.js",function(require,module,exports,__dirname,__filename,process,global){var WidgetClassPickerView = require('./WidgetClassPickerView').WidgetClassPickerView;
 
-        var ToolTipHints = {
-            "a-left": "Align left",
-            "a-center": "Align center",
-            "a-right": "Align right",
-            "padding-tb": "Top-Bottom Padding",
-            "padding-lr": "Left-Right Padding",
-            "pick-style": "Click to add a style"
-        };
-
-
-        var WidgetLayoutEditorView = Backbone.View.extend({
-            el: document.getElementById('layout-editor'),
-            className: 'w-section layout-editor',
-            events: {
-                'click .a-pick': 'changeAlignment',
-                'click .padding': 'changePadding',
-                'click #delete-widget': 'deleteWidget',
-                'mouseover .tt': 'showToolTip',
-                'mouseout .tt': 'hideToolTip'
-            },
-
-            initialize: function(widgetModel) {
-                _.bindAll(this);
-
-                this.model = widgetModel;
-                this.render();
-            },
+var ToolTipHints = {
+    "a-left": "Align left",
+    "a-center": "Align center",
+    "a-right": "Align right",
+    "padding-tb": "Top-Bottom Padding",
+    "padding-lr": "Left-Right Padding",
+    "pick-style": "Click to add a style"
+};
 
 
-            changeAlignment: function(e) {
-                $('.selected', '.alignment-picker').removeClass('selected');
-                var direction = (e.target.className).replace(' a-pick', '');
-                direction = direction.replace(' tt', '');
-                direction = direction.replace('a-', '');
+var WidgetLayoutEditorView = Backbone.View.extend({
+    el: document.getElementById('layout-editor'),
+    className: 'w-section layout-editor',
+    events: {
+        'click .a-pick': 'changeAlignment',
+        'click .padding': 'changePadding',
+        'click #delete-widget': 'deleteWidget',
+        'mouseover .tt': 'showToolTip',
+        'mouseout .tt': 'hideToolTip'
+    },
 
-                this.model.get('layout').set('alignment', direction);
-                e.target.className += ' selected';
-            },
+    initialize: function (widgetModel) {
+        _.bindAll(this);
 
-            changePadding: function(e) {
-                var padding = (e.target.id).replace('padding-', '');
-                $(e.target).toggleClass('selected');
+        this.model = widgetModel;
+        this.render();
+    },
 
 
-                if (padding == "tb") {
-                    if ($(e.target).hasClass('selected')) {
-                        this.model.get('layout').set('t_padding', 15);
-                        this.model.get('layout').set('b_padding', 15);
-                    } else {
-                        this.model.get('layout').set('t_padding', 0);
-                        this.model.get('layout').set('b_padding', 0);
-                    }
-                } else {
-                    if ($(e.target).hasClass('selected')) {
-                        this.model.get('layout').set('r_padding', 15);
-                        this.model.get('layout').set('l_padding', 15);
-                    } else {
-                        this.model.get('layout').set('r_padding', 0);
-                        this.model.get('layout').set('l_padding', 0);
-                    }
-                }
-            },
+    changeAlignment: function (e) {
+        $('.selected', '.alignment-picker').removeClass('selected');
+        var direction = (e.target.className).replace(' a-pick', '');
+        direction = direction.replace(' tt', '');
+        direction = direction.replace('a-', '');
 
-            render: function() {
-                var self = this;
-                this.el.appendChild(this.renderPaddingInfo());
-                this.el.appendChild(this.renderLayoutInfo());
-            },
+        this.model.get('layout').set('alignment', direction);
+        e.target.className += ' selected';
+    },
 
-            renderLayoutInfo: function() {
-                var aLeft = this.model.has('layout') && this.model.get('layout').get('alignment') == "left" ? " selected" : "";
-                var aCenter = this.model.has('layout') && this.model.get('layout').get('alignment') == "center" ? " selected" : "";
-                var aRight = this.model.has('layout') && this.model.get('layout').get('alignment') == "right" ? " selected" : "";
+    changePadding: function (e) {
+        var padding = (e.target.id).replace('padding-', '');
+        $(e.target).toggleClass('selected');
 
-                var div = document.createElement('div');
-                div.className = "alignment-picker";
-                div.innerHTML += '<div class="a-left a-pick tt' + aLeft + '" id="a-left"></div><div class="a-center a-pick tt' + aCenter + '" id="a-center"></div><div class="a-right a-pick tt' + aRight + '" id="a-right"></div>';
-                return div;
-            },
 
-            renderPaddingInfo: function() {
-                var paddingLR = this.model.has('layout') && this.model.get('layout').get('r_padding') > 0 ? "selected" : "";
-                var paddingTB = this.model.has('layout') && this.model.get('layout').get('b_padding') > 0 ? "selected" : "";
-
-                var div = document.createElement('div');
-                div.className = "padding-picker right";
-                div.innerHTML += '<div class="padding tb tt ' + paddingTB + '" id="padding-tb"></div><div class="padding lr tt ' + paddingLR + '" id="padding-lr"></div>';
-                return div;
-            },
-
-            showToolTip: function(e) {
-                if (this.toolTip) {
-                    $(this.toolTip).remove();
-                }
-
-                var div = document.createElement('div');
-                div.className = "tool-tip-box fadeIn";
-                var text = ToolTipHints[e.target.id];
-                if (text) {
-                    div.innerHTML = text;
-                    this.toolTip = div;
-                    this.el.appendChild(div);
-                }
-
-            },
-
-            hideToolTip: function(e) {
-                if (this.toolTip) {
-                    $(this.toolTip).remove();
-                }
-            },
-
-            deleteWidget: function() {
-                this.model.remove();
-            },
-
-            clear: function() {
-                this.el.innerHTML = '';
-                this.model = null;
-                this.remove();
+        if (padding == "tb") {
+            if ($(e.target).hasClass('selected')) {
+                this.model.get('layout').set('t_padding', 15);
+                this.model.get('layout').set('b_padding', 15);
+            } else {
+                this.model.get('layout').set('t_padding', 0);
+                this.model.get('layout').set('b_padding', 0);
             }
-        });
+        } else {
+            if ($(e.target).hasClass('selected')) {
+                this.model.get('layout').set('r_padding', 15);
+                this.model.get('layout').set('l_padding', 15);
+            } else {
+                this.model.get('layout').set('r_padding', 0);
+                this.model.get('layout').set('l_padding', 0);
+            }
+        }
+    },
 
-        exports.WidgetLayoutEditorView = WidgetLayoutEditorView;
+    render: function () {
+        var self = this;
+        this.el.appendChild(this.renderPaddingInfo());
+        this.el.appendChild(this.renderLayoutInfo());
+    },
+
+    renderLayoutInfo: function () {
+        var aLeft = this.model.has('layout') && this.model.get('layout').get('alignment') == "left" ? " selected" : "";
+        var aCenter = this.model.has('layout') && this.model.get('layout').get('alignment') == "center" ? " selected" : "";
+        var aRight = this.model.has('layout') && this.model.get('layout').get('alignment') == "right" ? " selected" : "";
+
+        var div = document.createElement('div');
+        div.className = "alignment-picker";
+        div.innerHTML += '<div class="a-left a-pick tt' + aLeft + '" id="a-left"></div><div class="a-center a-pick tt' + aCenter + '" id="a-center"></div><div class="a-right a-pick tt' + aRight + '" id="a-right"></div>';
+        return div;
+    },
+
+    renderPaddingInfo: function () {
+        var paddingLR = this.model.has('layout') && this.model.get('layout').get('r_padding') > 0 ? "selected" : "";
+        var paddingTB = this.model.has('layout') && this.model.get('layout').get('b_padding') > 0 ? "selected" : "";
+
+        var div = document.createElement('div');
+        div.className = "padding-picker right";
+        div.innerHTML += '<div class="padding tb tt ' + paddingTB + '" id="padding-tb"></div><div class="padding lr tt ' + paddingLR + '" id="padding-lr"></div>';
+        return div;
+    },
+
+    showToolTip: function (e) {
+        if (this.toolTip) {
+            $(this.toolTip).remove();
+        }
+
+        var div = document.createElement('div');
+        div.className = "tool-tip-box fadeIn";
+        var text = ToolTipHints[e.target.id];
+        if (text) {
+            div.innerHTML = text;
+            this.toolTip = div;
+            this.el.appendChild(div);
+        }
+
+    },
+
+    hideToolTip: function (e) {
+        if (this.toolTip) {
+            $(this.toolTip).remove();
+        }
+    },
+
+    deleteWidget: function () {
+        this.model.remove();
+    },
+
+    clear: function () {
+        this.el.innerHTML = '';
+        this.model = null;
+        this.remove();
+    }
+});
+
+exports.WidgetLayoutEditorView = WidgetLayoutEditorView;
+
 });
 
 require.define("/template_editor/WidgetClassPickerView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -5988,13 +6093,13 @@ require.define("/template_editor/WidgetClassPickerView.js",function(require,modu
         css: 'widget-editor',
 
         events: {
-            'click li'                : 'select',
-            'click .updown-handle'    : 'selectCurrent',
-            'mouseover li'            : 'hovered',
+            'click li': 'select',
+            'click .updown-handle': 'selectCurrent',
+            'mouseover li': 'hovered',
             'mouseover .updown-handle': 'hovered'
         },
 
-        initialize: function(widgetModel) {
+        initialize: function (widgetModel) {
             _.bindAll(this);
 
             this.model = widgetModel;
@@ -6004,7 +6109,7 @@ require.define("/template_editor/WidgetClassPickerView.js",function(require,modu
 
             var els = top.v1UIEState.getUIEVals(type).toJSON();
 
-            this.list = _.map(els, function(obj, key) {
+            this.list = _.map(els, function (obj, key) {
                 if (obj.class_name == currentClass) {
                     currentVal = key;
                 }
@@ -6028,31 +6133,31 @@ require.define("/template_editor/WidgetClassPickerView.js",function(require,modu
             this.render();
         },
 
-        render: function() {
+        render: function () {
             WidgetClassPickerView.__super__.render.call(this);
             this.expand();
             this.hide();
         },
 
-        hovered: function(e) {
+        hovered: function (e) {
             if (e.currentTarget.className == "updown-handle" && this.uieVals[this.currentVal.val]) {
-                this.model.set('tagName',   this.uieVals[this.currentVal.val].tagName);
+                this.model.set('tagName', this.uieVals[this.currentVal.val].tagName);
                 this.model.set('className', this.uieVals[this.currentVal.val].class_name);
                 return;
             }
 
-            if(!this.list[ind]) return;
+            if (!this.list[ind]) return;
 
             var ind = String(e.currentTarget.id).replace('li-' + this.cid + '-', '');
             this.model.set('tagName', this.uieVals[this.list[ind].val].tagName);
             this.model.set('className', this.uieVals[this.list[ind].val].class_name);
         },
 
-        show: function() {
+        show: function () {
             this.$el.fadeIn();
         },
 
-        hide: function() {
+        hide: function () {
             this.$el.hide();
         }
     });
@@ -6074,13 +6179,13 @@ require.define("/template_editor/CustomWidgetEditorModal.js",function(require,mo
             'click .sub-title': 'toggle',
         },
 
-        initialize: function(widgetModel) {
+        initialize: function (widgetModel) {
             _.bindAll(this);
             this.model = widgetModel;
             this.render();
         },
 
-        render: function() {
+        render: function () {
             var self = this;
             var htmlStr = this.model.get('htmlC') || '';
             var cssStr = this.model.get('cssC') || '';
@@ -6113,18 +6218,18 @@ require.define("/template_editor/CustomWidgetEditorModal.js",function(require,mo
             return this;
         },
 
-        toggle: function(e) {
+        toggle: function (e) {
             if ($(e.currentTarget.parentNode).hasClass('expanded')) return this.shrink(e);
             this.$el.find('.expanded').removeClass('expanded');
             $(e.currentTarget.parentNode).addClass('expanded');
             this.editors[e.currentTarget.id].focus();
         },
 
-        shrink: function(e) {
+        shrink: function (e) {
             $(e.currentTarget.parentNode).removeClass('expanded');
         },
 
-        onClose: function() {
+        onClose: function () {
             this.model.set('cssC', this.editors["e-css"].getValue());
             this.model.set('jsC', this.editors["e-js"].getValue());
             this.model.set('htmlC', this.editors["e-html"].getValue());
@@ -6134,6 +6239,7 @@ require.define("/template_editor/CustomWidgetEditorModal.js",function(require,mo
     });
 
     exports.CustomWidgetEditorModal = CustomWidgetEditorModal;
+
 });
 
 require.define("/template_editor/EditorGalleryView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -6151,8 +6257,9 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
     */
     /* uielement.displayProps.iconType may be one of these values, which happen to be class names for sprites . */
     var validIconClasses = ['button', 'image', 'header', 'text',
-                            'link', 'line', 'box', 'imageslider',
-                            'fbshare', 'embedvideo', 'custom-widget'];
+        'link', 'line', 'box', 'imageslider',
+        'fbshare', 'embedvideo', 'custom-widget'
+    ];
 
     var EditorGalleryView = Backbone.View.extend({
 
@@ -6169,13 +6276,13 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
         editorContext: "Page",
 
         events: {
-            'change input.search'    : 'searchInputChage',
-            'click .search-icon'     : 'searchToggle',
-            'keyup input.search'     : 'searchInputChage',
-            'click .search-cancel'   : 'searchCanceled'
+            'change input.search': 'searchInputChage',
+            'click .search-icon': 'searchToggle',
+            'keyup input.search': 'searchInputChage',
+            'click .search-cancel': 'searchCanceled'
         },
 
-        initialize: function(sectionsCollection) {
+        initialize: function (sectionsCollection) {
             _.bindAll(this);
 
             this.sectionsCollection = sectionsCollection;
@@ -6186,14 +6293,14 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
             this.subviews = [];
         },
 
-        render: function() {
+        render: function () {
             var self = this;
             this.setElement(util.get('top-panel-bb'));
 
             this.allList = util.get('all-list');
             this.allList.innerHTML = '';
             this.renderSearchPart();
-            /* To see the old random render<Type>Elements, refer to 4b40213136b3006bf7eb83b3e93998d81c71346b or prior. */ 
+            /* To see the old random render<Type>Elements, refer to 4b40213136b3006bf7eb83b3e93998d81c71346b or prior. */
             this.renderPluginElements();
 
             // hide all sections except first
@@ -6208,17 +6315,17 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
             return this;
         },
 
-        bindDraggable: function() {
+        bindDraggable: function () {
             var self = this;
 
             $(this.allList).find('li:not(.ui-draggable)').draggable({
                 cursor: "move",
                 helper: "clone",
-                start: function(e) {
+                start: function (e) {
                     self.dragActive = true;
                     v1.currentApp.view.sectionShadowView.displayColumnShadows();
                 },
-                stop: function(e) {
+                stop: function (e) {
                     self.dragActive = false;
                     v1.currentApp.view.sectionShadowView.hideColumnShadows();
                     self.hideAllSections();
@@ -6228,7 +6335,7 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
 
         },
 
-        renderSearchPart: function() {
+        renderSearchPart: function () {
 
             var self = this;
             var sectionView = new SearchGallerySectionView({
@@ -6243,27 +6350,27 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
             this.allList.appendChild(sectionView.render().el);
         },
 
-        searchToggle: function() {
+        searchToggle: function () {
             if (this._search_expanded)
                 this.searchCanceled();
             else
                 this.searchHovered();
         },
 
-        searchHovered: function() {
+        searchHovered: function () {
             $(".search-panel").addClass("hover");
             $('.search').focus();
             this._search_expanded = true;
         },
 
-        searchCanceled: function() {
+        searchCanceled: function () {
             $(".search-panel").removeClass("hover");
             $('.search').val('');
             $('.search').focusout();
             this._search_expanded = false;
         },
 
-        searchInputChage: function(e) {
+        searchInputChage: function (e) {
 
             var val = e.currentTarget.value;
 
@@ -6271,29 +6378,27 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
                 this.searchSection.clear();
                 $(".search-panel").removeClass("hover");
                 return;
-            }
-            else {
+            } else {
                 $(".search-panel").addClass("hover");
             }
 
             this.searchSection.clear();
             var results = this.searcher.search(val);
 
-            if(results.length > 0) {
+            if (results.length > 0) {
                 this.searchSection.expand();
-            }
-            else {
+            } else {
                 this.searchSection.hide();
             }
 
-            _.each(results, function(result) {
+            _.each(results, function (result) {
                 this.searchSection.addWidgetItem(result.id, result.className, result.text, result.icon);
             }, this);
 
         },
 
-        /* To see the old random render<Type>Elements, refer to 4b40213136b3006bf7eb83b3e93998d81c71346b or prior. */ 
-        renderPluginElements: function() {
+        /* To see the old random render<Type>Elements, refer to 4b40213136b3006bf7eb83b3e93998d81c71346b or prior. */
+        renderPluginElements: function () {
             var elements = [];
             var createdSections = [];
 
@@ -6301,24 +6406,24 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
             var pluginPairs = _.pairs(_.omit(plugins, ['root', 'crud']));
 
             // order should be root, crud, then rest.
-            if(plugins["crud"]) {
+            if (plugins["crud"]) {
                 pluginPairs.unshift(["crud", plugins["crud"]]);
             }
 
-            if(plugins["root"]) {
+            if (plugins["root"]) {
                 pluginPairs.unshift(["root", plugins["root"]]);
             }
 
-            _.each(pluginPairs, function(pair) {
+            _.each(pluginPairs, function (pair) {
                 var pluginName = pair[0],
                     plugin = pair[1];
                 if (plugin.uielements) {
-                    var displayName =  plugin.metadata.displayName || pluginName;
+                    var displayName = plugin.metadata.displayName || pluginName;
 
                     var sect = this.addNewSection(displayName);
                     createdSections.push(sect);
 
-                    _.each(plugin.uielements, function(element) {
+                    _.each(plugin.uielements, function (element) {
                         var className = null || 'plugin-icon';
                         if (element.displayProps && _.contains(validIconClasses, element.displayProps.iconType)) {
                             className = element.displayProps.iconType;
@@ -6339,7 +6444,7 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
 
             }, this);
 
-            _.each(this.pluginSections, function(sect) {
+            _.each(this.pluginSections, function (sect) {
                 sect.close();
             });
 
@@ -6351,7 +6456,7 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
             this.bindDraggable();
         },
 
-        addNewSection: function(name) {
+        addNewSection: function (name) {
 
             var self = this;
             var sectionView = new EditorGallerySectionView({
@@ -6370,11 +6475,11 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
             return sectionView;
         },
 
-        addPlusSign: function() {
+        addPlusSign: function () {
             var text = "You can add more functionality by installing new Plugins from the menu on the top right.";
             var div = document.createElement('div');
             div.className = "gallery-section plus-sign";
-            div.innerHTML = '<div class="gallery-header" title="'+text+'"><span>+</span></div>';
+            div.innerHTML = '<div class="gallery-header" title="' + text + '"><span>+</span></div>';
             this.plusSign = div;
             this.allList.appendChild(div);
 
@@ -6394,39 +6499,39 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
             });
         },
 
-        removeSection: function(sectionView) {
+        removeSection: function (sectionView) {
             sectionView.close();
             this.sections.splice(this.sections.indexOf(sectionView), 1);
             this.subviews.splice(this.subviews.indexOf(sectionView), 1);
         },
 
-        expandSection: function(index) {
+        expandSection: function (index) {
             this.sections[index].expand();
         },
 
-        hideSection: function(index) {
+        hideSection: function (index) {
             this.sections[index].hide();
         },
 
-        expandAllSections: function() {
-            _(this.sections).each(function(section) {
+        expandAllSections: function () {
+            _(this.sections).each(function (section) {
                 section.expand();
             });
         },
 
-        hideAllSections: function() {
-            _(this.sections).each(function(section) {
+        hideAllSections: function () {
+            _(this.sections).each(function (section) {
                 section.hide();
             });
         },
 
-        slideDown: function() {
+        slideDown: function () {
             var self = this;
             var itemGallery = document.getElementById('item-gallery');
             var h = $(itemGallery).scrollTop();
             this.slideDownActive = true;
             $(itemGallery).scrollTop(h + 14);
-            var tmr = setTimeout(function() {
+            var tmr = setTimeout(function () {
                 self.slideDownActive = false;
                 clearTimeout(tmr);
             }, 200);
@@ -6436,7 +6541,7 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
             this.$el.hide();
         },
 
-        show: function() {
+        show: function () {
             this.$el.fadeIn();
         }
 
@@ -6444,225 +6549,229 @@ require.define("/template_editor/EditorGalleryView.js",function(require,module,e
 
 
     exports.EditorGalleryView = EditorGalleryView;
+
 });
 
-require.define("/template_editor/EditorGallerySectionView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+require.define("/template_editor/EditorGallerySectionView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
-    var WidgetContainerModel = require('../models/WidgetContainerModel');
-    var WidgetModel = require('../models/WidgetModel');
+var WidgetContainerModel = require('../models/WidgetContainerModel');
+var WidgetModel = require('../models/WidgetModel');
 
-    var EditorGallerySectionView = Backbone.View.extend({
+var EditorGallerySectionView = Backbone.View.extend({
 
-        events: {
-            'click .gallery-header .qmark': 'showSectionTutorial',
-            'click .gallery-header': 'toggle'
-        },
+    events: {
+        'click .gallery-header .qmark': 'showSectionTutorial',
+        'click .gallery-header': 'toggle'
+    },
 
-        className: 'gallery-section',
-        isExpanded: true,
-        timer: null,
+    className: 'gallery-section',
+    isExpanded: true,
+    timer: null,
 
-        initialize: function(options) {
-            _.bindAll(this);
-            this.parentView = options.parentView;
-            this.options = options;
-            return this;
-        },
+    initialize: function (options) {
+        _.bindAll(this);
+        this.parentView = options.parentView;
+        this.options = options;
+        return this;
+    },
 
-        render: function() {
-            if (this.el) {
-                this.el.innerHTML = '';
-            }
-            var sectionName = this.name.replace(/ /g, '-');
-            this.header = this.addHeaderItem(this.name);
-            this.listWrapper = document.createElement('div');
-            this.listWrapper.className = "elements-panel ";
+    render: function () {
+        if (this.el) {
+            this.el.innerHTML = '';
+        }
+        var sectionName = this.name.replace(/ /g, '-');
+        this.header = this.addHeaderItem(this.name);
+        this.listWrapper = document.createElement('div');
+        this.listWrapper.className = "elements-panel ";
 
-            this.list = document.createElement('ul');
-            if (this.options.index > -1) {
-                this.listWrapper.className += 'top' + this.options.index;
-            }
-
-            this.listWrapper.appendChild(this.list);
-            this.list.style = '';
-            this.el.appendChild(this.listWrapper);
-
-            return this;
-        },
-
-        addWidgetItem: function(id, className, text, icon, generatorIdentifier, fullWidth) {
-            // if fullWidth is truthy, creates a full width item. Otherwise creates half width.
-            var li = document.createElement('li');
-            li.className = fullWidth ? className + ' full-width' : className + ' half-width';
-            li.id = id;
-            var tempLi = '<span class="icon <%= icon %>"></span><span class="name"><%= text %></span>';
-            li.innerHTML = _.template(tempLi, {
-                text: text,
-                icon: icon
-            });
-
-            if(generatorIdentifier) {
-                $(li).data('genpath', generatorIdentifier);
-            }
-
-            this.list.appendChild(li);
-
-            if (this.searcher) {
-                this.searcher.register(id, className, text, icon);
-            }
-
-            return li;
-        },
-
-        addHeaderItem: function(text, target) {
-            var li = document.createElement('div');
-            li.className = 'gallery-header open';
-            li.innerHTML = '<span>' + text + '</span>';
-            // + '<span class="qmark">?</span>';
-            var icon = document.createElement('img');
-            icon.className = "icon";
-            icon.src = STATIC_URL + "/img/right-arrow.png";
-            // li.appendChild(icon);
-            this.el.appendChild(li);
-            return li;
-        },
-
-        toggle: function() {
-            if (this.isExpanded) this.hide();
-            else {
-                this.parentView.hideAllSections();
-                this.expand();
-            }
-        },
-
-        expand: function() {
-            this.header.className += ' open';
-            this.listWrapper.className += ' open';
-
-            this.isExpanded = true;
-            $(window).on('mouseup', this.clickedOutsideHide);
-        },
-
-        hide: function() {
-            $(this.header).removeClass('open');
-            $(this.listWrapper).removeClass('open');
-            this.isExpanded = false;
-            $(window).off('mouseup', this.clickedOutsideHide);
-        },
-
-/* Dead code as of 2/10/14
-        mouseleave: function(e) {
-            if (this.timer) clearTimeout(this.timer);
-            var self = this;
-            this.timer = setTimeout(this.checkToHide, 130);
-        },
-        */
-        clickedOutsideHide: function(e) {
-            var container = this.$el;
-            // if the target of the click isn't the container
-            // ... nor a descendant of the container
-            if (!container.is(e.target) && container.has(e.target).length === 0) {
-                this.hide();
-            }
-        },
-
-        checkToHide: function() {
-            if (this.timer) clearTimeout(this.timer);
-            if (!this.parentView.dragActive && !this.parentView.slideDownActive) return this.hide();
-            this.timer = setTimeout(this.checkToHide, 2000);
-        },
-
-        showSectionTutorial: function(e) {
-            e.stopPropagation();
-            v1.showTutorial(this.name);
-        },
-
-        addSearcher: function(searcherObj) {
-            this.searcher = searcherObj;
+        this.list = document.createElement('ul');
+        if (this.options.index > -1) {
+            this.listWrapper.className += 'top' + this.options.index;
         }
 
-    });
+        this.listWrapper.appendChild(this.list);
+        this.list.style = '';
+        this.el.appendChild(this.listWrapper);
+
+        return this;
+    },
+
+    addWidgetItem: function (id, className, text, icon, generatorIdentifier, fullWidth) {
+        // if fullWidth is truthy, creates a full width item. Otherwise creates half width.
+        var li = document.createElement('li');
+        li.className = fullWidth ? className + ' full-width' : className + ' half-width';
+        li.id = id;
+        var tempLi = '<span class="icon <%= icon %>"></span><span class="name"><%= text %></span>';
+        li.innerHTML = _.template(tempLi, {
+            text: text,
+            icon: icon
+        });
+
+        if (generatorIdentifier) {
+            $(li).data('genpath', generatorIdentifier);
+        }
+
+        this.list.appendChild(li);
+
+        if (this.searcher) {
+            this.searcher.register(id, className, text, icon);
+        }
+
+        return li;
+    },
+
+    addHeaderItem: function (text, target) {
+        var li = document.createElement('div');
+        li.className = 'gallery-header open';
+        li.innerHTML = '<span>' + text + '</span>';
+        // + '<span class="qmark">?</span>';
+        var icon = document.createElement('img');
+        icon.className = "icon";
+        icon.src = STATIC_URL + "/img/right-arrow.png";
+        // li.appendChild(icon);
+        this.el.appendChild(li);
+        return li;
+    },
+
+    toggle: function () {
+        if (this.isExpanded) this.hide();
+        else {
+            this.parentView.hideAllSections();
+            this.expand();
+        }
+    },
+
+    expand: function () {
+        this.header.className += ' open';
+        this.listWrapper.className += ' open';
+
+        this.isExpanded = true;
+        $(window).on('mouseup', this.clickedOutsideHide);
+    },
+
+    hide: function () {
+        $(this.header).removeClass('open');
+        $(this.listWrapper).removeClass('open');
+        this.isExpanded = false;
+        $(window).off('mouseup', this.clickedOutsideHide);
+    },
+
+    /* Dead code as of 2/10/14
+    mouseleave: function(e) {
+        if (this.timer) clearTimeout(this.timer);
+        var self = this;
+        this.timer = setTimeout(this.checkToHide, 130);
+    },
+    */
+    clickedOutsideHide: function (e) {
+        var container = this.$el;
+        // if the target of the click isn't the container
+        // ... nor a descendant of the container
+        if (!container.is(e.target) && container.has(e.target).length === 0) {
+            this.hide();
+        }
+    },
+
+    checkToHide: function () {
+        if (this.timer) clearTimeout(this.timer);
+        if (!this.parentView.dragActive && !this.parentView.slideDownActive) return this.hide();
+        this.timer = setTimeout(this.checkToHide, 2000);
+    },
+
+    showSectionTutorial: function (e) {
+        e.stopPropagation();
+        v1.showTutorial(this.name);
+    },
+
+    addSearcher: function (searcherObj) {
+        this.searcher = searcherObj;
+    }
+
+});
 
 
-    exports.EditorGallerySectionView = EditorGallerySectionView;
+exports.EditorGallerySectionView = EditorGallerySectionView;
+
 });
 
 require.define("/models/WidgetContainerModel.js",function(require,module,exports,__dirname,__filename,process,global){    var WidgetModel = require('./WidgetModel').WidgetModel;
     var LoginRouteCollection = require('../collections/LoginRouteCollection').LoginRouteCollection;
 
 
-        var WidgetContainerModel = WidgetModel.extend({
+    var WidgetContainerModel = WidgetModel.extend({
 
-            initialize: function(bone, isNew) {
-                WidgetContainerModel.__super__.initialize.call(this, bone, isNew);
-            },
+        initialize: function (bone, isNew) {
+            WidgetContainerModel.__super__.initialize.call(this, bone, isNew);
+        },
 
-            createLoginRoutes: function() {
-                this.get('data').set('loginRoutes', new LoginRouteCollection());
-                v1State.get('users').each(function(userModel) {
-                    this.get('data').get('loginRoutes').push({
-                        role: userModel.get('name'),
-                        redirect: "internal://Homepage"
-                    });
-                }, this);
-            },
+        createLoginRoutes: function () {
+            this.get('data').set('loginRoutes', new LoginRouteCollection());
+            v1State.get('users').each(function (userModel) {
+                this.get('data').get('loginRoutes').push({
+                    role: userModel.get('name'),
+                    redirect: "internal://Homepage"
+                });
+            }, this);
+        },
 
-            createSearchTarget: function() {
-                v1State.get('pages').each(function(pageM) {
-                    console.log(pageM.hasSearchList());
-                    if (pageM.hasSearchList(this.get('data').get('searchQuery').get('searchOn')) && pageM.isContextFree()) {
-                        this.get('data').get('searchQuery').set('searchPage', pageM.getDataLang());
-                    }
-                }, this);
-            },
+        createSearchTarget: function () {
+            v1State.get('pages').each(function (pageM) {
+                console.log(pageM.hasSearchList());
+                if (pageM.hasSearchList(this.get('data').get('searchQuery').get('searchOn')) && pageM.isContextFree()) {
+                    this.get('data').get('searchQuery').set('searchPage', pageM.getDataLang());
+                }
+            }, this);
+        },
 
-            serialize: function() {
-                var json = _.clone(this.attributes);
+        serialize: function () {
+            var json = _.clone(this.attributes);
 
-                json.layout = this.get('layout').serialize();
-                json.data = this.get('data').serialize();
-                if (json.context) delete json.context;
+            json.layout = this.get('layout').serialize();
+            json.data = this.get('data').serialize();
+            if (json.context) delete json.context;
 
-                return json;
-            }
-        });
+            return json;
+        }
+    });
 
-        exports.WidgetContainerModel = WidgetContainerModel;
+    exports.WidgetContainerModel = WidgetContainerModel;
+
 });
 
 require.define("/collections/LoginRouteCollection.js",function(require,module,exports,__dirname,__filename,process,global){  var LoginRouteCollection = Backbone.Collection.extend({
 
-    initialize: function() {
-      v1State.get('users').bind('change add remove', this.reorganize, this);
-    },
+      initialize: function () {
+          v1State.get('users').bind('change add remove', this.reorganize, this);
+      },
 
-    findRouteWithRole: function(roleStr) {
-      var val = null;
-      this.each(function(userRole) {
-        if(userRole.get('role') == roleStr) {
-          val = userRole.get('redirect');
-          return val;
-        }
-      }, this);
-      return "internal://Homepage";
-    },
+      findRouteWithRole: function (roleStr) {
+          var val = null;
+          this.each(function (userRole) {
+              if (userRole.get('role') == roleStr) {
+                  val = userRole.get('redirect');
+                  return val;
+              }
+          }, this);
+          return "internal://Homepage";
+      },
 
-    reorganize: function() {
-      var newContent = [];
-      v1State.get('users').each(function(user) {
-        var val = this.findRouteWithRole(user.get('name'));
-        newContent.push({
-          role: user.get('name'),
-          redirect: val
-        });
-      }, this);
+      reorganize: function () {
+          var newContent = [];
+          v1State.get('users').each(function (user) {
+              var val = this.findRouteWithRole(user.get('name'));
+              newContent.push({
+                  role: user.get('name'),
+                  redirect: val
+              });
+          }, this);
 
-      this.reset(newContent);
-    }
+          this.reset(newContent);
+      }
 
   });
 
   exports.LoginRouteCollection = LoginRouteCollection;
+
 });
 
 require.define("/template_editor/SearchGallerySectionView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -6673,7 +6782,7 @@ require.define("/template_editor/SearchGallerySectionView.js",function(require,m
 
         className: 'search elements-panel',
 
-        render: function() {
+        render: function () {
             if (this.el) {
                 this.el.innerHTML = '';
             }
@@ -6684,19 +6793,19 @@ require.define("/template_editor/SearchGallerySectionView.js",function(require,m
             return this;
         },
 
-        expand: function() {
-            if(this.isExpanded) return;
+        expand: function () {
+            if (this.isExpanded) return;
             this.$el.addClass("open");
             this.isExpanded = true;
         },
 
-        hide: function() {
-            if(!this.isExpanded) return;
+        hide: function () {
+            if (!this.isExpanded) return;
             this.isExpanded = false;
             this.$el.removeClass("open");
         },
 
-        clear: function() {
+        clear: function () {
             this.list.innerHTML = '';
         }
 
@@ -6704,6 +6813,7 @@ require.define("/template_editor/SearchGallerySectionView.js",function(require,m
 
 
     exports.SearchGallerySectionView = SearchGallerySectionView;
+
 });
 
 require.define("/template_editor/Searcher.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -6712,7 +6822,7 @@ require.define("/template_editor/Searcher.js",function(require,module,exports,__
 
         this.items = [];
 
-        this.register = function(id, className, text, icon) {
+        this.register = function (id, className, text, icon) {
             this.items.push({
                 id: id,
                 className: className,
@@ -6721,10 +6831,10 @@ require.define("/template_editor/Searcher.js",function(require,module,exports,__
             });
         };
 
-        this.search = function(str) {
+        this.search = function (str) {
 
             var results = [];
-            _.each(this.items, function(item) {
+            _.each(this.items, function (item) {
                 if (item.text.toLowerCase().indexOf(str.toLowerCase()) > -1) {
                     results.push(item);
                 }
@@ -6745,12 +6855,12 @@ require.define("/AutoFillHelper.js",function(require,module,exports,__dirname,__
     var AutoFiller = {
 
         fillUIElement: function (model) {
-            
+
             var extraData = {};
 
             var type = model.get('className');
 
-            if(v1UIEState.getBaseClass(type)) {
+            if (v1UIEState.getBaseClass(type)) {
                 extraData.className = v1UIEState.getBaseClass(type);
             }
 
@@ -6774,7 +6884,7 @@ require.define("/AutoFillHelper.js",function(require,module,exports,__dirname,__
             "https://i.istockimg.com/file_thumbview_approve/3516561/2/stock-photo-3516561-back-to-school-with-copyspace.jpg"
         ],
 
-        loremIpsum: function() {
+        loremIpsum: function () {
             var loremIpsumWordBank = new Array("lorem", "ipsum", "dolor", "sit", "amet,", "consectetur", "adipisicing", "elit,", "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et", "dolore", "magna", "aliqua.", "enim", "ad", "minim", "veniam,", "quis", "nostrud", "exercitation", "ullamco", "laboris", "nisi", "ut", "aliquip", "ex", "ea", "commodo", "consequat.", "duis", "aute", "irure", "dolor", "in", "reprehenderit", "in", "voluptate", "velit", "esse", "cillum", "dolore", "eu", "fugiat", "nulla", "pariatur.", "excepteur", "sint", "occaecat", "cupidatat", "non", "proident,", "sunt", "in", "culpa", "qui", "officia", "deserunt", "mollit", "anim", "id", "est", "laborum.", "sed", "ut", "perspiciatis,", "unde", "omnis", "iste", "natus", "error", "sit", "voluptatem", "accusantium", "doloremque", "laudantium,", "totam", "rem", "aperiam", "eaque", "ipsa,", "quae", "ab", "illo", "inventore", "veritatis", "et", "quasi", "architecto", "beatae", "vitae", "dicta", "sunt,", "explicabo.", "nemo", "enim", "ipsam", "voluptatem,", "quia", "voluptas", "sit,", "aspernatur", "aut", "odit", "aut", "fugit,", "sed", "quia", "consequuntur", "magni", "dolores", "eos,", "qui", "ratione", "voluptatem", "sequi", "nesciunt,", "neque", "porro", "quisquam", "est,", "qui", "dolorem", "ipsum,", "quia", "dolor", "sit,", "amet,", "consectetur,", "adipisci", "velit,", "sed", "quia", "non", "numquam", "eius", "modi", "tempora", "incidunt,", "ut", "labore", "et", "dolore", "magnam", "aliquam", "quaerat", "voluptatem.", "ut", "enim", "ad", "minima", "veniam,", "quis", "nostrum", "exercitationem", "ullam", "corporis", "suscipit", "laboriosam,", "nisi", "ut", "aliquid", "ex", "ea", "commodi", "consequatur?", "quis", "autem", "vel", "eum", "iure", "reprehenderit,", "qui", "in", "ea", "voluptate", "velit", "esse,", "quam", "nihil", "molestiae", "consequatur,", "vel", "illum,", "qui", "dolorem", "eum", "fugiat,", "quo", "voluptas", "nulla", "pariatur?", "at", "vero", "eos", "et", "accusamus", "et", "iusto", "odio", "dignissimos", "ducimus,", "qui", "blanditiis", "praesentium", "voluptatum", "deleniti", "atque", "corrupti,", "quos", "dolores", "et", "quas", "molestias", "excepturi", "sint,", "obcaecati", "cupiditate", "non", "provident,", "similique", "sunt", "in", "culpa,", "qui", "officia", "deserunt", "mollitia", "animi,", "id", "est", "laborum", "et", "dolorum", "fuga.", "harum", "quidem", "rerum", "facilis", "est", "et", "expedita", "distinctio.", "Nam", "libero", "tempore,", "cum", "soluta", "nobis", "est", "eligendi", "optio,", "cumque", "nihil", "impedit,", "quo", "minus", "id,", "quod", "maxime", "placeat,", "facere", "possimus,", "omnis", "voluptas", "assumenda", "est,", "omnis", "dolor", "repellendus.", "temporibus", "autem", "quibusdam", "aut", "officiis", "debitis", "aut", "rerum", "necessitatibus", "saepe", "eveniet,", "ut", "et", "voluptates", "repudiandae", "sint", "molestiae", "non", "recusandae.", "itaque", "earum", "rerum", "hic", "tenetur", "a", "sapiente", "delectus,", "aut", "reiciendis", "voluptatibus", "maiores", "alias", "consequatur", "aut", "perferendis", "doloribus", "asperiores", "repellat");
             var minWordCount = 15;
             var maxWordCount = 100;
@@ -6797,6 +6907,7 @@ require.define("/AutoFillHelper.js",function(require,module,exports,__dirname,__
     }
 
     exports.AutoFiller = AutoFiller;
+
 });
 
 require.define("/pages/PageView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -6845,7 +6956,7 @@ require.define("/pages/PageView.js",function(require,module,exports,__dirname,__
             'click .edit-header': 'clickedEditHeader'
         },
 
-        initialize: function(routeModel, templateModel, ind, isMobile) {
+        initialize: function (routeModel, templateModel, ind, isMobile) {
             _.bindAll(this);
 
             if (routeModel !== null) {
@@ -6859,7 +6970,7 @@ require.define("/pages/PageView.js",function(require,module,exports,__dirname,__
             }
         },
 
-        render: function() {
+        render: function () {
             if (!this.model) {
                 this.el.innerHTML += 'This template has no route. Please add one if you wish to use this template as a page.';
             } else {
@@ -6879,7 +6990,7 @@ require.define("/pages/PageView.js",function(require,module,exports,__dirname,__
             }
         },
 
-        renderUrl: function() {
+        renderUrl: function () {
             if (!this.model) {
                 // homepage url can't be edited
                 if (this.model.get('name') === 'Homepage') {
@@ -6889,7 +7000,7 @@ require.define("/pages/PageView.js",function(require,module,exports,__dirname,__
             }
         },
 
-        renderMenu: function() {
+        renderMenu: function () {
             var page_context = {};
             page_context = this.model.attributes;
             page_context.page_name = this.model.get('name');
@@ -6903,11 +7014,11 @@ require.define("/pages/PageView.js",function(require,module,exports,__dirname,__
             this.el.appendChild(span);
         },
 
-        accessLevelChanged: function(e) {
+        accessLevelChanged: function (e) {
             this.model.set('access_level', e.target.value);
         },
 
-        deletePage: function() {
+        deletePage: function () {
             if (this.model.get('name') == "Homepage" || this.model.get('name') == "Registration Page") {
                 new SimpleModalView({
                     text: "The Hompage is an essential part of " + "your application, and can't be deleted."
@@ -6918,9 +7029,9 @@ require.define("/pages/PageView.js",function(require,module,exports,__dirname,__
             this.askToDelete();
         },
 
-        askToDelete: function() {
+        askToDelete: function () {
 
-            var translateTypetoNL = function(str) {
+            var translateTypetoNL = function (str) {
                 if (str == "node") {
                     str = "Widget";
                 }
@@ -6936,7 +7047,7 @@ require.define("/pages/PageView.js",function(require,module,exports,__dirname,__
 
             var widgetsNLString = "";
             if (widgets.length) {
-                var widgetsNL = _.map(widgets, function(widget) {
+                var widgetsNL = _.map(widgets, function (widget) {
                     return translateTypetoNL(widget.widget.get('type')) + ' on ' + widget.pageName;
                 });
                 widgetsNLString = widgetsNL.join('<br>');
@@ -6945,7 +7056,7 @@ require.define("/pages/PageView.js",function(require,module,exports,__dirname,__
 
             var linksNLString = "";
             if (links.length) {
-                var linksNL = _.map(links, function(link) {
+                var linksNL = _.map(links, function (link) {
                     return 'Link on ' + link.section + ' of ' + link.pageName;
                 });
                 linksNLString = linksNL.join('<br>');
@@ -6957,15 +7068,15 @@ require.define("/pages/PageView.js",function(require,module,exports,__dirname,__
 
                 new DialogueView({
                     text: "The related widgets listed below will be deleted with this page. Do you want to proceed? <br><br> " + widgetsNLString + linksNLString
-                }, function() {
+                }, function () {
 
                     coll.remove(model.cid);
 
-                    _.each(widgets, function(widget) {
+                    _.each(widgets, function (widget) {
                         widget.widget.collection.remove(widget.widget);
                     });
 
-                    _.each(links, function(link) {
+                    _.each(links, function (link) {
                         link.link.collection.remove(link.link);
                     });
                 });
@@ -6973,60 +7084,62 @@ require.define("/pages/PageView.js",function(require,module,exports,__dirname,__
 
         },
 
-        clickedEditHeader: function() {
+        clickedEditHeader: function () {
             new HeaderEditorView(this.templateModel);
         },
 
-        expand: function() {
+        expand: function () {
             this.el.className += ' expanded';
             this.el.style.width = "280px";
             this.expanded = true;
         },
 
-        hide: function() {
+        hide: function () {
             this.el.style.width = "";
             this.$el.removeClass('expanded');
             this.expanded = false;
         }
     });
 
-   exports.PageView = PageView;
+    exports.PageView = PageView;
+
 });
 
 require.define("/pages/HeaderEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    var DialogueView = require('../mixins/DialogueView').DialogueView;
     require('../mixins/BackboneModal');
 
 
-        var HeaderEditorView = Backbone.ModalView.extend({
-            padding: 0,
-            width: 600,
-            id: 'url-editor',
-            //height: 150,
-            events: {
-                'keyup #header-editor': 'headerContentChanged',
-            },
+    var HeaderEditorView = Backbone.ModalView.extend({
+        padding: 0,
+        width: 600,
+        id: 'url-editor',
+        //height: 150,
+        events: {
+            'keyup #header-editor': 'headerContentChanged',
+        },
 
-            initialize: function(pageModel) {
-                _.bindAll(this);
+        initialize: function (pageModel) {
+            _.bindAll(this);
 
-                this.model = pageModel;
-                this.render();
-            },
+            this.model = pageModel;
+            this.render();
+        },
 
-            render: function() {
-                console.log(this.model.toJSON());
-                var template = '<textarea id="header-editor" style="width:100%; height: 400px;"><%= head %></textarea>';
-                this.el.innerHTML = _.template(template, this.model.toJSON());
-                this.$editor = this.$el.find('#header-editor');
-            },
+        render: function () {
+            console.log(this.model.toJSON());
+            var template = '<textarea id="header-editor" style="width:100%; height: 400px;"><%= head %></textarea>';
+            this.el.innerHTML = _.template(template, this.model.toJSON());
+            this.$editor = this.$el.find('#header-editor');
+        },
 
-            headerContentChanged: function() {
-                this.model.set('head', this.$editor.val());
-            }
+        headerContentChanged: function () {
+            this.model.set('head', this.$editor.val());
+        }
 
-        });
+    });
 
-        exports.HeaderEditorView = HeaderEditorView;
+    exports.HeaderEditorView = HeaderEditorView;
+
 });
 
 require.define("/template_editor/PageTemplatePicker.js",function(require,module,exports,__dirname,__filename,process,global){        var TemplateGenerator = require('../TemplateGenerator').TemplateGenerator;
@@ -7044,14 +7157,14 @@ require.define("/template_editor/PageTemplatePicker.js",function(require,module,
                 'click .list-template': 'listSelected'
             },
 
-            initialize: function(options) {
+            initialize: function (options) {
                 _.bindAll(this);
                 this.model = options.model;
                 this.options = options;
                 this.render();
             },
 
-            staticSelected: function(e) {
+            staticSelected: function (e) {
                 var tempId = String(e.currentTarget.id).replace('page-', '');
                 this.model.get('uielements').add(page_templates[tempId].uielements);
 
@@ -7059,7 +7172,7 @@ require.define("/template_editor/PageTemplatePicker.js",function(require,module,
                 this.closeModal();
             },
 
-            infoSelected: function(e) {
+            infoSelected: function (e) {
                 var tableId = String(e.currentTarget.id).replace('table-info-', '');
                 var tableModel = v1State.get('tables').get(tableId);
 
@@ -7074,7 +7187,7 @@ require.define("/template_editor/PageTemplatePicker.js",function(require,module,
                 this.closeModal();
             },
 
-            listSelected: function(e) {
+            listSelected: function (e) {
                 var tableId = String(e.currentTarget.id).replace('table-list-', '');
                 var tableModel = v1State.get('tables').get(tableId);
 
@@ -7085,17 +7198,17 @@ require.define("/template_editor/PageTemplatePicker.js",function(require,module,
                 this.closeModal();
             },
 
-            render: function() {
+            render: function () {
                 var self = this;
                 this.el.innerHTML = "<h2>Pick A Template</h2><p>Looks like this page is blank. Would you like to start with one of the templates?</p>";
 
                 var list = document.createElement('ul');
                 list.className = 'template-icons';
-                _(page_templates).each(function(page, ind) {
+                _(page_templates).each(function (page, ind) {
                     list.innerHTML += '<li class="page-template static-template" id="page-' + ind + '"><img src="/static/img/page_templates/' + page.icon + '"><span>' + page.name + '</span></li>';
                 });
 
-                v1State.get('tables').each(function(tableM) {
+                v1State.get('tables').each(function (tableM) {
                     list.innerHTML += '<li class="page-template info-template" id="table-info-' + tableM.cid + '"><img src="/static/img/page_templates/info-page-icon.png"><span>' + tableM.get('name') + ' Info Page</span></li>';
                     list.innerHTML += '<li class="page-template list-template" id="table-list-' + tableM.cid + '"><img src="/static/img/page_templates/list-page-icon.png"><span>' + tableM.get('name') + ' List Page</span></li>';
                 });
@@ -7104,7 +7217,7 @@ require.define("/template_editor/PageTemplatePicker.js",function(require,module,
                 return this;
             },
 
-            closeModal: function() {
+            closeModal: function () {
                 if (this.options.callback) {
                     this.options.callback.call();
                 }
@@ -7115,143 +7228,180 @@ require.define("/template_editor/PageTemplatePicker.js",function(require,module,
 
 });
 
-require.define("/TemplateGenerator.js",function(require,module,exports,__dirname,__filename,process,global){
-  var WidgetCollection = require("./collections/WidgetCollection").WidgetCollection;
+require.define("/TemplateGenerator.js",function(require,module,exports,__dirname,__filename,process,global){var WidgetCollection = require("./collections/WidgetCollection").WidgetCollection;
 
-  var AppGenerator = Backbone.View.extend({
-    answersDict : {},
+var AppGenerator = Backbone.View.extend({
+    answersDict: {},
 
-    initialize: function(answers) {
-      _.bindAll(this);
+    initialize: function (answers) {
+        _.bindAll(this);
     },
 
-    generateUsers: function() {
-      var usersCollection = new UserRolesCollection();
-      if(this.answersDict.multiple_users[0][0] == "yes") {
-        _(this.answersDict.types_of_users[0]).each(function(user_role, ind) {
-          var user = usersCollection.createUserWithName(user_role);
-          user.addFieldsWithNames(this.answersDict.X_user_info[ind]);
+    generateUsers: function () {
+        var usersCollection = new UserRolesCollection();
+        if (this.answersDict.multiple_users[0][0] == "yes") {
+            _(this.answersDict.types_of_users[0]).each(function (user_role, ind) {
+                var user = usersCollection.createUserWithName(user_role);
+                user.addFieldsWithNames(this.answersDict.X_user_info[ind]);
+            }, this);
+        } else {
+            var user = usersCollection.createUserWithName("User");
+            user.addFieldsWithNames(this.answersDict.user_info[0]);
+        }
+
+        return usersCollection;
+    },
+
+    generateTables: function () {
+        var tablesColl = new TableCollection();
+        _(this.answersDict.other_info[0]).each(function (table_name, ind) {
+            var table = tablesColl.createTableWithName(table_name);
+            table.addFieldsWithNames(this.answersDict.X_info[ind]);
         }, this);
-      }
-      else {
-        var user = usersCollection.createUserWithName("User");
-        user.addFieldsWithNames(this.answersDict.user_info[0]);
-      }
 
-      return usersCollection;
+        return tablesColl;
     },
 
-    generateTables: function() {
-      var tablesColl = new TableCollection();
-      _(this.answersDict.other_info[0]).each(function(table_name, ind) {
-        var table = tablesColl.createTableWithName(table_name);
-        table.addFieldsWithNames(this.answersDict.X_info[ind]);
-      }, this);
+    generatePages: function () {
+        var pageColl = new PageCollection();
+        pageColl.push(this.generateHomepage());
+        pageColl.push(this.generateRegistrationPage());
 
-      return tablesColl;
+        return pageColl;
     },
 
-    generatePages: function() {
-      var pageColl = new PageCollection();
-      pageColl.push(this.generateHomepage());
-      pageColl.push(this.generateRegistrationPage());
+    generateHomepage: function () {
+        var homepage = _.clone(HomepageTemp);
+        homepage.uielements[0].data.content = appName;
+        if (this.answersDict.intro_text) homepage.uielements[1].data.content = this.answersDict.intro_text[0][0];
 
-      return pageColl;
-    },
-
-    generateHomepage: function() {
-      var homepage = _.clone(HomepageTemp);
-      homepage.uielements[0].data.content = appName;
-      if(this.answersDict.intro_text) homepage.uielements[1].data.content = this.answersDict.intro_text[0][0];
-
-      if(this.answersDict.logo[0]) {
-        homepage.uielements[2].data.content_attribs.src = this.answersDict.logo[0];
-      }
-      return homepage;
-    },
-
-    generateRegistrationPage: function() {
-
-    },
-
-    generateProfilePage: function() {
-
-    },
-
-    generateInfoPage: function(tableM) {
-      var arr = [];
-
-      var nmrElements = 0;
-      var nmrImageElements = 0;
-      var hasImageElements = 0;
-      var widgetCollection = new WidgetCollection();
-      if(tableM.get('fields').getImageFields()) hasImageElements = 1;
-      tableM.getFieldsColl().each(function(fieldModel) {
-
-        var type = fieldModel.get('type');
-        if(type == "fk"||type == "m2m"||type == "o2o") { return; }
-
-        var displayType = util.getDisplayType(type);
-        var formFieldModel = { field_name: fieldModel.get('name'),
-                               displayType: "single-line-text",
-                               type: type,
-                               label: fieldModel.get('name'),
-                               placeholder: fieldModel.get('name') };
-
-        var layout = {left : hasImageElements*3 + 2, top: nmrElements*3 + 12, height: 3, width: 5};
-        var content_ops = {};
-        content_ops.content =  '{{Page.'+ tableM.get('name') +'.'+fieldModel.get('name')+'}}';
-
-        if(displayType == "links") {
-          content_ops.content = 'Download '+fieldModel.get('name');
-          content_ops.href = '{{Page.'+ tableM.get('name') +'.'+fieldModel.get('name')+'}}';
+        if (this.answersDict.logo[0]) {
+            homepage.uielements[2].data.content_attribs.src = this.answersDict.logo[0];
         }
-
-        if(displayType == "images") {
-          layout = {left : 2, top: nmrImageElements*9 + 12, height: 9, width: 2};
-          content_ops.src_content = '{{Page.'+ tableM.get('name') +'.'+fieldModel.get('name')+'}}';
-          nmrImageElements++;
-        }
-        else {
-          nmrElements++;
-        }
-
-        var newElement = widgetCollection.createNodeWithFieldTypeAndContent(layout, displayType, content_ops);
-        arr.push(newElement);
-      });
-
-      var headerModel = widgetCollection.createNodeWithFieldTypeAndContent({ left:3, height:3, width: 6, top: 3, alignment: "center"},
-                                                                             "headerTexts",
-                                                                             {content: tableM.get('name') + " Info" });
-
-      arr.push(headerModel);
-
-      return arr;
+        return homepage;
     },
 
-    generateListPage: function(tableM) {
-      var widgetCollection = new WidgetCollection();
-      var headerModel = widgetCollection.createNodeWithFieldTypeAndContent({ left:3, height:3, width: 6, top: 3, alignment: "center"},
-                                                                             "headerTexts",
-                                                                             {content: "List of " + tableM.get('name') });
-      var listModel   = widgetCollection.createList({ left:3, height:3, width: 6, top: 11}, tableM);
-      var createFormModel   = widgetCollection.createCreateForm({ left:0, height:3, width: 3, top: 11, l_padding: 15, r_padding: 15}, tableM);
+    generateRegistrationPage: function () {
 
-      var arr = [];
-      arr.push(listModel);
-      arr.push(headerModel);
-      arr.push(createFormModel);
-
-      return arr;
     },
 
-    getJSON: function() {
-      return this.state.serialize();
+    generateProfilePage: function () {
+
+    },
+
+    generateInfoPage: function (tableM) {
+        var arr = [];
+
+        var nmrElements = 0;
+        var nmrImageElements = 0;
+        var hasImageElements = 0;
+        var widgetCollection = new WidgetCollection();
+        if (tableM.get('fields').getImageFields()) hasImageElements = 1;
+        tableM.getFieldsColl().each(function (fieldModel) {
+
+            var type = fieldModel.get('type');
+            if (type == "fk" || type == "m2m" || type == "o2o") {
+                return;
+            }
+
+            var displayType = util.getDisplayType(type);
+            var formFieldModel = {
+                field_name: fieldModel.get('name'),
+                displayType: "single-line-text",
+                type: type,
+                label: fieldModel.get('name'),
+                placeholder: fieldModel.get('name')
+            };
+
+            var layout = {
+                left: hasImageElements * 3 + 2,
+                top: nmrElements * 3 + 12,
+                height: 3,
+                width: 5
+            };
+            var content_ops = {};
+            content_ops.content = '{{Page.' + tableM.get('name') + '.' + fieldModel.get('name') + '}}';
+
+            if (displayType == "links") {
+                content_ops.content = 'Download ' + fieldModel.get('name');
+                content_ops.href = '{{Page.' + tableM.get('name') + '.' + fieldModel.get('name') + '}}';
+            }
+
+            if (displayType == "images") {
+                layout = {
+                    left: 2,
+                    top: nmrImageElements * 9 + 12,
+                    height: 9,
+                    width: 2
+                };
+                content_ops.src_content = '{{Page.' + tableM.get('name') + '.' + fieldModel.get('name') + '}}';
+                nmrImageElements++;
+            } else {
+                nmrElements++;
+            }
+
+            var newElement = widgetCollection.createNodeWithFieldTypeAndContent(layout, displayType, content_ops);
+            arr.push(newElement);
+        });
+
+        var headerModel = widgetCollection.createNodeWithFieldTypeAndContent({
+                left: 3,
+                height: 3,
+                width: 6,
+                top: 3,
+                alignment: "center"
+            },
+            "headerTexts", {
+                content: tableM.get('name') + " Info"
+            });
+
+        arr.push(headerModel);
+
+        return arr;
+    },
+
+    generateListPage: function (tableM) {
+        var widgetCollection = new WidgetCollection();
+        var headerModel = widgetCollection.createNodeWithFieldTypeAndContent({
+                left: 3,
+                height: 3,
+                width: 6,
+                top: 3,
+                alignment: "center"
+            },
+            "headerTexts", {
+                content: "List of " + tableM.get('name')
+            });
+        var listModel = widgetCollection.createList({
+            left: 3,
+            height: 3,
+            width: 6,
+            top: 11
+        }, tableM);
+        var createFormModel = widgetCollection.createCreateForm({
+            left: 0,
+            height: 3,
+            width: 3,
+            top: 11,
+            l_padding: 15,
+            r_padding: 15
+        }, tableM);
+
+        var arr = [];
+        arr.push(listModel);
+        arr.push(headerModel);
+        arr.push(createFormModel);
+
+        return arr;
+    },
+
+    getJSON: function () {
+        return this.state.serialize();
     }
 
-  });
+});
 
-  exports.AppGenerator = AppGenerator;
+exports.AppGenerator = AppGenerator;
 
 
 /* EXAMPLE */
@@ -7314,7 +7464,7 @@ require.define("/template_editor/GuideView.js",function(require,module,exports,_
             positionHorizontalGrid: 80,
             positionVerticalGrid: 15,
 
-            initialize: function(widgetsCollection) {
+            initialize: function (widgetsCollection) {
                 _.bindAll(this);
 
                 var self = this;
@@ -7328,19 +7478,19 @@ require.define("/template_editor/GuideView.js",function(require,module,exports,_
                 this.listenTo(this.widgetsCollection, 'remove', this.removeWidget);
             },
 
-            render: function() {
+            render: function () {
                 this.widgetsCollection.each(this.placeWidget);
                 this.setupDummyLines();
             },
 
-            placeWidget: function(widget) {
+            placeWidget: function (widget) {
                 this.placeWidgetLines(widget);
-                this.listenTo(widget.get('layout'), 'change', function() {
+                this.listenTo(widget.get('layout'), 'change', function () {
                     this.changedPosition(widget);
                 }, this);
             },
 
-            placeWidgetLines: function(widget) {
+            placeWidgetLines: function (widget) {
                 var layout = widget.get('layout');
                 var cid = widget.cid;
                 this.placeHorizontal(layout.get('top'), cid);
@@ -7349,16 +7499,16 @@ require.define("/template_editor/GuideView.js",function(require,module,exports,_
                 this.placeVertical(layout.get('left') + layout.get('width'), cid);
             },
 
-            setupDummyLines: function() {
-                for(var ii = 0; ii <= 12; ii++) {
+            setupDummyLines: function () {
+                for (var ii = 0; ii <= 12; ii++) {
                     this.placeVertical(ii, "dum");
                 }
             },
 
-            removeWidget: function(widget) {
+            removeWidget: function (widget) {
 
                 var vKeysToOmit = [];
-                _(this.verticalLinesDict).each(function(lineObj, key) {
+                _(this.verticalLinesDict).each(function (lineObj, key) {
                     lineObj.models = _.without(lineObj.models, widget.cid);
                     if (!lineObj.models.length) {
                         vKeysToOmit.push(key);
@@ -7369,7 +7519,7 @@ require.define("/template_editor/GuideView.js",function(require,module,exports,_
                 this.verticalLinesDict = _.omit(this.verticalLinesDict, vKeysToOmit);
 
                 var hKeysToOmit = [];
-                _(this.horizontalLinesDict).each(function(lineObj, key) {
+                _(this.horizontalLinesDict).each(function (lineObj, key) {
                     lineObj.models = _.without(lineObj.models, widget.cid);
                     if (!lineObj.models.length) {
                         $(lineObj.line).remove();
@@ -7380,10 +7530,10 @@ require.define("/template_editor/GuideView.js",function(require,module,exports,_
                 this.horizontalLinesDict = _.omit(this.horizontalLinesDict, hKeysToOmit);
             },
 
-            changedPosition: function(widget) {
+            changedPosition: function (widget) {
 
                 var vKeysToOmit = [];
-                _(this.verticalLinesDict).each(function(lineObj, key) {
+                _(this.verticalLinesDict).each(function (lineObj, key) {
                     lineObj.models = _.without(lineObj.models, widget.cid);
                     if (!lineObj.models.length) {
                         vKeysToOmit.push(key);
@@ -7394,7 +7544,7 @@ require.define("/template_editor/GuideView.js",function(require,module,exports,_
                 this.verticalLinesDict = _.omit(this.verticalLinesDict, vKeysToOmit);
 
                 var hKeysToOmit = [];
-                _(this.horizontalLinesDict).each(function(lineObj, key) {
+                _(this.horizontalLinesDict).each(function (lineObj, key) {
                     lineObj.models = _.without(lineObj.models, widget.cid);
                     if (!lineObj.models.length) {
                         $(lineObj.line).remove();
@@ -7407,7 +7557,7 @@ require.define("/template_editor/GuideView.js",function(require,module,exports,_
                 this.placeWidgetLines(widget);
             },
 
-            placeHorizontal: function(nmr, cid) {
+            placeHorizontal: function (nmr, cid) {
                 var lineObj = (this.horizontalLinesDict[nmr] || {});
 
                 if (!lineObj.line) {
@@ -7424,7 +7574,7 @@ require.define("/template_editor/GuideView.js",function(require,module,exports,_
                 this.horizontalLinesDict[nmr] = lineObj;
             },
 
-            placeVertical: function(nmr, cid) {
+            placeVertical: function (nmr, cid) {
                 var lineObj = (this.verticalLinesDict[nmr] || {});
 
                 if (!lineObj.line) {
@@ -7441,28 +7591,28 @@ require.define("/template_editor/GuideView.js",function(require,module,exports,_
                 this.verticalLinesDict[nmr] = lineObj;
             },
 
-            showAll: function() {
-                _(this.horizontalLinesDict).each(function(val, key) {
+            showAll: function () {
+                _(this.horizontalLinesDict).each(function (val, key) {
                     $(val.line).addClass('show');
                 });
 
-                _(this.verticalLinesDict).each(function(val, key) {
+                _(this.verticalLinesDict).each(function (val, key) {
                     $(val.line).addClass('show');
                 });
             },
 
-            hideAll: function() {
-                _(this.horizontalLinesDict).each(function(val, key) {
+            hideAll: function () {
+                _(this.horizontalLinesDict).each(function (val, key) {
                     $(val.line).removeClass('show');
                 });
 
-                _(this.verticalLinesDict).each(function(val, key) {
+                _(this.verticalLinesDict).each(function (val, key) {
                     $(val.line).removeClass('show');
                 });
             },
 
-            toggleGuides: function() {
-                if(keyDispatcher.textEditing) return;
+            toggleGuides: function () {
+                if (keyDispatcher.textEditing) return;
 
                 if (this.show) {
                     this.hideAll();
@@ -7473,30 +7623,30 @@ require.define("/template_editor/GuideView.js",function(require,module,exports,_
                 }
             },
 
-            showVertical: function(coor, cid) {
+            showVertical: function (coor, cid) {
                 var coorRounded = Math.round(coor);
                 var delta = coorRounded - coor;
 
                 if (this.verticalLinesDict[coorRounded] && !(this.verticalLinesDict[coorRounded].models.length == 1 && this.verticalLinesDict[coorRounded].models[0] == cid)) {
                     $(this.verticalLinesDict[coorRounded].line).addClass('show');
-                    if(delta > -0.15 && delta < 0.15 && this.verticalLinesDict[coorRounded].models.length != 1) return coorRounded;
+                    if (delta > -0.15 && delta < 0.15 && this.verticalLinesDict[coorRounded].models.length != 1) return coorRounded;
                 }
             },
 
-            showHorizontal: function(coor, cid) {
+            showHorizontal: function (coor, cid) {
                 var coorRounded = Math.round(coor);
                 var delta = coorRounded - coor;
 
                 if (this.horizontalLinesDict[coorRounded] && !(this.horizontalLinesDict[coorRounded].models.length == 1 && this.horizontalLinesDict[coorRounded].models[0] == cid)) {
                     $(this.horizontalLinesDict[coorRounded].line).addClass('show');
-                    if(delta > -0.5 && delta < 0.5) return coorRounded;
+                    if (delta > -0.5 && delta < 0.5) return coorRounded;
                 }
 
 
                 return null;
             },
 
-            close: function() {
+            close: function () {
                 keyDispatcher.unbind(';', this.toggleGuides);
                 Backbone.View.prototype.close.call(this);
             }
@@ -7504,140 +7654,144 @@ require.define("/template_editor/GuideView.js",function(require,module,exports,_
         });
 
         exports.GuideView = GuideView;
+
 });
 
-require.define("/RedoController.js",function(require,module,exports,__dirname,__filename,process,global){
-  var RedoController = Backbone.View.extend({
+require.define("/RedoController.js",function(require,module,exports,__dirname,__filename,process,global){var RedoController = Backbone.View.extend({
     redoStack: [],
     undoStack: [],
 
-    initialize: function(data) {
-      _.bindAll(this);
-      this.startLogging();
+    initialize: function (data) {
+        _.bindAll(this);
+        this.startLogging();
     },
 
     startLogging: function () {
-      var uiElements = v1State.getCurrentPage().get('uielements');
-      this.bindCollection(uiElements);
+        var uiElements = v1State.getCurrentPage().get('uielements');
+        this.bindCollection(uiElements);
     },
 
-    bindCollection: function(coll) {
-      this.listenTo(coll, 'add', this.added);
-      this.listenTo(coll, 'remove', this.removed);
-      this.listenTo(coll, 'change', this.changed);
-      coll.each(this.bindModel);
+    bindCollection: function (coll) {
+        this.listenTo(coll, 'add', this.added);
+        this.listenTo(coll, 'remove', this.removed);
+        this.listenTo(coll, 'change', this.changed);
+        coll.each(this.bindModel);
     },
 
-    bindModel: function(model) {
-      this.listenTo(model, 'change', this.changed);
-      _(model.attributes).each(function(val, key) {
+    bindModel: function (model) {
+        this.listenTo(model, 'change', this.changed);
+        _(model.attributes).each(function (val, key) {
 
-        if(this.isModel(val)) { this.bindModel(val); }
-        else if(this.isCollection(val)) { this.bindCollection(val); }
+            if (this.isModel(val)) {
+                this.bindModel(val);
+            } else if (this.isCollection(val)) {
+                this.bindCollection(val);
+            }
 
-      }, this);
+        }, this);
     },
 
-    added: function(model, collection) {
-      var changeObj = {
-        action: 'added',
-        obj: model,
-        collection: collection
-      };
-      this.undoStack.push(changeObj);
+    added: function (model, collection) {
+        var changeObj = {
+            action: 'added',
+            obj: model,
+            collection: collection
+        };
+        this.undoStack.push(changeObj);
     },
 
-    removed: function(model, collection) {
-      var changeObj = {
-        action: 'removed',
-        obj: model,
-        collection: collection
-      };
-      this.undoStack.push(changeObj);
+    removed: function (model, collection) {
+        var changeObj = {
+            action: 'removed',
+            obj: model,
+            collection: collection
+        };
+        this.undoStack.push(changeObj);
     },
 
-    changed: function(model) {
-      var changeObj = {
-        action: 'changed',
-        prevAttributes: _.clone(model._previousAttributes),
-        obj: model
-      };
-      this.undoStack.push(changeObj);
+    changed: function (model) {
+        var changeObj = {
+            action: 'changed',
+            prevAttributes: _.clone(model._previousAttributes),
+            obj: model
+        };
+        this.undoStack.push(changeObj);
     },
 
-    isModel: function(obj) {
-      if(obj && obj.attributes) return true;
-      return false;
+    isModel: function (obj) {
+        if (obj && obj.attributes) return true;
+        return false;
     },
 
     isCollection: function (obj) {
-      if(obj && obj.models) return true;
-      return false;
+        if (obj && obj.models) return true;
+        return false;
     },
 
-    undo: function() {
-      var obj = this.undoStack.pop();
-      if(!obj) return;
-      var reverted_obj = this.pushChange(obj);
-      this.redoStack.push(reverted_obj);
+    undo: function () {
+        var obj = this.undoStack.pop();
+        if (!obj) return;
+        var reverted_obj = this.pushChange(obj);
+        this.redoStack.push(reverted_obj);
     },
 
-    redo: function() {
-      var obj = this.redoStack.pop();
-      console.log(obj);
-      if(!obj) return;
-      this.pushChange(obj);
-      //this.redoStack.push(obj);
+    redo: function () {
+        var obj = this.redoStack.pop();
+        console.log(obj);
+        if (!obj) return;
+        this.pushChange(obj);
+        //this.redoStack.push(obj);
     },
 
-    pushChange: function(obj) {
+    pushChange: function (obj) {
 
-      var revertedObj = {};
+        var revertedObj = {};
 
-      switch(obj.action) {
+        switch (obj.action) {
         case "added":
-          this.stopListening(obj.collection, 'remove', this.removed);
-          obj.collection.remove(obj.obj);
-          this.listenTo(obj.collection, 'remove', this.removed);
+            this.stopListening(obj.collection, 'remove', this.removed);
+            obj.collection.remove(obj.obj);
+            this.listenTo(obj.collection, 'remove', this.removed);
 
-          revertedObj.action = "removed";
-          revertedObj.collection = obj.collection;
-          revertedObj.obj = obj.obj;
-          break;
+            revertedObj.action = "removed";
+            revertedObj.collection = obj.collection;
+            revertedObj.obj = obj.obj;
+            break;
         case "removed":
-          this.stopListening(obj.collection, 'add', this.added);
-          obj.collection.add(obj.obj);
-          this.listenTo(obj.collection, 'add', this.added);
+            this.stopListening(obj.collection, 'add', this.added);
+            obj.collection.add(obj.obj);
+            this.listenTo(obj.collection, 'add', this.added);
 
-          revertedObj.action = "added";
-          revertedObj.collection = obj.collection;
-          revertedObj.obj = obj.obj;
-          break;
+            revertedObj.action = "added";
+            revertedObj.collection = obj.collection;
+            revertedObj.obj = obj.obj;
+            break;
         case "changed":
-          revertedObj.prevAttributes = _.clone(obj.obj.attributes);
+            revertedObj.prevAttributes = _.clone(obj.obj.attributes);
 
-          obj.obj.attributes = _.clone(obj.prevAttributes);
-          this.stopListening(obj.obj, 'change', this.changed);
-          obj.obj.trigger('change');
-          if(obj.obj.has('top')) {
-            obj.obj.trigger('change:left');
-            obj.obj.trigger('change:top');
-            obj.obj.trigger('change:width');
-            obj.obj.trigger('change:height');
-          }
-          this.listenTo(obj.obj, 'change', this.changed);
+            obj.obj.attributes = _.clone(obj.prevAttributes);
+            this.stopListening(obj.obj, 'change', this.changed);
+            obj.obj.trigger('change');
+            if (obj.obj.has('top')) {
+                obj.obj.trigger('change:left');
+                obj.obj.trigger('change:top');
+                obj.obj.trigger('change:width');
+                obj.obj.trigger('change:height');
+            }
+            this.listenTo(obj.obj, 'change', this.changed);
 
-          revertedObj.action = "changed";
-          revertedObj.obj = obj.obj;
+            revertedObj.action = "changed";
+            revertedObj.obj = obj.obj;
 
-          break;
-      }
+            break;
+        }
 
-      return revertedObj;
+        return revertedObj;
     }
-  });
+});
 
-  exports.RedoController = RedoController;
+exports.RedoController = RedoController;
+
 });
 
 require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -7645,10 +7799,10 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
     var UIElementListView = require('./UIElementListView').UIElementListView;
     var StaticsEditorView = require('./StaticsEditorView').StaticsEditorView;
     var BaseCSSEditorView = require('./BaseCSSEditorView').BaseCSSEditorView;
-    var FontEditorView    = require('./FontEditorView').FontEditorView;
+    var FontEditorView = require('./FontEditorView').FontEditorView;
 
     var UIElementEditingView = require('./UIElementEditingView').UIElementEditingView;
-    var ThemesGalleryView    = require('./ThemesGalleryView').ThemesGalleryView;
+    var ThemesGalleryView = require('./ThemesGalleryView').ThemesGalleryView;
 
 
     var CSSEditorView = Backbone.View.extend({
@@ -7722,28 +7876,28 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
         ],
 
         events: {
-            'click #theme-picker-btn' : 'openThemePicker',
-            'click #navigate-back'    : 'navBack'
+            'click #theme-picker-btn': 'openThemePicker',
+            'click #navigate-back': 'navBack'
         },
 
 
         expanded: false,
 
-        initialize: function() {
+        initialize: function () {
             _.bindAll(this);
 
             this.model = v1UIEState;
             this.lastSave = null;
             this.deepListenTo(this.model, 'change', this.save);
 
-            _.each(this.model.getUIElementCollections(), function(coll) {
+            _.each(this.model.getUIElementCollections(), function (coll) {
                 this.listenTo(coll, 'selected', this.styleSelected);
             }, this);
 
             // TODO: get this back
             var self = this;
             var currentPageInd = v1.currentApp
-            v1State.get('templates').each(function(templateModel) {
+            v1State.get('templates').each(function (templateModel) {
                 var elementsCollection = templateModel.getUIElements();
                 // elementsCollection.each(this.bindWidget, this);
                 this.listenToModels(elementsCollection, 'selected', function (widgetModel) {
@@ -7756,13 +7910,13 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
             // this.listenTo(elementsCollection, 'add', this.bindWidget);
         },
 
-        bindWidget: function(widgetModel) {
-            this.listenTo(widgetModel, 'selected', function() {
+        bindWidget: function (widgetModel) {
+            this.listenTo(widgetModel, 'selected', function () {
 
             });
         },
 
-        render: function() {
+        render: function () {
             var self = this;
 
             /* Top Row */
@@ -7774,7 +7928,7 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
             /* Elements List */
             this.elementsList = document.createElement('ul');
             this.elementsList.innerHTML += '<li id="theme-picker-btn"><a>Pick a Theme</li>';
-            _.each(this.elements, function(element) {
+            _.each(this.elements, function (element) {
                 var id = element.id;
                 var liEl = document.createElement('li');
                 liEl.id = id;
@@ -7785,7 +7939,7 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
 
                 this.elementsList.appendChild(liEl);
 
-                $(liEl).bind('click', function() {
+                $(liEl).bind('click', function () {
                     self.showElementType(id, element.key, element.text);
                 });
 
@@ -7798,76 +7952,78 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
             return this;
         },
 
-        showElementType: function(type, key, text) {
+        showElementType: function (type, key, text) {
 
             switch (type) {
-                case "basecss":
+            case "basecss":
 
-                    var editorView = new BaseCSSEditorView(this.model);
-                    $(this.elementsList).hide();
-                    this.setTitle("Base CSS");
-                    this.expandExtra();
-                    this.makeResizable();
-                    this.el.appendChild(editorView.render().el);
-                    editorView.setupAce();
-                    this.currentView = editorView;
-                    this.$el.find('.navback').show();
+                var editorView = new BaseCSSEditorView(this.model);
+                $(this.elementsList).hide();
+                this.setTitle("Base CSS");
+                this.expandExtra();
+                this.makeResizable();
+                this.el.appendChild(editorView.render().el);
+                editorView.setupAce();
+                this.currentView = editorView;
+                this.$el.find('.navback').show();
 
-                    break;
+                break;
 
-                case "fonts":
+            case "fonts":
 
-                    var fontEditorView = new FontEditorView(this.model);
-                    $(this.elementsList).hide();
-                    this.setTitle("Fonts");
-                    this.el.appendChild(fontEditorView.render().el);
-                    this.currentView = fontEditorView;
-                    this.$el.find('.navback').show();
+                var fontEditorView = new FontEditorView(this.model);
+                $(this.elementsList).hide();
+                this.setTitle("Fonts");
+                this.el.appendChild(fontEditorView.render().el);
+                this.currentView = fontEditorView;
+                this.$el.find('.navback').show();
 
-                    break;
+                break;
 
-                case "statics":
+            case "statics":
 
-                    var staticsEditor = new StaticsEditorView(this.model);
-                    $(this.elementsList).hide();
-                    this.setTitle("Static Files");
-                    this.el.appendChild(staticsEditor.render().el);
-                    this.currentView = staticsEditor;
-                    this.$el.find('.navback').show();
+                var staticsEditor = new StaticsEditorView(this.model);
+                $(this.elementsList).hide();
+                this.setTitle("Static Files");
+                this.el.appendChild(staticsEditor.render().el);
+                this.currentView = staticsEditor;
+                this.$el.find('.navback').show();
 
-                    break;
+                break;
 
-                default:
-                    var listView = new UIElementListView(this.model.get(key), type);
-                    $(this.elementsList).hide();
-                    this.setTitle(text);
-                    this.el.appendChild(listView.render().el);
-                    this.currentView = listView;
-                    this.$el.find('.navback').show();
+            default:
+                var listView = new UIElementListView(this.model.get(key), type);
+                $(this.elementsList).hide();
+                this.setTitle(text);
+                this.el.appendChild(listView.render().el);
+                this.currentView = listView;
+                this.$el.find('.navback').show();
 
-                    break;
+                break;
             }
         },
 
-        styleSelected: function(styleModel) {
-            if(this.currentView) this.currentView.close();
+        styleSelected: function (styleModel) {
+            if (this.currentView) this.currentView.close();
             $(this.elementsList).hide();
 
             styleModel = styleModel[0];
 
-            this.currentView = new UIElementEditingView({ model: styleModel });
+            this.currentView = new UIElementEditingView({
+                model: styleModel
+            });
             this.el.appendChild(this.currentView.render().el);
 
             this.setTitle(styleModel.get('class_name'));
             this.currentView.setupAce();
         },
 
-        elementSelected: function(widgetModel) {
+        elementSelected: function (widgetModel) {
 
-            if(!this.expanded) return;
+            if (!this.expanded) return;
 
             var type = widgetModel.get('type');
-            if(widgetModel.isList()) {
+            if (widgetModel.isList()) {
                 type = "lists";
             }
             var className = widgetModel.get('className');
@@ -7876,8 +8032,8 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
             //this.styleSelected(styleModel);
         },
 
-        openThemePicker: function() {
-            if(this.currentView) this.currentView.close();
+        openThemePicker: function () {
+            if (this.currentView) this.currentView.close();
             $(this.elementsList).hide();
 
             this.currentView = new ThemesGalleryView();
@@ -7886,7 +8042,7 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
             this.$el.find('.navback').show();
         },
 
-        navBack: function() {
+        navBack: function () {
             if (this.currentView) this.currentView.close();
             this.expand();
             this.disableResizable();
@@ -7895,7 +8051,7 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
             this.$el.find('.navback').hide();
         },
 
-        setTitle: function(str) {
+        setTitle: function (str) {
             this.titleDiv.innerHTML = str;
         },
 
@@ -7904,56 +8060,56 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
             this.$el.resizable({
                 handles: "e",
                 iframeFix: true,
-                start: function(event, ui) {
-                    $('#page').css('pointer-events','none');
+                start: function (event, ui) {
+                    $('#page').css('pointer-events', 'none');
                     self.$el.removeClass('animated');
                 },
-                stop: function(event, ui) {
-                    $('#page').css('pointer-events','auto');
+                stop: function (event, ui) {
+                    $('#page').css('pointer-events', 'auto');
                     self.$el.addClass('animated');
                 }
             });
         },
 
         disableResizable: function (argument) {
-            if(this.$el.hasClass("ui-resizable")) {
-                this.$el.resizable( "destroy" );
+            if (this.$el.hasClass("ui-resizable")) {
+                this.$el.resizable("destroy");
                 this.el.style.width = '';
             }
         },
 
         expandExtra: function (argument) {
 
-            if(!this.$el.hasClass('expanded')){
+            if (!this.$el.hasClass('expanded')) {
                 this.el.className += ' expanded';
             }
 
-            if(!this.$el.hasClass('extra')) {
+            if (!this.$el.hasClass('extra')) {
                 this.el.className += ' extra';
             }
 
             this.expanded = true;
         },
 
-        expand: function() {
-            if(!this.$el.hasClass('expanded')) {
+        expand: function () {
+            if (!this.$el.hasClass('expanded')) {
                 this.el.className += ' expanded';
             }
 
-            if(this.$el.hasClass('extra')) {
+            if (this.$el.hasClass('extra')) {
                 this.$el.removeClass('extra');
             }
 
             this.expanded = true;
         },
 
-        hide: function() {
+        hide: function () {
             this.$el.removeClass('expanded');
             this.disableResizable();
             this.expanded = false;
         },
 
-        save: function() {
+        save: function () {
             var self = this;
             var json = this.model.serialize();
             var save_url = '/app/' + appId + '/uiestate/';
@@ -7977,11 +8133,11 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
                     uie_state: JSON.stringify(json)
                 },
                 statusCode: {
-                    200: function(data) {
+                    200: function (data) {
                         console.log('Saved.');
                         self.model.trigger('synced');
                     },
-                    500: function() {
+                    500: function () {
                         alert('Server Error');
                     }
                 },
@@ -7992,6 +8148,7 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
     });
 
     exports.CSSEditorView = CSSEditorView;
+
 });
 
 require.define("/css-editor/UIElementListView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -8116,7 +8273,7 @@ require.define("/css-editor/UIElementListView.js",function(require,module,export
             'submit .element-create-form': 'submitForm'
         },
 
-        initialize: function(UIElementColl, type) {
+        initialize: function (UIElementColl, type) {
             _.bindAll(this);
             this.type = type;
             this.collection = UIElementColl;
@@ -8124,14 +8281,14 @@ require.define("/css-editor/UIElementListView.js",function(require,module,export
             this.collection.bind('remove', this.removeUIE);
         },
 
-        render: function() {
+        render: function () {
             var self = this;
             var div = document.createElement('span');
             div.className = 'elems';
             this.elems = div;
             this.el.appendChild(this.elems);
 
-            this.collection.each(function(uieModel) {
+            this.collection.each(function (uieModel) {
                 uieModel.id = self.collection.length;
                 self.appendUIE(uieModel);
             });
@@ -8139,8 +8296,8 @@ require.define("/css-editor/UIElementListView.js",function(require,module,export
             var createBtn = document.createElement('span');
             var temp = [
                 '<div class="create-text">',
-                  '<img src="/static/img/add.png" class="span2 add-img">',
-                  '<h3 class="offset1">Create an element</span>',
+                '<img src="/static/img/add.png" class="span2 add-img">',
+                '<h3 class="offset1">Create an element</span>',
                 '</div>',
             ].join('\n');
             createBtn.innerHTML = _.template(temp, {});
@@ -8150,33 +8307,36 @@ require.define("/css-editor/UIElementListView.js",function(require,module,export
         },
 
 
-        showForm: function(e) {
+        showForm: function (e) {
             var root = {};
-            if (baseTags[this.type]) { root = baseTags[this.type][0]; }
+            if (baseTags[this.type]) {
+                root = baseTags[this.type][0];
+            }
             this.collection.push(root);
         },
 
-        submitForm: function(e) {
+        submitForm: function (e) {
             //alert("HEEEEY");
         },
 
-        appendUIE: function(uieModel) {
+        appendUIE: function (uieModel) {
             var newView = new UIElementView(uieModel);
             this.elems.appendChild(newView.render().el);
         },
 
-        removeUIE: function(uieModel) {
+        removeUIE: function (uieModel) {
             $('#' + uieModel.cid).remove();
         }
 
     });
 
     exports.UIElementListView = UIElementListView;
+
 });
 
 require.define("/css-editor/UIElementView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
-    
-    var UIElementEditingView = require('./UIElementEditingView');    
+
+    var UIElementEditingView = require('./UIElementEditingView');
 
     var UIElementView = Backbone.View.extend({
         el: null,
@@ -8189,7 +8349,7 @@ require.define("/css-editor/UIElementView.js",function(require,module,exports,__
             'keyup .class_name': 'classNameChaged'
         },
 
-        initialize: function(uieModel) {
+        initialize: function (uieModel) {
             _.bindAll(this);
 
             this.model = uieModel;
@@ -8199,7 +8359,7 @@ require.define("/css-editor/UIElementView.js",function(require,module,exports,__
             this.renderStyle();
         },
 
-        render: function() {
+        render: function () {
             this.el.id = 'elem-' + this.model.cid;
 
             var upperDiv = document.createElement('div');
@@ -8224,13 +8384,13 @@ require.define("/css-editor/UIElementView.js",function(require,module,exports,__
             return this;
         },
 
-        reRender: function(argument) {
+        reRender: function (argument) {
             this.tempNodeDiv.innerHTML = _.template(this.tempNode(), {
                 info: this.model.attributes
             });
         },
 
-        reRenderStyleTags: function(e) {
+        reRenderStyleTags: function (e) {
             var styleTag = document.getElementById(this.model.cid + '-' + 'style');
             styleTag.innerHTML = '#' + this.model.get('class_name') + '{' + this.model.get('style') + '}';
             var hoverTag = document.getElementById(this.model.cid + '-' + 'hover-style');
@@ -8239,7 +8399,7 @@ require.define("/css-editor/UIElementView.js",function(require,module,exports,__
             activeTag.innerHTML = '#' + this.model.get('class_name') + ':active {' + this.model.get('activeStyle') + '}';
         },
 
-        renderStyle: function() {
+        renderStyle: function () {
 
             var styleTag = document.createElement('style');
             styleTag.id = this.model.cid + '-' + 'style';
@@ -8258,7 +8418,7 @@ require.define("/css-editor/UIElementView.js",function(require,module,exports,__
             document.head.appendChild(activeStyleTag);
         },
 
-        removeUIE: function(e) {
+        removeUIE: function (e) {
             e.preventDefault();
             e.stopPropagation();
             var model = this.model;
@@ -8266,11 +8426,11 @@ require.define("/css-editor/UIElementView.js",function(require,module,exports,__
             $(this.el).remove();
         },
 
-        baseChanged: function() {
+        baseChanged: function () {
 
         },
 
-        toggleElement: function(e) {
+        toggleElement: function (e) {
             if (e.target.tagName == "INPUT") return;
             if (e.target.className.indexOf('ace_') === 0) return;
             console.log(e.target);
@@ -8285,7 +8445,7 @@ require.define("/css-editor/UIElementView.js",function(require,module,exports,__
             }
         },
 
-        expandElement: function() {
+        expandElement: function () {
             // this.isExpanded = true;
             // this.expandedView = new UIElementEditingView(this.model);
             // this.el.appendChild(this.expandedView.render().el);
@@ -8295,36 +8455,37 @@ require.define("/css-editor/UIElementView.js",function(require,module,exports,__
             this.model.collection.trigger('selected', [this.model]);
         },
 
-        shrinkElement: function() {
+        shrinkElement: function () {
             this.expandedView.close();
             this.isExpanded = false;
             this.el.style.height = '225px';
         },
 
-        classNameChaged: function(e) {
+        classNameChaged: function (e) {
             this.model.set('class_name', e.target.value);
         },
 
-        tempNode: function() {
+        tempNode: function () {
             return [
-              '<div class="element-node">',
-              '<<%= info.tagName %> ',
-              'id="<%= info.class_name %>" ',
-              '<% _(info.cons_attribs).each(function(val, key){ %>',
-              '<%= key %> = <%= val %>',
-              '<% }); %><% _(info.content_attribs).each(function(val, key){ %>',
-              '<%= key %> = <%= val %>',
-              '<% }); %>>',
-              '<% if(!info.isSingle) { %>',
-              '<%= info.content %></<%=info.tagName%>>',
-              '<% } %>',
-              '</div>'
+                '<div class="element-node">',
+                '<<%= info.tagName %> ',
+                'id="<%= info.class_name %>" ',
+                '<% _(info.cons_attribs).each(function(val, key){ %>',
+                '<%= key %> = <%= val %>',
+                '<% }); %><% _(info.content_attribs).each(function(val, key){ %>',
+                '<%= key %> = <%= val %>',
+                '<% }); %>>',
+                '<% if(!info.isSingle) { %>',
+                '<%= info.content %></<%=info.tagName%>>',
+                '<% } %>',
+                '</div>'
             ].join('\n');
         }
 
     });
 
     exports.UIElementView = UIElementView;
+
 });
 
 require.define("/css-editor/UIElementEditingView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -8332,7 +8493,7 @@ require.define("/css-editor/UIElementEditingView.js",function(require,module,exp
     require('../mixins/BackboneModal');
 
     var UIElementEditingView = Backbone.View.extend({
-        
+
         tagName: 'div',
         className: 'element-view',
 
@@ -8340,7 +8501,7 @@ require.define("/css-editor/UIElementEditingView.js",function(require,module,exp
             'click .delete-elem': 'deleteElement'
         },
 
-        initialize: function(options) {
+        initialize: function (options) {
             _.bindAll(this);
 
             this.model = options.model;
@@ -8350,7 +8511,7 @@ require.define("/css-editor/UIElementEditingView.js",function(require,module,exp
             this.model.bind('change:activeStyle', this.renderStyleTags);
         },
 
-        render: function() {
+        render: function () {
             var tempPane = [
                 '<div class="sect"><h4>Normal State</h4><div id="style-<%= cid %>" class="style style-editor" placeholder="Styling here..."></div></div>',
                 '<div class="sect"><h4>Hover State</h4><div id="hover-style-<%= cid %>" class="hover-style style-editor"></div></div>',
@@ -8367,13 +8528,13 @@ require.define("/css-editor/UIElementEditingView.js",function(require,module,exp
             return this;
         },
 
-        setupAce: function() {
+        setupAce: function () {
             console.log(this.el);
             console.log($("#style-" + this.model.cid));
             var self = this;
 
             console.trace();
-            setTimeout(function() {
+            setTimeout(function () {
 
                 var cid = self.model.cid;
                 console.log(cid);
@@ -8399,18 +8560,18 @@ require.define("/css-editor/UIElementEditingView.js",function(require,module,exp
 
         },
 
-        deleteElement: function() {
+        deleteElement: function () {
             var self = this;
             this.model.collection.remove(self.model.cid);
             this.closeModal();
         },
 
-        styleChanged: function(e) {
+        styleChanged: function (e) {
             var value = this.styleEditor.getValue();
             this.model.set('style', value);
         },
 
-        hoverStyleChanged: function(e) {
+        hoverStyleChanged: function (e) {
             var value = this.hoverStyleEditor.getValue();
             console.log(value);
             console.log("YOLO");
@@ -8418,7 +8579,7 @@ require.define("/css-editor/UIElementEditingView.js",function(require,module,exp
             this.model.set('hoverStyle', value);
         },
 
-        activeStyleChanged: function(e) {
+        activeStyleChanged: function (e) {
             var value = this.activeStyleEditor.getValue();
             this.model.set('activeStyle', value);
         }
@@ -8426,6 +8587,7 @@ require.define("/css-editor/UIElementEditingView.js",function(require,module,exp
     });
 
     exports.UIElementEditingView = UIElementEditingView;
+
 });
 
 require.define("/css-editor/StaticsEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -8438,12 +8600,12 @@ require.define("/css-editor/StaticsEditorView.js",function(require,module,export
             'click .static-file': 'clickedStatic'
         },
 
-        initialize: function(themeModel) {
+        initialize: function (themeModel) {
             _.bindAll(this);
             this.model = themeModel;
         },
 
-        render: function() {
+        render: function () {
 
             var temp = [
                 '<div id="theme-statics" class="row"></div>',
@@ -8457,27 +8619,27 @@ require.define("/css-editor/StaticsEditorView.js",function(require,module,export
             return this;
         },
 
-        uploadStatic: function() {
+        uploadStatic: function () {
             var self = this;
             util.filepicker.openFilePick(this.staticsAdded, this, appId);
         },
 
-        appendStaticFile: function(file) {
+        appendStaticFile: function (file) {
             this.staticsList.append('<div id="themestatic-' + file.id + '" class="static-file"><img src="' + file.url + '"><p class="name">' + file.name + '</p><a href="#' + file.id + '" class="btn btn-danger remove">Delete</a></div>');
         },
 
-        deleteStaticFile: function(e) {
+        deleteStaticFile: function (e) {
             var self = this;
             var imgNode = e.target.parentNode;
             var id = parseInt(imgNode.id.replace('themestatic-', ''), 10);
             $.ajax({
                 type: 'POST',
                 url: url + '/static/' + id + '/delete/',
-                success: function() {
+                success: function () {
                     console.log('successfully deleted!');
                     util.get('theme-statics').removeChild(imgNode);
                 },
-                error: function(jqxhr, textStatus) {
+                error: function (jqxhr, textStatus) {
                     message = "Error deleting file";
                     if (textStatus) {
                         message += ': ' + textStatus;
@@ -8491,14 +8653,14 @@ require.define("/css-editor/StaticsEditorView.js",function(require,module,export
         },
 
 
-        staticsAdded: function(files, self) {
-            _(files).each(function(file) {
+        staticsAdded: function (files, self) {
+            _(files).each(function (file) {
                 file.name = file.filename;
                 self.appendStaticFile(file);
             });
         },
 
-        clickedStatic: function(e) {
+        clickedStatic: function (e) {
             var $el = $(e.currentTarget).find('img');
             link = $el.attr('src');
             util.copyToClipboard(link);
@@ -8507,6 +8669,7 @@ require.define("/css-editor/StaticsEditorView.js",function(require,module,export
     });
 
     exports.StaticsEditorView = StaticsEditorView;
+
 });
 
 require.define("/css-editor/BaseCSSEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -8514,18 +8677,17 @@ require.define("/css-editor/BaseCSSEditorView.js",function(require,module,export
     var BaseCSSEditorView = Backbone.View.extend({
 
         className: 'elements basecss',
-        events: {
-        },
+        events: {},
 
         doneTypingInterval: 3000,
 
-        initialize: function(themeModel) {
+        initialize: function (themeModel) {
             _.bindAll(this);
             this.model = themeModel;
             this.typingTimer = null;
         },
 
-        render: function() {
+        render: function () {
             var temp = [
                 '<div class="base-css" id="base-css" style="height:100%; width:100%;">'
             ].join('\n');
@@ -8533,26 +8695,27 @@ require.define("/css-editor/BaseCSSEditorView.js",function(require,module,export
             return this;
         },
 
-        setupAce: function() {
+        setupAce: function () {
             this.editor = ace.edit("base-css");
             this.editor.getSession().setMode("ace/mode/css");
             this.editor.setValue(this.model.get('basecss'), -1);
             this.editor.on("change", this.keyup);
         },
 
-        keyup: function(e) {
-            if(this.typingTimer) clearTimeout(this.typingTimer);
+        keyup: function (e) {
+            if (this.typingTimer) clearTimeout(this.typingTimer);
             this.typingTimer = setTimeout(this.baseChanged, this.doneTypingInterval);
         },
 
-        baseChanged: function(e) {
-          var currentCSS = this.editor.getValue();
-          this.model.set('basecss', currentCSS);
+        baseChanged: function (e) {
+            var currentCSS = this.editor.getValue();
+            this.model.set('basecss', currentCSS);
         }
 
     });
 
     exports.BaseCSSEditorView = BaseCSSEditorView;
+
 });
 
 require.define("/css-editor/FontEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -8562,12 +8725,12 @@ require.define("/css-editor/FontEditorView.js",function(require,module,exports,_
         className: 'elements fonts',
         events: {},
 
-        initialize: function(themeModel) {
+        initialize: function (themeModel) {
             _.bindAll(this);
             this.model = themeModel;
         },
 
-        render: function() {
+        render: function () {
             var temp = [
                 '<input type="text" class="font-selector">',
                 '<ul class="fonts hoff2"></ul>',
@@ -8577,10 +8740,10 @@ require.define("/css-editor/FontEditorView.js",function(require,module,exports,_
 
 
             var tempFont = [
-              '<li class="row">',
+                '<li class="row">',
                 '<span class="remove" data-cid="<%= cid %>">×</span>',
                 '<span class="font" style="font-family:<%= font %>"><%= font %></span>',
-              '</li>'
+                '</li>'
             ].join('\n');
 
             var self = this;
@@ -8588,7 +8751,7 @@ require.define("/css-editor/FontEditorView.js",function(require,module,exports,_
             fontStyles.type = "text/css";
 
             // add font to page style, and to font list
-            this.model.get('fonts').each(function(font) {
+            this.model.get('fonts').each(function (font) {
 
                 fontStyles.innerHTML += '@import url("http://fonts.googleapis.com/css?family=' + font.get('name') + ':400,700,900,400italic");\n';
                 this.$el.find('.fonts').append(_.template(tempFont, {
@@ -8599,11 +8762,11 @@ require.define("/css-editor/FontEditorView.js",function(require,module,exports,_
             }, this);
             document.body.appendChild(fontStyles);
 
-            console.log( $('.font-selector'));
+            console.log($('.font-selector'));
             // setup font event handlers
-            this.$el.find('.font-selector').fontselect().change(function() {
+            this.$el.find('.font-selector').fontselect().change(function () {
                 var value = $(this).val();
-                
+
                 if (self.model.get('fonts').where({
                     name: value
                 }).length > 0) {
@@ -8621,7 +8784,7 @@ require.define("/css-editor/FontEditorView.js",function(require,module,exports,_
 
             });
 
-            this.$el.find('.fonts').on('click', 'li .remove', function(e) {
+            this.$el.find('.fonts').on('click', 'li .remove', function (e) {
                 var cid = e.currentTarget.dataset.cid;
                 self.model.get('fonts').remove(cid);
                 console.log(self.model.get('fonts').serialize());
@@ -8631,7 +8794,7 @@ require.define("/css-editor/FontEditorView.js",function(require,module,exports,_
             return this;
         },
 
-        baseChanged: function(e) {
+        baseChanged: function (e) {
             var currentCSS = this.editor.getValue();
             this.model.set('basecss', currentCSS);
         }
@@ -8639,128 +8802,129 @@ require.define("/css-editor/FontEditorView.js",function(require,module,exports,_
     });
 
     exports.FontEditorView = FontEditorView;
+
 });
 
-require.define("/css-editor/ThemesGalleryView.js",function(require,module,exports,__dirname,__filename,process,global){
-    'use strict';
+require.define("/css-editor/ThemesGalleryView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
-    var ThemeDisplayView = require('./ThemeDisplayView');
+var ThemeDisplayView = require('./ThemeDisplayView');
 
-    var ThemesGalleryView = Backbone.View.extend({
-        css: 'gallery',
-        events: {
-            'mouseover  .theme': 'previewTheme',
-            'mouseleave .theme': 'revertTheme',
-            'click .load-theme-btn': 'loadTheme'
-        },
+var ThemesGalleryView = Backbone.View.extend({
+    css: 'gallery',
+    events: {
+        'mouseover  .theme': 'previewTheme',
+        'mouseleave .theme': 'revertTheme',
+        'click .load-theme-btn': 'loadTheme'
+    },
 
-        className: 'gallery-view',
-        currentPreview: 0,
+    className: 'gallery-view',
+    currentPreview: 0,
 
-        initialize: function() {
-            this.title = "Themes";
-        },
+    initialize: function () {
+        this.title = "Themes";
+    },
 
-        render: function() {
-            this.listView = document.createElement('ul');
-            this.listView.className = 'theme-gallery';
+    render: function () {
+        this.listView = document.createElement('ul');
+        this.listView.className = 'theme-gallery';
 
-            var template = [
-                '<li class="theme" class="theme-item" id="theme-<%= id %>">',
-                '<h2><%= name %></h2>',
-                '<p class="designed-by">Designed by <%= designer %></p>',
-                '<div class="img"><img src="<%= image %>"><div class="details" id="theme-prev-<%= id %>">Previewing</div></div>',
-                '<div id="theme-btn-<%= id %>" class="btn load-theme-btn">Load Theme</div>',
-                '</li>'
-            ].join('\n');
+        var template = [
+            '<li class="theme" class="theme-item" id="theme-<%= id %>">',
+            '<h2><%= name %></h2>',
+            '<p class="designed-by">Designed by <%= designer %></p>',
+            '<div class="img"><img src="<%= image %>"><div class="details" id="theme-prev-<%= id %>">Previewing</div></div>',
+            '<div id="theme-btn-<%= id %>" class="btn load-theme-btn">Load Theme</div>',
+            '</li>'
+        ].join('\n');
 
-            _(themes).each(function(theme, index) {
-                if (!theme.name) {
-                    theme.name = "Theme " + index;
-                }
-                this.listView.innerHTML += _.template(template, theme);
-            }, this);
+        _(themes).each(function (theme, index) {
+            if (!theme.name) {
+                theme.name = "Theme " + index;
+            }
+            this.listView.innerHTML += _.template(template, theme);
+        }, this);
 
-            $(this.el).append(this.listView);
+        $(this.el).append(this.listView);
 
-            return this;
-        },
+        return this;
+    },
 
-        previewTheme: function(e) {
-            var themeId = String(e.currentTarget.id).replace('theme-','');
+    previewTheme: function (e) {
+        var themeId = String(e.currentTarget.id).replace('theme-', '');
 
-            if(this.currentPreview == themeId) return;
-            $('.details.active').removeClass('active');
-            var url = "/theme/" + themeId + '/sheet.css';
-            this.currentPreview = themeId;
-            v1.view.iframeProxy.addTempStyleSheet(url, function() {
-                $('#theme-prev-' + themeId).addClass('active');
-            });
-        },
+        if (this.currentPreview == themeId) return;
+        $('.details.active').removeClass('active');
+        var url = "/theme/" + themeId + '/sheet.css';
+        this.currentPreview = themeId;
+        v1.view.iframeProxy.addTempStyleSheet(url, function () {
+            $('#theme-prev-' + themeId).addClass('active');
+        });
+    },
 
-        revertTheme: function() {
-            var self = this;
-            this.currentPreview = null;
-            setTimeout(function() {
-                if(self.currentPreview === null) {
-                    v1.view.iframeProxy.removeTempStyleSheet();
-                }
-            }, 200);
-        },
+    revertTheme: function () {
+        var self = this;
+        this.currentPreview = null;
+        setTimeout(function () {
+            if (self.currentPreview === null) {
+                v1.view.iframeProxy.removeTempStyleSheet();
+            }
+        }, 200);
+    },
 
-        loadTheme: function(e) {
-            $('.load-theme-btn').html("Load Theme");
-            var themeId = e.currentTarget.id.replace('theme-btn-','');
-            e.currentTarget.innerHTML = "Loading";
-            e.currentTarget.appendChild(util.threeDots().el);
+    loadTheme: function (e) {
+        $('.load-theme-btn').html("Load Theme");
+        var themeId = e.currentTarget.id.replace('theme-btn-', '');
+        e.currentTarget.innerHTML = "Loading";
+        e.currentTarget.appendChild(util.threeDots().el);
 
-            $.ajax({
-                type: "POST",
-                url: '/theme/' + themeId + '/info/',
-                success: function(data) {
-                    var info = data.themeInfo;
-                    var url = '/app/' + appId + '/uiestate/';
-                    var newState = uieState;
-                    newState = _.extend(uieState, this.theme);
+        $.ajax({
+            type: "POST",
+            url: '/theme/' + themeId + '/info/',
+            success: function (data) {
+                var info = data.themeInfo;
+                var url = '/app/' + appId + '/uiestate/';
+                var newState = uieState;
+                newState = _.extend(uieState, this.theme);
 
-                    var self = this;
-                    $.ajax({
-                        type: "POST",
-                        url: url,
-                        data: {
-                            uie_state: JSON.stringify(newState)
-                        },
-                        success: function(data) {
-                            e.currentTarget.innerHTML = "Loaded!";
-                            //self.$el.find('.load').append('<div class="hoff1"><h4 class="text-success"><strong>Loaded!</strong></h4></div>');
-                        }
-                    });
+                var self = this;
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: {
+                        uie_state: JSON.stringify(newState)
+                    },
+                    success: function (data) {
+                        e.currentTarget.innerHTML = "Loaded!";
+                        //self.$el.find('.load').append('<div class="hoff1"><h4 class="text-success"><strong>Loaded!</strong></h4></div>');
+                    }
+                });
 
-                    /* Load Statics */
-                    $.ajax({
-                        type: "GET",
-                        url: '/theme/' + info.id + '/static/',
-                        success: function(data) {
-                            _(data).each(function(static_file) {
-                                $.ajax({
-                                    type: "POST",
-                                    url: '/app/' + appId + '/static/',
-                                    data: JSON.stringify(static_file),
-                                    success: function(data) {}
-                                });
+                /* Load Statics */
+                $.ajax({
+                    type: "GET",
+                    url: '/theme/' + info.id + '/static/',
+                    success: function (data) {
+                        _(data).each(function (static_file) {
+                            $.ajax({
+                                type: "POST",
+                                url: '/app/' + appId + '/static/',
+                                data: JSON.stringify(static_file),
+                                success: function (data) {}
                             });
-                        }
-                    });
-                },
-                dataType: "JSON"
-            });
+                        });
+                    }
+                });
+            },
+            dataType: "JSON"
+        });
 
 
-        }
+    }
 
-    });
+});
 
-    exports.ThemesGalleryView = ThemesGalleryView;
+exports.ThemesGalleryView = ThemesGalleryView;
+
 });
 
 require.define("/css-editor/ThemeDisplayView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -8774,7 +8938,7 @@ require.define("/css-editor/ThemeDisplayView.js",function(require,module,exports
             },
             theme: null,
 
-            initialize: function(data) {
+            initialize: function (data) {
                 _.bindAll(this);
 
                 this.info = data.themeInfo;
@@ -8782,7 +8946,7 @@ require.define("/css-editor/ThemeDisplayView.js",function(require,module,exports
                 this.render();
             },
 
-            render: function() {
+            render: function () {
                 var template = ['<h2 class="span30"><%= name %></h2>',
                     '<p class="designed-by hoff1">Designed by <%= designer %></p>',
                     '<div class="span12"><img src="<%= image %>"></div>',
@@ -8791,7 +8955,7 @@ require.define("/css-editor/ThemeDisplayView.js",function(require,module,exports
                 this.el.innerHTML = _.template(template, this.info);
             },
 
-            loadTheme: function() {
+            loadTheme: function () {
                 var url = '/app/' + appId + '/uiestate/';
                 var newState = uieState;
                 if (this.info.web_or_mobile == "M") {
@@ -8808,9 +8972,9 @@ require.define("/css-editor/ThemeDisplayView.js",function(require,module,exports
                     data: {
                         uie_state: JSON.stringify(newState)
                     },
-                    success: function(data) {
+                    success: function (data) {
                         self.$el.find('.load').append('<div class="hoff1"><h4 class="text-success"><strong>Loaded!</strong></h4></div>');
-                        setTimeout(function() {
+                        setTimeout(function () {
                             self.closeModal();
                         }, 800);
                     }
@@ -8821,21 +8985,21 @@ require.define("/css-editor/ThemeDisplayView.js",function(require,module,exports
                 $.ajax({
                     type: "GET",
                     url: '/theme/' + self.info.id + '/static/',
-                    success: function(data) {
-                        _(data).each(function(static_file) {
+                    success: function (data) {
+                        _(data).each(function (static_file) {
                             $.ajax({
                                 type: "POST",
                                 url: '/app/' + appId + '/static/',
                                 data: JSON.stringify(static_file),
-                                success: function(data) {}
+                                success: function (data) {}
                             });
                         });
                     }
                 });
             },
 
-            switchToV2: function() {
-                v1State.get('pages').each(function(pageM) {
+            switchToV2: function () {
+                v1State.get('pages').each(function (pageM) {
                     pageM.get('navbar').set('version', 2);
                     pageM.get('footer').set('version', 2);
                 });
@@ -8847,6 +9011,7 @@ require.define("/css-editor/ThemeDisplayView.js",function(require,module,exports
     );
 
     exports.ThemeDisplayView = ThemeDisplayView;
+
 });
 
 require.define("/template_editor/SectionShadowView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -8856,17 +9021,17 @@ require.define("/template_editor/SectionShadowView.js",function(require,module,e
         widgetsContainer: null,
 
         events: {
-            'mouseover'       : 'hovered',
-            'mouseup'         : 'hovered',
-            'mouseover .ycol' : 'hoveredColumn',
-            'mouseup .ycol'   : 'hoveredColumn'
+            'mouseover': 'hovered',
+            'mouseup': 'hovered',
+            'mouseover .ycol': 'hoveredColumn',
+            'mouseup .ycol': 'hoveredColumn'
         },
 
         className: "section-shadow-view",
 
         subviews: [],
 
-        initialize: function(sectionCollection) {
+        initialize: function (sectionCollection) {
             _.bindAll(this);
 
             this.collection = sectionCollection;
@@ -8875,7 +9040,7 @@ require.define("/template_editor/SectionShadowView.js",function(require,module,e
             this.listenTo(this.collection, 'remove', this.removeSectionShadow);
         },
 
-        render: function() {
+        render: function () {
 
             this.shadowFrame = document.getElementById('shadow-frame');
             var iframe = v1.currentApp.view.iframe;
@@ -8889,7 +9054,7 @@ require.define("/template_editor/SectionShadowView.js",function(require,module,e
             return this;
         },
 
-        renderSectionShadow: function(sectionModel) {
+        renderSectionShadow: function (sectionModel) {
 
             var $el = $(this.iframeDoc).find('[data-cid="' + sectionModel.cid + '"]');
             var ycols = $el.find('[data-column]');
@@ -8903,7 +9068,7 @@ require.define("/template_editor/SectionShadowView.js",function(require,module,e
             // overallShadowEl.className = "section-shodow-wrapper";
 
             /* DOM el for each column */
-            ycols.each(function() {
+            ycols.each(function () {
                 var colCid = this.dataset.cid;
                 var shadowEl = util.addShadow(this, document.getElementById('page-wrapper'), self.iframe, self.iframeDoc);
                 shadowEl.className = "section-shadow";
@@ -8912,23 +9077,23 @@ require.define("/template_editor/SectionShadowView.js",function(require,module,e
 
                 $(shadowEl).droppable({
                     accept: ".ui-draggable",
-                    drop: function( event, ui ) {
+                    drop: function (event, ui) {
 
                         var extraData = {};
 
                         var type = $(ui.draggable).data("type");
 
                         // try {
-                            if($(ui.draggable).data("extraData")) {
-                                extraData = $(ui.draggable).data("extraData");
-                            }
+                        if ($(ui.draggable).data("extraData")) {
+                            extraData = $(ui.draggable).data("extraData");
+                        }
 
-                            if($(ui.draggable).data("genpath")) {
-                                sectionModel.get('columns').get(colCid).addElementWithPath(type, $(ui.draggable).data("genpath"), extraData);
-                                return;
-                            }
+                        if ($(ui.draggable).data("genpath")) {
+                            sectionModel.get('columns').get(colCid).addElementWithPath(type, $(ui.draggable).data("genpath"), extraData);
+                            return;
+                        }
 
-                            sectionModel.get('columns').get(colCid).addElement(type, extraData);
+                        sectionModel.get('columns').get(colCid).addElement(type, extraData);
 
                         // }
                         // catch(e) {
@@ -8938,10 +9103,10 @@ require.define("/template_editor/SectionShadowView.js",function(require,module,e
 
                         // }
                     },
-                    over: function() {
+                    over: function () {
                         shadowEl.className = "section-shadow active";
                     },
-                    out: function() {
+                    out: function () {
                         shadowEl.className = "section-shadow";
                     }
                 });
@@ -8951,29 +9116,29 @@ require.define("/template_editor/SectionShadowView.js",function(require,module,e
 
         },
 
-        reRenderSectionShadow: function() {
-            _.each(this.shadows, function(el) {
+        reRenderSectionShadow: function () {
+            _.each(this.shadows, function (el) {
                 $(el).remove();
             });
             this.shadows = [];
             this.render();
         },
 
-        removeSectionShadow: function(sectionModel) {
+        removeSectionShadow: function (sectionModel) {
             // TODO: Fix this
         },
 
-        displayColumnShadows: function() {
+        displayColumnShadows: function () {
             this.reRenderSectionShadow();
             $(this.shadowFrame).show();
-            _.each(this.shadows, function(shadowEl) {
+            _.each(this.shadows, function (shadowEl) {
                 $(shadowEl).show();
             });
         },
 
-        hideColumnShadows: function() {
+        hideColumnShadows: function () {
             $(this.shadowFrame).hide();
-            _.each(this.shadows, function(shadowEl) {
+            _.each(this.shadows, function (shadowEl) {
                 $(shadowEl).hide();
             });
         }
@@ -8984,54 +9149,54 @@ require.define("/template_editor/SectionShadowView.js",function(require,module,e
 
 });
 
-require.define("/template_editor/SectionEditorsView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
-    var SectionEditorView = require('./SectionEditorView').SectionEditorView;
+require.define("/template_editor/SectionEditorsView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
+var SectionEditorView = require('./SectionEditorView').SectionEditorView;
 
-    var SectionEditorsView = Backbone.View.extend({
+var SectionEditorsView = Backbone.View.extend({
 
-        el: document.body,
+    el: document.body,
 
-        widgetsContainer: null,
+    widgetsContainer: null,
 
-        events: {
-            'click #addNewSectionTitle' : 'showSectionOptions',
-            'click .section-option': 'selectSectionLayout'
-        },
+    events: {
+        'click #addNewSectionTitle': 'showSectionOptions',
+        'click .section-option': 'selectSectionLayout'
+    },
 
-        optionsHidden : true,
+    optionsHidden: true,
 
-        subviews: [],
+    subviews: [],
 
-        initialize: function(sectionsCollection) {
-            _.bindAll(this);
+    initialize: function (sectionsCollection) {
+        _.bindAll(this);
 
-            var self = this;
-            this.subviews = [];
+        var self = this;
+        this.subviews = [];
 
-            this.sectionsCollection = sectionsCollection;
-            this.listenTo(this.sectionsCollection, 'add', this.placeNewSectionEditor);
-            this.editorViews = [];
-        },
+        this.sectionsCollection = sectionsCollection;
+        this.listenTo(this.sectionsCollection, 'add', this.placeNewSectionEditor);
+        this.editorViews = [];
+    },
 
-        render: function() {
-            this.pageWrapper = document.getElementById('page-wrapper');
-            var iframe = v1.currentApp.view.iframe;
-            this.iframe = iframe;
-            this.iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    render: function () {
+        this.pageWrapper = document.getElementById('page-wrapper');
+        var iframe = v1.currentApp.view.iframe;
+        this.iframe = iframe;
+        this.iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
 
-            this.sectionsCollection.each(this.placeNewSectionEditor);
-        },
+        this.sectionsCollection.each(this.placeNewSectionEditor);
+    },
 
-        placeNewSectionEditor: function(sectionModel) {
-            var sectionEditorView = new SectionEditorView(sectionModel).render();
-            this.pageWrapper.appendChild(sectionEditorView.el);
+    placeNewSectionEditor: function (sectionModel) {
+        var sectionEditorView = new SectionEditorView(sectionModel).render();
+        this.pageWrapper.appendChild(sectionEditorView.el);
 
-            this.editorViews.push(sectionEditorView);
+        this.editorViews.push(sectionEditorView);
 
-        }
-    });
+    }
+});
 
-    exports.SectionEditorsView = SectionEditorsView;
+exports.SectionEditorsView = SectionEditorsView;
 
 });
 
@@ -9042,20 +9207,20 @@ require.define("/template_editor/SectionEditorView.js",function(require,module,e
     var SectionEditorView = Backbone.View.extend({
 
         events: {
-            'keyup .class_name'     : 'classNameChaged',
-            'click .remove-section' : 'removeSection',
-            'click .settings'       : 'openSettingsView',
-            'click .section-up'     : 'moveSectionUp',
-            'click .section-down'   : 'moveSectionDown',
+            'keyup .class_name': 'classNameChaged',
+            'click .remove-section': 'removeSection',
+            'click .settings': 'openSettingsView',
+            'click .section-up': 'moveSectionUp',
+            'click .section-down': 'moveSectionDown',
             'click .dropdown-toggle': 'toggleDropdown',
-            'mouseover'             : 'menuHovered',
-            'mouseout'              : 'menuUnhovered'
+            'mouseover': 'menuHovered',
+            'mouseout': 'menuUnhovered'
         },
 
         className: "section-editor-view",
         isActive: true,
 
-        initialize: function(sectionModel) {
+        initialize: function (sectionModel) {
             _.bindAll(this);
             this.model = sectionModel;
             this.listenTo(this.model, 'hovered', this.hovered);
@@ -9063,22 +9228,23 @@ require.define("/template_editor/SectionEditorView.js",function(require,module,e
             this.listenTo(this.model, 'remove', this.close);
         },
 
-        render: function() {
+        render: function () {
             var template = [
-                    '<div class="btn-group">',
-                        '<div class="section-editor-button">',
-                            '<div class="dropdown-toggle"><img width="24" class="icon" src="' + STATIC_URL + 'img/edit.png"></div>',
-                            '<div class="section-up move">▲</div>',
-                            '<div class="section-down move">▼</div>',
-                        '</div>',
-                        '<ul class="section-editor-menu animated">',
-                            '<div class="top-arrow arw"></div>',
-     
-                            '<li><a><input type="text" class="class_name" value="<%= className %>" placeholder="Class Name"></a></li>',
-                            '<li><span class="option-button delete-button tt remove-section"></span><div class="option-button settings"></div></li>',
-                            // '<li class="remove-section"><a>Remove Section</a></li>',
-                        '</ul>',
-                    '</div>'].join('');
+                '<div class="btn-group">',
+                '<div class="section-editor-button">',
+                '<div class="dropdown-toggle"><img width="24" class="icon" src="' + STATIC_URL + 'img/edit.png"></div>',
+                '<div class="section-up move">▲</div>',
+                '<div class="section-down move">▼</div>',
+                '</div>',
+                '<ul class="section-editor-menu animated">',
+                '<div class="top-arrow arw"></div>',
+
+                '<li><a><input type="text" class="class_name" value="<%= className %>" placeholder="Class Name"></a></li>',
+                '<li><span class="option-button delete-button tt remove-section"></span><div class="option-button settings"></div></li>',
+                // '<li class="remove-section"><a>Remove Section</a></li>',
+                '</ul>',
+                '</div>'
+            ].join('');
 
             var data = this.model.toJSON();
             data.className = data.className || "";
@@ -9103,7 +9269,7 @@ require.define("/template_editor/SectionEditorView.js",function(require,module,e
             return this;
         },
 
-        renderShadow: function() {
+        renderShadow: function () {
 
             this.shadowEl = util.addShadow(this.$sectionEl[0], document.getElementById('page-wrapper'), this.iframe, this.iframeDoc);
             this.shadowEl.className = "section-shadow";
@@ -9112,19 +9278,18 @@ require.define("/template_editor/SectionEditorView.js",function(require,module,e
 
         },
 
-        positionShadow: function() {
+        positionShadow: function () {
             this.$sectionEl = $(this.iframeDoc).find('[data-cid="' + this.model.cid + '"]');
             var positionRightTop = util.getRightTop(this.$sectionEl[0], document.getElementById('page-wrapper'), this.iframe, this.iframeDoc);
             this.shadowEl.style.top = (positionRightTop.top) + "px";
             this.shadowEl.style.height = this.$sectionEl.outerHeight() + 'px';
         },
 
-        toggleDropdown: function() {
+        toggleDropdown: function () {
             if (this.expanded) {
                 this.$menu.hide();
                 this.expanded = false;
-            }
-            else {
+            } else {
                 this.$menu.addClass('fadeInUp');
                 this.$menu.show();
                 this.$el.find('.class_name').focus();
@@ -9132,7 +9297,7 @@ require.define("/template_editor/SectionEditorView.js",function(require,module,e
             }
         },
 
-        setPosition: function() {
+        setPosition: function () {
             var $el = $(this.iframeDoc).find('[data-cid="' + this.model.cid + '"]');
             var el = $el[0];
 
@@ -9141,20 +9306,20 @@ require.define("/template_editor/SectionEditorView.js",function(require,module,e
             this.el.style.top = (positionRightTop.top + 15) + 'px';
         },
 
-        classNameChaged: function(e) {
+        classNameChaged: function (e) {
             var value = e.currentTarget.value;
             this.model.set('className', value);
         },
 
-        openSettingsView: function() {
+        openSettingsView: function () {
             new WidgetSettingsView(this.model).render();
             this.isActive = true;
         },
 
-        moveSectionUp: function() {
+        moveSectionUp: function () {
             var fromInd = _.indexOf(this.model.collection.models, this.model);
             var toInd = fromInd - 1;
-            if(fromInd == 0) return;
+            if (fromInd == 0) return;
             this.model.collection.arrangeSections(fromInd, toInd);
             this.setPosition();
             this.positionShadow();
@@ -9163,47 +9328,47 @@ require.define("/template_editor/SectionEditorView.js",function(require,module,e
         moveSectionDown: function () {
             var fromInd = _.indexOf(this.model.collection.models, this.model);
             var toInd = fromInd + 1;
-            if(this.model.collection.models.length == toInd) return;
+            if (this.model.collection.models.length == toInd) return;
             this.model.collection.arrangeSections(fromInd, toInd);
             this.setPosition();
             this.positionShadow();
         },
 
-        removeSection: function() {
+        removeSection: function () {
             this.model.collection.remove(this.model);
         },
 
-        menuHovered: function() {
+        menuHovered: function () {
             this.positionShadow();
             this.$shadowView.show();
             this.isActive = true;
         },
 
-        menuUnhovered: function() {
+        menuUnhovered: function () {
             this.isActive = false;
             var self = this;
-            var timer = setTimeout(function() {
-            	console.log(self.isActive);
-            	if (!self.isActive) {
-            		self.$shadowView.hide();
-            	}
+            var timer = setTimeout(function () {
+                console.log(self.isActive);
+                if (!self.isActive) {
+                    self.$shadowView.hide();
+                }
 
-            	clearTimeout(timer);
+                clearTimeout(timer);
             }, 600);
         },
 
-        hovered: function() {
+        hovered: function () {
             this.setPosition();
             this.$el.show();
         },
 
-        unhovered: function() {
+        unhovered: function () {
             this.$el.hide();
             this.$menu.hide();
             this.expanded = false;
         },
 
-        close: function() {
+        close: function () {
             this.$shadowView.remove();
             SectionEditorView.__super__.close.call(this);
         }
@@ -9211,205 +9376,206 @@ require.define("/template_editor/SectionEditorView.js",function(require,module,e
     });
 
     exports.SectionEditorView = SectionEditorView;
+
 });
 
 require.define("/template_editor/editor-templates.js",function(require,module,exports,__dirname,__filename,process,global){var Templates = {};
 
 Templates.tempMeta = [
-  '<ul class="meta" style="display:none;">',
+    '<ul class="meta" style="display:none;">',
     '<li><img class="delete" src="/static/img/delete-icon.png"></li>',
     '<li><img class="delete" src="/static/img/delete-icon.png"></li>',
-  '</ul>'
+    '</ul>'
 ].join('\n');
 
 
 Templates.tempNode = [
-  '<<%= element.tagName %> ',
-  'class = "<%= element.class_name %>" ',
-  '<% _(element.cons_attribs).each(function(val, key) { %>',
-  '<%=key%>="<%=val%>"<% }); %> ',
-  '<% _(element.content_attribs).each(function(val, key) { %>',
-  '<%=key%>="<%=val%>"<% }); %>> ',
-  '<% if(!element.isSingle) { %>',
-  '<%= element.content %>',
-  '</<%= element.tagName %>>',
-  '<% }; %>'
+    '<<%= element.tagName %> ',
+    'class = "<%= element.class_name %>" ',
+    '<% _(element.cons_attribs).each(function(val, key) { %>',
+    '<%=key%>="<%=val%>"<% }); %> ',
+    '<% _(element.content_attribs).each(function(val, key) { %>',
+    '<%=key%>="<%=val%>"<% }); %>> ',
+    '<% if(!element.isSingle) { %>',
+    '<%= element.content %>',
+    '</<%= element.tagName %>>',
+    '<% }; %>'
 ].join('');
 
 Templates.NavbarEditor = [
-  '<div>',
+    '<div>',
     '<div class="clone">Click here to clone navigation bar from another page.</div>',
     '<div class="hoff1">',
-      '<h4 class="offset1">Main Title</h4><input type="text" name="edit-brandName" class="span16" style="float:none;" id="edit-brandname" value="<%= brandName %>">',
+    '<h4 class="offset1">Main Title</h4><input type="text" name="edit-brandName" class="span16" style="float:none;" id="edit-brandname" value="<%= brandName %>">',
     '</div>',
     '<hr>',
     '<h4 class="offset1">Links</h4>',
     '<div class="links-list hoff1">',
-      '<ul id="link-editors"></ul>',
-      '<div class="well well-small add-link">',
-      'Add Link',
-      '</div>',
+    '<ul id="link-editors"></ul>',
+    '<div class="well well-small add-link">',
+    'Add Link',
     '</div>',
-  '</div>'
+    '</div>',
+    '</div>'
 ].join('\n');
 
 Templates.FooterEditor = [
-  '<div>',
+    '<div>',
     '<div class="clone">Click here to clone footer from another page.</div>',
     '<div class="hoff1">',
-      '<h4 class="offset1">Custom Footer Text</h4><input type="text" name="edit-customText" class="span16" style="float:none;" id="edit-customText" value="<%= customText %>">',
+    '<h4 class="offset1">Custom Footer Text</h4><input type="text" name="edit-customText" class="span16" style="float:none;" id="edit-customText" value="<%= customText %>">',
     '</div>',
     '<hr>',
     '<h4 class="offset1">Links</h4>',
     '<div class="links-list hoff1">',
-      '<ul id="link-editors"></ul>',
-      '<div class="well well-small add-link">',
-      'Add Link',
-      '</div>',
+    '<ul id="link-editors"></ul>',
+    '<div class="well well-small add-link">',
+    'Add Link',
     '</div>',
-  '</div>'
+    '</div>',
+    '</div>'
 ].join('\n');
 
 Templates.LinkEditor = [
-  '<div class="row">',
+    '<div class="row">',
     '<div class="span12">',
-      '<label>Link title</label>',
-      '<input class="link-title" type="text" value="<%= title %>"">',
+    '<label>Link title</label>',
+    '<input class="link-title" type="text" value="<%= title %>"">',
     '</div>',
     '<div class="span20">',
-      '<div class="select-container">',
-        '<label>Location</label>',
-        '<select class="link-options"></select>',
-      '</div>',
-      '<div class="url-container" style="display: none">',
-        '<label>Url</label>',
-        '<input type="url" class="url" id="url" value="<%= url %>">',
-      '</div>',
+    '<div class="select-container">',
+    '<label>Location</label>',
+    '<select class="link-options"></select>',
+    '</div>',
+    '<div class="url-container" style="display: none">',
+    '<label>Url</label>',
+    '<input type="url" class="url" id="url" value="<%= url %>">',
+    '</div>',
     '</div>',
     '<a class="remove" style="float:right" href="#">Delete Link</a>',
-  '</div>'
+    '</div>'
 ].join('\n');
 
 
 Templates.tempLi = [
-  '<li id="entity-user-<%= attr %>" class="large single-data">',
-  '<span class="name">Show <%= name %> <%= attr %></span></li>'
+    '<li id="entity-user-<%= attr %>" class="large single-data">',
+    '<span class="name">Show <%= name %> <%= attr %></span></li>'
 ].join('\n');
 
 Templates.tempLiSingleData = [
-  '<li id="entity-<%= cid %>-<%= attr %>" class="large single-data">',
-  '<span class="name">Show <%= name %> <%= attr %></span></li>'
+    '<li id="entity-<%= cid %>-<%= attr %>" class="large single-data">',
+    '<span class="name">Show <%= name %> <%= attr %></span></li>'
 ].join('\n');
 
 Templates.tempLiEntity = [
-  '<li id="entity-<%= cid %>" class="show entity">',
-  '<span class="name">List of <%= name %></span></li>'
+    '<li id="entity-<%= cid %>" class="show entity">',
+    '<span class="name">List of <%= name %></span></li>'
 ].join('\n');
 
 Templates.tempLiTable = [
-  '<li id="entity-<%= cid %>" class="table-gal entity">',
-  '<span class="name"><%= name %> Table</span></li>'
+    '<li id="entity-<%= cid %>" class="table-gal entity">',
+    '<span class="name"><%= name %> Table</span></li>'
 ].join('\n');
 
 Templates.tempHrefSelect = [
-  '<select class="select-href" id="prop-<%= hash %>">',
-  "<% _(listOfPages).each(function(page){ var b = ''; if(('internal://'+page) == val){ b = 'selected';}%>",
-  '<option value="internal://<%= page %>" <%= b %>><%= page %></option>',
-  '<%  }) %>',
-  '<% if(external) { %><option value="<%= external %>" selected><%= external %></option><% }; %>',
-  '<option value="external-link">External Link</option>',
-  '</select>'
+    '<select class="select-href" id="prop-<%= hash %>">',
+    "<% _(listOfPages).each(function(page){ var b = ''; if(('internal://'+page) == val){ b = 'selected';}%>",
+    '<option value="internal://<%= page %>" <%= b %>><%= page %></option>',
+    '<%  }) %>',
+    '<% if(external) { %><option value="<%= external %>" selected><%= external %></option><% }; %>',
+    '<option value="external-link">External Link</option>',
+    '</select>'
 ].join('\n');
 
 Templates.tempSourceSelect = [
-  '<select class="statics"  id="prop-<%= hash %>">',
-  '<option class="upload-image">Placeholder</option>',
-  "<% _(statics).each(function(asset){ var b = ''; if(asset == val){ b = 'selected';} %>",
-  '<option value="<%= asset.url %>" <%= b %>><%= asset.name %></option>',
-  '<%  }) %>',
-  '<option class="upload-image" value="upload-image">+ Upload an image</option>',
-  '</select>'
+    '<select class="statics"  id="prop-<%= hash %>">',
+    '<option class="upload-image">Placeholder</option>',
+    "<% _(statics).each(function(asset){ var b = ''; if(asset == val){ b = 'selected';} %>",
+    '<option value="<%= asset.url %>" <%= b %>><%= asset.name %></option>',
+    '<%  }) %>',
+    '<option class="upload-image" value="upload-image">+ Upload an image</option>',
+    '</select>'
 ].join('\n');
 
 Templates.tableNode = [
-  '<table class="table table-bordered">',
+    '<table class="table table-bordered">',
     '<tr><% _(fieldsToDisplay).each(function(field) { %> <td><%= field %></td> <% }); %></tr>',
     '<tr><% _(fieldsToDisplay).each(function(field) { %> <td><i><%= field %>Data</i></td> <% }); %></tr>',
     '<tr><% _(fieldsToDisplay).each(function(field) { %> <td><i><%= field %>Data</i></td> <% }); %></tr>',
     '<tr><% _(fieldsToDisplay).each(function(field) { %> <td><i><%= field %>Data</i></td> <% }); %></tr>',
     '<tr><% _(fieldsToDisplay).each(function(field) { %> <td><i><%= field %>Data</i></td> <% }); %></tr>',
-  '</table>'
+    '</table>'
 ].join('\n');
 
 Templates.createFormButton = [
-  '<li id="entity-<%= entity.cid %>-<%= form.cid %>" class="create entity">',
-  '<span class="name"><%= form.get(\'name\') %> Form</span></li>'
+    '<li id="entity-<%= entity.cid %>-<%= form.cid %>" class="create entity">',
+    '<span class="name"><%= form.get(\'name\') %> Form</span></li>'
 ].join('\n');
 
 Templates.formButton = [
-  '<li id="entity-<%= entity.cid %>-<%= form.cid %>" class="<%= form.get(\'action\') %> entity">',
-  '<span class="name"><%= form.get(\'name\') %> Form</span></li>'
+    '<li id="entity-<%= entity.cid %>-<%= form.cid %>" class="<%= form.get(\'action\') %> entity">',
+    '<span class="name"><%= form.get(\'name\') %> Form</span></li>'
 ].join('\n');
 
 var FieldTypes = {
-  "single-line-text" : '<input type="text" class="" placeholder="<%= field.get(\'placeholder\') %>">',
-  "paragraph-text"   : '<textarea class="" placeholder="<%= field.get(\'placeholder\') %>"></textarea>',
-  "dropdown"         : '<select class="drowdown"><% _(field.get(\'options\').split(\',\')).each(function(option, ind){ %><option><%= option %><% }); %></option>',
-  "option-boxes"     : '<span class="option-boxes"><% _(field.get(\'options\').split(\',\')).each(function(option, ind){ %><div class="option"><input id="opt-<%= ind %>" class="field-type" type="radio" name="types" value="single-line-text"><label for="opt-<%= ind %>"><%= option %></label></div><% }); %></span>',
-  "password-text"    : '<input type="password" class="password" placeholder="<%= field.get(\'placeholder\') %>">',
-  "email-text"       : '<input type="text" class="email" placeholder="<%= field.get(\'placeholder\') %>">',
-  "button"           : '<input type="submit" class="btn" value="<%= field.get(\'placeholder\') %>">',
-  "image-uploader"   : '<div class="upload-image btn">Upload Image</div>',
-  "file-uploader"    : '<div class="upload-file btn">Upload File</div>',
-  "date-picker"      : '<div class="date-picker-wrapper"><input type="text" placeholder="<%= field.get(\'placeholder\') %>"><img class="date-picker-icon"></div>'
+    "single-line-text": '<input type="text" class="" placeholder="<%= field.get(\'placeholder\') %>">',
+    "paragraph-text": '<textarea class="" placeholder="<%= field.get(\'placeholder\') %>"></textarea>',
+    "dropdown": '<select class="drowdown"><% _(field.get(\'options\').split(\',\')).each(function(option, ind){ %><option><%= option %><% }); %></option>',
+    "option-boxes": '<span class="option-boxes"><% _(field.get(\'options\').split(\',\')).each(function(option, ind){ %><div class="option"><input id="opt-<%= ind %>" class="field-type" type="radio" name="types" value="single-line-text"><label for="opt-<%= ind %>"><%= option %></label></div><% }); %></span>',
+    "password-text": '<input type="password" class="password" placeholder="<%= field.get(\'placeholder\') %>">',
+    "email-text": '<input type="text" class="email" placeholder="<%= field.get(\'placeholder\') %>">',
+    "button": '<input type="submit" class="btn" value="<%= field.get(\'placeholder\') %>">',
+    "image-uploader": '<div class="upload-image btn">Upload Image</div>',
+    "file-uploader": '<div class="upload-file btn">Upload File</div>',
+    "date-picker": '<div class="date-picker-wrapper"><input type="text" placeholder="<%= field.get(\'placeholder\') %>"><img class="date-picker-icon"></div>'
 };
 
 
 Templates.fieldNode = [
-'<label><%= field.get(\'label\') %></label>',
-  '<% if(field.get(\'displayType\') == "single-line-text") { %>',
+    '<label><%= field.get(\'label\') %></label>',
+    '<% if(field.get(\'displayType\') == "single-line-text") { %>',
     FieldTypes['single-line-text'],
-  '<% } %>',
-  '<% if(field.get(\'displayType\') == "paragraph-text") { %>',
+    '<% } %>',
+    '<% if(field.get(\'displayType\') == "paragraph-text") { %>',
     FieldTypes['paragraph-text'],
-  '<% } %>',
-  '<% if(field.get(\'displayType\') == "dropdown") { %>',
+    '<% } %>',
+    '<% if(field.get(\'displayType\') == "dropdown") { %>',
     FieldTypes['dropdown'],
-  '<% } %>',
-  '<% if(field.get(\'displayType\') == "option-boxes") { %>',
+    '<% } %>',
+    '<% if(field.get(\'displayType\') == "option-boxes") { %>',
     FieldTypes['option-boxes'],
-  '<% } %>',
-  '<% if(field.get(\'displayType\') == "password-text") { %>',
+    '<% } %>',
+    '<% if(field.get(\'displayType\') == "password-text") { %>',
     FieldTypes['password-text'],
-  '<% } %>',
-  '<% if(field.get(\'displayType\') == "email-text") { %>',
+    '<% } %>',
+    '<% if(field.get(\'displayType\') == "email-text") { %>',
     FieldTypes['email-text'],
-  '<% } %>',
-  '<% if(field.get(\'displayType\') == "button") { %>',
+    '<% } %>',
+    '<% if(field.get(\'displayType\') == "button") { %>',
     FieldTypes['button'],
-  '<% } %>',
-  '<% if(field.get(\'displayType\') == "image-uploader") { %>',
+    '<% } %>',
+    '<% if(field.get(\'displayType\') == "image-uploader") { %>',
     FieldTypes['image-uploader'],
-  '<% } %>',
-  '<% if(field.get(\'displayType\') == "file-uploader") { %>',
+    '<% } %>',
+    '<% if(field.get(\'displayType\') == "file-uploader") { %>',
     FieldTypes['file-uploader'],
-  '<% } %>',
-  '<% if(field.get(\'displayType\') == "date-picker") { %>',
+    '<% } %>',
+    '<% if(field.get(\'displayType\') == "date-picker") { %>',
     FieldTypes['date-picker'],
-  '<% } %>'
+    '<% } %>'
 ].join('\n');
 
 Templates.queryView = [
-  // '<small>',
-  // '<p id="query-description"><%= c.nLang %></p>',
-  // '</small>',
-  '<div class="sections-container">',
+    // '<small>',
+    // '<p id="query-description"><%= c.nLang %></p>',
+    // '</small>',
+    '<div class="sections-container">',
     '<% if(type == "table") { %>',
     '<div class="sect">',
     '<p>What fields would you like to display?</p>',
     '<% _.each(entity.get("fields").models, function(field) { %>',
-      '<% var checked = \'\'; var u_id = field.cid; if(_.contains(query.get(\'fieldsToDisplay\'), field.get(\'name\'))) { checked = \'checked\'; } %>',
-      '<label><input class="fields-to-display btn" id="field-<%= field.cid %>" type="checkbox" value="<%= field.get(\'name\') %>" <%= checked %>><%= field.get(\'name\') %></label>',
+    '<% var checked = \'\'; var u_id = field.cid; if(_.contains(query.get(\'fieldsToDisplay\'), field.get(\'name\'))) { checked = \'checked\'; } %>',
+    '<label><input class="fields-to-display btn" id="field-<%= field.cid %>" type="checkbox" value="<%= field.get(\'name\') %>" <%= checked %>><%= field.get(\'name\') %></label>',
     '<% }) %>',
     '</div>',
     '<% } %>',
@@ -9435,74 +9601,74 @@ Templates.queryView = [
     '<label><input type="radio" class="nmr-rows" id="all-rows" name="nmrRows" value="All" <%= c.rAll %>> All</label>',
     '<label><input type="radio" class="nmr-rows" id="first-rows" name="nmrRows" value="First" <%= c.rFirst %>> <input type="text" id="first-nmr" value="<%= c.rFirstNmr %>"> rows</label>',
     '</div>',
-  '</div>'
+    '</div>'
 ].join('\n');
 
 
 Templates.listEditorView = [
-  '<span class="view-type-list type-pick"></span><span class="view-tyle-grid type-pick"></span>',
+    '<span class="view-type-list type-pick"></span><span class="view-tyle-grid type-pick"></span>',
 ].join('\n');
 
 
 Templates.tempUIElement = [
-  '<<%= element.get(\'tagName\') %>',
-  'class = "<%= element.get(\'class_name\') %>"',
-  '<% if(element.get(\'cons_attribs\')) { %>',
-  '<% _(element.get(\'cons_attribs\').attributes).each(function(val, key) { %>',
-  '<%=key%> = "<%=val%>"<% }); %>',
-  '<% } %>',
-  '<% _(element.get(\'content_attribs\').attributes).each(function(val, key) { %>',
-  '<%=key%> = "<%=val%>"<% }); %>>',
-  '<% if(!element.get(\'isSingle\')) { %>',
-  '<%= element.get(\'content\') %>',
-  '</<%= element.get(\'tagName\') %>>',
-  '<% }; %>'
+    '<<%= element.get(\'tagName\') %>',
+    'class = "<%= element.get(\'class_name\') %>"',
+    '<% if(element.get(\'cons_attribs\')) { %>',
+    '<% _(element.get(\'cons_attribs\').attributes).each(function(val, key) { %>',
+    '<%=key%> = "<%=val%>"<% }); %>',
+    '<% } %>',
+    '<% _(element.get(\'content_attribs\').attributes).each(function(val, key) { %>',
+    '<%=key%> = "<%=val%>"<% }); %>>',
+    '<% if(!element.get(\'isSingle\')) { %>',
+    '<%= element.get(\'content\') %>',
+    '</<%= element.get(\'tagName\') %>>',
+    '<% }; %>'
 ].join('\n');
 
 Templates.sliderTemp = [
-  '<div id="slider-<%= cid %>" class="carousel slide">',
+    '<div id="slider-<%= cid %>" class="carousel slide">',
     '<ol class="carousel-indicators">',
-      '<% for(var i=0; i < slides.length; i++) { %>',
-      '<li data-target="#slider-<%= cid %>" data-slide-to="<%= i %>" <% if(i==0) { %>class="active" <% } %>></li>',
-      '<% } %>',
+    '<% for(var i=0; i < slides.length; i++) { %>',
+    '<li data-target="#slider-<%= cid %>" data-slide-to="<%= i %>" <% if(i==0) { %>class="active" <% } %>></li>',
+    '<% } %>',
     '</ol>',
     '<!-- Carousel items -->',
     '<div class="carousel-inner">',
-      '<% _(slides).each(function(slide, index) { %>',
-        '<div class="<% if(index == 0) { %>active <% } %>item">',
-          '<img src="<%= slide.image %>">',
-          '<div class="carousel-caption"><p><%= slide.text %></p></div>',
-        '</div>',
-      '<% }); %>',
+    '<% _(slides).each(function(slide, index) { %>',
+    '<div class="<% if(index == 0) { %>active <% } %>item">',
+    '<img src="<%= slide.image %>">',
+    '<div class="carousel-caption"><p><%= slide.text %></p></div>',
+    '</div>',
+    '<% }); %>',
     '</div>',
     '<!-- Carousel nav -->',
     '<a class="carousel-control left" href="#slider-<%= cid %>" data-slide="prev">&lsaquo;</a>',
     '<a class="carousel-control right" href="#slider-<%= cid %>" data-slide="next">&rsaquo;</a>',
-  '</div>',
+    '</div>',
 ].join('\n');
 
 Templates.twitterfeedTemp = [
-'<script src="http://widgets.twimg.com/j/2/widget.js"></script>',
-'<script>',
-'new TWTR.Widget({',
-  'version: 2,',
-  'type: \'profile\',',
-  'rpp: 4,',
-  'interval: 6000,',
-  'width: \'auto\',',
-  'height: 300,',
-  'theme: {',
+    '<script src="http://widgets.twimg.com/j/2/widget.js"></script>',
+    '<script>',
+    'new TWTR.Widget({',
+    'version: 2,',
+    'type: \'profile\',',
+    'rpp: 4,',
+    'interval: 6000,',
+    'width: \'auto\',',
+    'height: 300,',
+    'theme: {',
     'shell: {',
-      'background: \'#aacceb\',',
-      'color: \'#ffffff\'',
+    'background: \'#aacceb\',',
+    'color: \'#ffffff\'',
     '},',
     'tweets: {',
-      'background: \'#000000\',',
-      'color: \'#ffffff\',',
-      'links: \'#1398f0\'',
+    'background: \'#000000\',',
+    'color: \'#ffffff\',',
+    'links: \'#1398f0\'',
     '}',
-  '},',
-  'features: {',
+    '},',
+    'features: {',
     'scrollbar: true,',
     'loop: false,',
     'live: true,',
@@ -9510,40 +9676,41 @@ Templates.twitterfeedTemp = [
     'timestamp: true,',
     'avatars: true,',
     'behavior: \'all\'',
-  '}',
-'}).render().setUser(\'<%= username %>\').start();',
-'</script>'].join('\n');
+    '}',
+    '}).render().setUser(\'<%= username %>\').start();',
+    '</script>'
+].join('\n');
 
 Templates.facebookshareTemp = ['<img src="/static/img/fb-share-sample.png" width="300" >'].join('\n');
 
 Templates.sliderEditorTemp = [
-  '<div class="row">',
-  '<ul class="slider-images" style="height:490px; overflow-y: scroll;">',
-  '</ul>',
-  '</div>'
+    '<div class="row">',
+    '<ul class="slider-images" style="height:490px; overflow-y: scroll;">',
+    '</ul>',
+    '</div>'
 ].join('\n');
 
 Templates.sliderImageEditorTemp = [
-  '<li id="image-editor-<%= cid %>" class="span11 offset1 hoff1">',
+    '<li id="image-editor-<%= cid %>" class="span11 offset1 hoff1">',
     '<div class="thumbnail">',
-      //'<img src="<%= image %>>',
-      '<img src="<%= image %>">',
-      '<p><textarea type="text" class="text" id="edit-<%= cid %>"><%= text %></textarea></p>',
-      '<span class="btn btn-danger btn-small remove" id="remove-<%= cid %>">Remove</span>',
+    //'<img src="<%= image %>>',
+    '<img src="<%= image %>">',
+    '<p><textarea type="text" class="text" id="edit-<%= cid %>"><%= text %></textarea></p>',
+    '<span class="btn btn-danger btn-small remove" id="remove-<%= cid %>">Remove</span>',
     '</div>',
-  '</li>'
+    '</li>'
 ].join('\n');
 
 Templates.thirdPartyLogin = [
-  '<div class="<%= provider %>-login-btn btn"><%= content %></div>'
+    '<div class="<%= provider %>-login-btn btn"><%= content %></div>'
 ].join('\n');
 
 
 Templates.searchboxTemp = [
-'<form class="search-box">',
-'<input type="text" placeholder="Search for  <%= entityName %>…">',
-'<input type="submit" class="btn" value="Search">',
-'</form>'
+    '<form class="search-box">',
+    '<input type="text" placeholder="Search for  <%= entityName %>…">',
+    '<input type="submit" class="btn" value="Search">',
+    '</form>'
 ].join('\n');
 
 exports.EditorTemplates = Templates;
@@ -9554,28 +9721,28 @@ require.define("/plugins_view/PluginsView.js",function(require,module,exports,__
     require('../mixins/BackboneDropdownView');
     var PluginBrowserView = require('./PluginBrowserView');
 
-    var tempPluginsView = 
-    [
-    '<div class="hoff1">',
+    var tempPluginsView = [
+        '<div class="hoff1">',
         '<h2 class="pheader">',
-            'Installed Plugins',
+        'Installed Plugins',
         '</h2>',
         "<button id='browsePlugins' class='btn pull-right browsePluginsButton'>Browse All</button>",
         "<hr>",
         "<div class='pluginContainer'>",
         "<% for (var i=0; i<plugins.length;i++) { if (!plugins[i].metadata) {  plugins[i].metadata={}; plugins[i].metadata.name = plugins[i].name; plugins[i].metadata.description = ''; } %>",
         '<div class="pluginBar">',
-            '<div class="identifier"><div class="pluginImageHolder"></div></div>',
-            '<div class="meta-data">',
-                '<a class="title" href="#""><%=plugins[i].metadata.name%></a>',
-                '<div class="information"> <%=plugins[i].metadata.description%></div>',
-            '</div>',
-            '<div id="delete-plugin-<%= plugins[i].metadata.name %>" class="delete-plugin">X</div>',
+        '<div class="identifier"><div class="pluginImageHolder"></div></div>',
+        '<div class="meta-data">',
+        '<a class="title" href="#""><%=plugins[i].metadata.name%></a>',
+        '<div class="information"> <%=plugins[i].metadata.description%></div>',
+        '</div>',
+        '<div id="delete-plugin-<%= plugins[i].metadata.name %>" class="delete-plugin">X</div>',
         '</div>',
         '<hr>',
         '<% } %>',
         '</div>',
-    '</div>'].join('\n');
+        '</div>'
+    ].join('\n');
 
 
     var PluginsView = Backbone.DropdownView.extend({
@@ -9589,24 +9756,29 @@ require.define("/plugins_view/PluginsView.js",function(require,module,exports,__
             'click .browsePluginsButton': 'browsePlugins'
         },
 
-        initialize: function() {
+        initialize: function () {
             _.bindAll(this);
             this.listenTo(v1State.get('plugins'), 'change', this.render);
         },
 
-        render: function() {
+        render: function () {
             var plugins = v1State.get('plugins').serialize();
-            plugins = _.map(plugins, function(val, key) { val.name = key; return val; });
-            this.$el.html(_.template(tempPluginsView, {plugins: plugins}));
+            plugins = _.map(plugins, function (val, key) {
+                val.name = key;
+                return val;
+            });
+            this.$el.html(_.template(tempPluginsView, {
+                plugins: plugins
+            }));
 
             return this;
         },
 
-        browsePlugins: function(){
+        browsePlugins: function () {
             var browserView = new PluginBrowserView({});
         },
 
-        deletePlugin: function(e){
+        deletePlugin: function (e) {
 
             var delButton = $(e.target);
             var elToRemove = delButton.parents('.pluginBar');
@@ -9615,11 +9787,11 @@ require.define("/plugins_view/PluginsView.js",function(require,module,exports,__
             v1.currentApp.model.get('plugins').uninstall(pluginName);
         },
 
-        getActivePlugins: function (){
+        getActivePlugins: function () {
 
             var enabledPlugins = v1.currentApp.model.get('plugins').filter(
                 function (p) {
-                    return p.getPluginStatus() ;
+                    return p.getPluginStatus();
                 }
             );
 
@@ -9637,65 +9809,68 @@ require.define("/mixins/BackboneDropdownView.js",function(require,module,exports
             events: {
 
             },
-            _configure: function(options) {
+            _configure: function (options) {
                 Backbone.DropdownView.__super__._configure.call(this, options);
                 _.bindAll(this);
             },
 
-            _ensureElement: function(options) {
+            _ensureElement: function (options) {
                 Backbone.DropdownView.__super__._ensureElement.call(this, options);
             },
 
-            setToggleEl: function($el) {
+            setToggleEl: function ($el) {
                 this.$toggleEl = $el;
                 var self = this;
-                $el.on('click', function() {
+                $el.on('click', function () {
                     self.toggle();
                 });
             },
             // Set the displacement of the little pointer
-            setPointerPosition: function(offset){
+            setPointerPosition: function (offset) {
 
             },
 
-            toggle: function() {
-                if(this.isExpanded) { this.hide(); } else { this.expand(); }
+            toggle: function () {
+                if (this.isExpanded) {
+                    this.hide();
+                } else {
+                    this.expand();
+                }
             },
 
-            expand: function() {
+            expand: function () {
                 this.$el.addClass('expanded');
                 this.$toggleEl.addClass('expanded');
                 this.isExpanded = true;
                 $(window).on('mouseup', this.clickedOnElement);
-                $( $('#inviteFrame').contents().get(0) ).on('mouseup', this.clickedOnElement);
+                $($('#inviteFrame').contents().get(0)).on('mouseup', this.clickedOnElement);
                 $(window).on('keydown', this.closeHandler);
 
             },
 
-            hide: function() {
+            hide: function () {
                 this.$el.removeClass('expanded');
                 this.$toggleEl.removeClass('expanded');
 
                 this.isExpanded = false;
                 $(window).off('mouseup', this.clickedOnElement);
-                $( $('#inviteFrame').contents().get(0) ).off('mouseup', this.clickedOnElement);
+                $($('#inviteFrame').contents().get(0)).off('mouseup', this.clickedOnElement);
                 $(window).off('keydown', this.closeHandler);
             },
 
-            clickedOnElement: function(e) {
+            clickedOnElement: function (e) {
                 var container = this.$el;
                 var toggleEl = this.$toggleEl;
                 // if the target of the click isn't the container
                 // ... nor a descendant of the container
                 if (!container.is(e.target) && !toggleEl.is(e.target) &&
-                    container.has(e.target).length === 0 && toggleEl.has(e.target).length === 0)
-                {
+                    container.has(e.target).length === 0 && toggleEl.has(e.target).length === 0) {
                     this.hide();
                 }
             },
 
-            closeHandler: function(e) {
-                if(e.keyCode == 27) {
+            closeHandler: function (e) {
+                if (e.keyCode == 27) {
                     this.hide();
                 }
             }
@@ -9720,14 +9895,14 @@ require.define("/plugins_view/PluginBrowserView.js",function(require,module,expo
             'click .addPluginButton': 'addPlugin'
         },
 
-        initialize: function() {
+        initialize: function () {
             _.bindAll(this);
             this.render();
         },
 
         currentList: null,
 
-        render: function() {
+        render: function () {
             var self = this;
             var loadingSpin = util.addLoadingSpin(this.el);
 
@@ -9735,8 +9910,8 @@ require.define("/plugins_view/PluginBrowserView.js",function(require,module,expo
                 type: "GET",
                 url: "//plugins.appcubator.com/plugins/list",
                 dataType: "json",
-                success: function(data) {
-                	console.log(data);
+                success: function (data) {
+                    console.log(data);
                     $(loadingSpin).remove();
                     self.layoutPlugins(data);
                 }
@@ -9745,7 +9920,7 @@ require.define("/plugins_view/PluginBrowserView.js",function(require,module,expo
             return this;
         },
 
-        layoutPlugins: function(listPlugins) {
+        layoutPlugins: function (listPlugins) {
             this.currentList = listPlugins;
             var template = util.getHTML('plugin-browser');
             this.el.innerHTML = _.template(template, {
@@ -9753,7 +9928,7 @@ require.define("/plugins_view/PluginBrowserView.js",function(require,module,expo
             });
         },
 
-        addPlugin: function(e) {
+        addPlugin: function (e) {
             /* Installs the plugin */
             var ind = e.currentTarget.id.replace('add-', '');
             var plugin = this.currentList[ind];
@@ -9776,49 +9951,53 @@ require.define("/SettingsView.js",function(require,module,exports,__dirname,__fi
         subviews: [],
 
         events: {
-            "keyup #scripts-content" : "scriptsChanged",
-            "keyup #header-content"  : "headerChanged"
+            "keyup #scripts-content": "scriptsChanged",
+            "keyup #header-content": "headerChanged"
         },
 
-        initialize: function() {
+        initialize: function () {
             _.bindAll(this);
             this.model = v1State;
         },
 
-        render: function() {
+        render: function () {
 
             var template = [
                 '<div class="" id="settings-page">',
-                    '<h2 class="pheader">App Settings</h2>',
-                    '<ul id="list-tables">',
-                    '<li>',
-                        '<h3>Header</h3>',
-                        '<textarea id="header-content"><%= header_content %></textarea>',
-                    '</li>',
-                    '<li>',
-                        '<h3>Scripts</h3>',
-                        '<textarea id="scripts-content"><%= scripts_content %></textarea>',
-                    '</li>',
-                    '</ul>',
-                '</div>'].join('\n');
+                '<h2 class="pheader">App Settings</h2>',
+                '<ul id="list-tables">',
+                '<li>',
+                '<h3>Header</h3>',
+                '<textarea id="header-content"><%= header_content %></textarea>',
+                '</li>',
+                '<li>',
+                '<h3>Scripts</h3>',
+                '<textarea id="scripts-content"><%= scripts_content %></textarea>',
+                '</li>',
+                '</ul>',
+                '</div>'
+            ].join('\n');
 
-            this.el.innerHTML = _.template(template, { header_content: this.model.get("header") || "",
-                                                       scripts_content: this.model.get("scripts") || ""});
+            this.el.innerHTML = _.template(template, {
+                header_content: this.model.get("header") || "",
+                scripts_content: this.model.get("scripts") || ""
+            });
             return this;
         },
 
-        scriptsChanged: function(e) {
+        scriptsChanged: function (e) {
             console.log(e.currentTarget.value);
             this.model.set("scripts", e.currentTarget.value);
         },
 
-        headerChanged: function(e) {
+        headerChanged: function (e) {
             this.model.set("header", e.currentTarget.value);
         }
 
     });
 
     exports.SettingsView = SettingsView;
+
 });
 
 require.define("/RoutesView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -9826,22 +10005,23 @@ require.define("/RoutesView.js",function(require,module,exports,__dirname,__file
     require('./mixins/BackboneDropdownView');
     var RouteView = require('./RouteView').RouteView;
 
-    var template = [ '<div class="arrow_box"></div>',
-    '<div class="" id="entities-page">',
+    var template = ['<div class="arrow_box"></div>',
+        '<div class="" id="entities-page">',
         '<h2 class="pheader">Routes</h2>',
         '<ul id="list-routes">',
         '</ul>',
-    '</div>'].join('\n');
+        '</div>'
+    ].join('\n');
 
     var RoutesView = Backbone.DropdownView.extend({
 
         title: 'Tables',
         className: 'dropdown-view routes-view',
         events: {
-            'click .route-name' : 'clickedRoute'
+            'click .route-name': 'clickedRoute'
         },
 
-        initialize: function() {
+        initialize: function () {
             _.bindAll(this);
 
             this.collection = v1State.get('routes');
@@ -9851,7 +10031,7 @@ require.define("/RoutesView.js",function(require,module,exports,__dirname,__file
             this.title = "Routes";
         },
 
-        render: function() {
+        render: function () {
 
             this.$el.html(_.template(template, {}));
             this.renderRoutes();
@@ -9868,20 +10048,20 @@ require.define("/RoutesView.js",function(require,module,exports,__dirname,__file
             return this;
         },
 
-        renderRoutes: function() {
+        renderRoutes: function () {
             this.collection.each(this.renderRoute);
         },
 
-        renderRoute: function(routeModel) {
+        renderRoute: function (routeModel) {
             var routeView = new RouteView(routeModel);
             this.$el.find('#list-routes').append(routeView.render().el);
         },
 
-        removeRoute: function(routeModel) {
+        removeRoute: function (routeModel) {
             this.$el.find('#route-' + routeModel.cid).remove();
         },
 
-        createRoute: function(val) {
+        createRoute: function (val) {
 
             var templateName = prompt("Would you like to create a template as well?", val);
 
@@ -9904,6 +10084,7 @@ require.define("/RoutesView.js",function(require,module,exports,__dirname,__file
     });
 
     exports.RoutesView = RoutesView;
+
 });
 
 require.define("/RouteView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -9911,12 +10092,12 @@ require.define("/RouteView.js",function(require,module,exports,__dirname,__filen
 
     var WidgetSettingsView = require('./template_editor/WidgetSettingsView').WidgetSettingsView;
 
-    var template = [ 
+    var template = [
         '<small class="url-name"><%= url %></small>',
         '<span class="pull-right">',
-            '<%= options %>',
-            '<div class="option-button settings blue"></div>',
-            '<span class="cross">×<span>',
+        '<%= options %>',
+        '<div class="option-button settings blue"></div>',
+        '<span class="cross">×<span>',
         '</span>'
     ].join('\n');
 
@@ -9927,19 +10108,19 @@ require.define("/RouteView.js",function(require,module,exports,__dirname,__filen
         className: 'route-name',
 
         events: {
-            'click .url-name' : 'clickedRoute',
+            'click .url-name': 'clickedRoute',
             'click .cross': 'removeRoute',
             'click .settings': 'clickedSettings'
         },
 
-        initialize: function(model) {
+        initialize: function (model) {
             _.bindAll(this);
             this.model = model;
 
             this.listenTo(this.model, 'remove', this.close);
         },
 
-        render: function() {
+        render: function () {
             var name = this.model.get('name');
             var url = this.model.getUrlString();
 
@@ -9947,23 +10128,26 @@ require.define("/RouteView.js",function(require,module,exports,__dirname,__filen
 
             if (this.model.generate == "routes.staticpage") {
                 var options = '<select>'
-                options += '<option>'+ this.model.get('name') +' template</option>';
+                options += '<option>' + this.model.get('name') + ' template</option>';
 
-                v1State.get('templates').each(function(templateModel) {
-                    if(templateModel.get('name') == name) return;
+                v1State.get('templates').each(function (templateModel) {
+                    if (templateModel.get('name') == name) return;
 
-                    options += '<option>'+ templateModel.get('name') +' template</option>';
+                    options += '<option>' + templateModel.get('name') + ' template</option>';
                 });
 
                 options += '</select>';
             }
 
-            this.$el.html(_.template(template, {options: options, url: url }));
+            this.$el.html(_.template(template, {
+                options: options,
+                url: url
+            }));
 
             return this;
         },
 
-        clickedRoute: function() {
+        clickedRoute: function () {
 
             if (this.model.generate == "routes.staticpage") {
                 var template = this.model.get('name');
@@ -9972,11 +10156,11 @@ require.define("/RouteView.js",function(require,module,exports,__dirname,__filen
 
         },
 
-        clickedSettings: function() {
+        clickedSettings: function () {
             new WidgetSettingsView(this.model).render();
         },
 
-        removeRoute: function(e) {
+        removeRoute: function (e) {
             e.preventDefault();
             v1State.get('routes').remove(this.model);
 
@@ -10000,61 +10184,61 @@ require.define("/SoftErrorView.js",function(require,module,exports,__dirname,__f
         },
         top: false,
 
-        initialize: function(options, closeCallback) {
+        initialize: function (options, closeCallback) {
             _.bindAll(this);
 
             this.text = options.text;
             this.path = options.path;
 
             // wrap the callback in a function, since the callback may be undefined
-            this.closeCallback = function() {
-                if (typeof(closeCallback) == 'function') return closeCallback();
+            this.closeCallback = function () {
+                if (typeof (closeCallback) == 'function') return closeCallback();
                 else return false;
             };
             this.render();
         },
 
-        resolve: function() {
+        resolve: function () {
             var arr = this.path.split('/');
             var el = arr[0];
             var str = "<p>";
 
             switch (el) {
-                case "pages":
-                    var pageObj = appState.pages[arr[1]];
-                    str += "Problem is on <a href='/app/" + appId + "/page/" + arr[1] + "/'>" + pageObj.name + '</a>';
-                    break;
+            case "pages":
+                var pageObj = appState.pages[arr[1]];
+                str += "Problem is on <a href='/app/" + appId + "/page/" + arr[1] + "/'>" + pageObj.name + '</a>';
+                break;
             }
 
             str += "</p>";
 
             switch (arr[2]) {
-                case "uielements":
-                    var widgetObj = v1State.get('pages').models[arr[1]].get('uielements').models[arr[3]];
+            case "uielements":
+                var widgetObj = v1State.get('pages').models[arr[1]].get('uielements').models[arr[3]];
 
-                    var iframe = document.getElementById('page');
-                    if (iframe) {
-                        var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-                        var domEl = innerDoc.getElementById('widget-wrapper-' + widgetObj.cid);
+                var iframe = document.getElementById('page');
+                if (iframe) {
+                    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    var domEl = innerDoc.getElementById('widget-wrapper-' + widgetObj.cid);
 
-                        if (domEl) {
-                            this.overlayEl = util.addOverlay(domEl);
-                        } else {
-                            this.listenTo(v1, 'editor-loaded', function() {
-                                var domEl = document.getElementById('widget-wrapper-' + widgetObj.cid);
-                                var self = this;
-                                setTimeout(function() {
-                                    self.overlayEl = util.addOverlay(domEl);
-                                }, 300);
-                            }, this);
-                        }
+                    if (domEl) {
+                        this.overlayEl = util.addOverlay(domEl);
+                    } else {
+                        this.listenTo(v1, 'editor-loaded', function () {
+                            var domEl = document.getElementById('widget-wrapper-' + widgetObj.cid);
+                            var self = this;
+                            setTimeout(function () {
+                                self.overlayEl = util.addOverlay(domEl);
+                            }, 300);
+                        }, this);
                     }
+                }
             }
 
             return str;
         },
 
-        render: function() {
+        render: function () {
 
             var div = document.createElement('div');
             div.className = "modal-bg fadeIn";
@@ -10082,7 +10266,7 @@ require.define("/SoftErrorView.js",function(require,module,exports,__dirname,__f
             return this;
         },
 
-        close: function() {
+        close: function () {
             $(this.bgDiv).remove();
             if (this.overlayEl) $(this.overlayEl).remove();
             this.stopListening(v1, 'editor-loaded');
@@ -10093,6 +10277,7 @@ require.define("/SoftErrorView.js",function(require,module,exports,__dirname,__f
     });
 
     exports.SoftErrorView = SoftErrorView;
+
 });
 
 require.define("/models_view/NodeModelsView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -10101,12 +10286,13 @@ require.define("/models_view/NodeModelsView.js",function(require,module,exports,
     var NodeModelView = require('./NodeModelView');
     require('../mixins/BackboneDropdownView');
 
-    var template = [ '<div class="arrow_box"></div>',
-    '<div class="" id="entities-page">',
+    var template = ['<div class="arrow_box"></div>',
+        '<div class="" id="entities-page">',
         '<h2 class="pheader">Models</h2>',
         '<ul id="list-tables">',
         '</ul>',
-    '</div>'].join('\n');
+        '</div>'
+    ].join('\n');
 
     var NodeModelsView = Backbone.DropdownView.extend({
 
@@ -10118,7 +10304,7 @@ require.define("/models_view/NodeModelsView.js",function(require,module,exports,
         },
         subviews: [],
 
-        initialize: function() {
+        initialize: function () {
             _.bindAll(this);
             this.subviews = [this.tablesView, this.relationsView, this.createRelationView];
             this.collection = v1State.get('models');
@@ -10128,7 +10314,7 @@ require.define("/models_view/NodeModelsView.js",function(require,module,exports,
             this.title = "Tables";
         },
 
-        render: function() {
+        render: function () {
 
             this.$el.html(_.template(template, {}));
             this.renderTables();
@@ -10146,20 +10332,20 @@ require.define("/models_view/NodeModelsView.js",function(require,module,exports,
             return this;
         },
 
-        renderTables: function() {
+        renderTables: function () {
             this.collection.each(this.renderTable);
             //this.$('#users').append(this.userTablesView.render().el);
         },
 
-        renderTable: function(tableModel) {
+        renderTable: function (tableModel) {
             this.$el.find('#list-tables').append('<li class="table-name" id="table-' + tableModel.cid + '">' + tableModel.get('name') + '<span class="remove-model pull-right" id="remove-table-' + tableModel.cid + '">×<span></li>');
         },
 
-        removeTable: function(tableModel) {
+        removeTable: function (tableModel) {
             this.$el.find('#table-' + tableModel.cid).remove();
         },
 
-        clickedTableName: function(e) {
+        clickedTableName: function (e) {
             var cid = String(e.currentTarget.id).replace('table-', '');
             var tableModel = v1State.get('models').get(cid);
             var tableView = new NodeModelView(tableModel);
@@ -10167,14 +10353,14 @@ require.define("/models_view/NodeModelsView.js",function(require,module,exports,
             // this.el.appendChild(tableView.render().el);
         },
 
-        clickedRemoveTable: function(e) {
+        clickedRemoveTable: function (e) {
             e.preventDefault();
 
             var cid = String(e.currentTarget.id).replace('remove-table-', '');
             var tableModel = v1State.get('models').get(cid);
             var modelName = tableModel.get('name');
 
-            var r = confirm("Are you sure you want to delete "+ modelName+" model?");
+            var r = confirm("Are you sure you want to delete " + modelName + " model?");
             if (r == true) {
                 v1State.get('models').remove(tableModel);
             }
@@ -10182,12 +10368,12 @@ require.define("/models_view/NodeModelsView.js",function(require,module,exports,
             return false;
         },
 
-        renderRelations: function() {
+        renderRelations: function () {
             //util.get('relations').appendChild(this.createRelationView.render().el);
             //util.get('relations').appendChild(this.relationsView.render().el);
         },
 
-        createTable: function(val) {
+        createTable: function (val) {
             //force table names to be singular
             var name = val;
 
@@ -10200,13 +10386,13 @@ require.define("/models_view/NodeModelsView.js",function(require,module,exports,
             return elem;
         },
 
-        showCreateRelationForm: function() {
+        showCreateRelationForm: function () {
             var self = this;
             this.createRelationView.$el.fadeIn('fast');
             util.scrollToElement(self.$('#new-relation'));
         },
 
-        scrollToRelation: function(e) {
+        scrollToRelation: function (e) {
             e.preventDefault();
             var hash = e.currentTarget.hash;
             if (hash === '#relation-new') {
@@ -10218,6 +10404,7 @@ require.define("/models_view/NodeModelsView.js",function(require,module,exports,
     });
 
     exports.NodeModelsView = NodeModelsView;
+
 });
 
 require.define("/models_view/NodeModelView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -10225,10 +10412,10 @@ require.define("/models_view/NodeModelView.js",function(require,module,exports,_
     var FieldModel = require('../models/FieldModel').FieldModel;
     //var AdminPanelView = require('../AdminPanelView').AdminPanelView;
 
-    var NodeModelPluginsView     = require('./NodeModelPluginsView').NodeModelPluginsView;
+    var NodeModelPluginsView = require('./NodeModelPluginsView').NodeModelPluginsView;
     var NodeModelDescriptionView = require('./NodeModelDescriptionView').NodeModelDescriptionView;
-    var TableDataView        = require('./NodeModelDataView').NodeModelDataView;
-    var TableCodeView        = require('./NodeModelCodeView').NodeModelCodeView;
+    var TableDataView = require('./NodeModelDataView').NodeModelDataView;
+    var TableCodeView = require('./NodeModelCodeView').NodeModelCodeView;
 
 
     var SoftErrorView = require('../SoftErrorView');
@@ -10236,22 +10423,22 @@ require.define("/models_view/NodeModelView.js",function(require,module,exports,_
     require('../mixins/BackboneCardView');
 
     var tableTemplate = [
-            '<div class="header">',
-                '<div>',
-                '<h2><%= name %></h2>',
-                '<div class="q-mark-circle"></div>',
-                '</div>',
-                '<ul class="tabs">',
-                    '<li class="description-li right-icon">',
-                    '<span>Description</span>',
-                    '</li><li class="code-li right-icon">',
-                    '<span>Code</span>',
-                    '</li><li class="data-li right-icon">',
-                    '<span>Access Data</span>',
-                    '</li>',
-                '</ul>',
-            '</div>',
-            '<div class="current-content"></div>',
+        '<div class="header">',
+        '<div>',
+        '<h2><%= name %></h2>',
+        '<div class="q-mark-circle"></div>',
+        '</div>',
+        '<ul class="tabs">',
+        '<li class="description-li right-icon">',
+        '<span>Description</span>',
+        '</li><li class="code-li right-icon">',
+        '<span>Code</span>',
+        '</li><li class="data-li right-icon">',
+        '<span>Access Data</span>',
+        '</li>',
+        '</ul>',
+        '</div>',
+        '<div class="current-content"></div>',
     ].join('\n');
 
     var NodeModelView = Backbone.CardView.extend({
@@ -10263,13 +10450,13 @@ require.define("/models_view/NodeModelView.js",function(require,module,exports,_
         subviews: [],
 
         events: {
-            'change .attribs'     : 'changedAttribs',
+            'change .attribs': 'changedAttribs',
             'click .q-mark-circle': 'showTableTutorial',
-            'click .right-icon'   : 'tabClicked'
+            'click .right-icon': 'tabClicked'
         },
 
 
-        initialize: function(tableModel) {
+        initialize: function (tableModel) {
             _.bindAll(this);
             this.model = tableModel;
             this.listenTo(this.model, 'remove', this.remove);
@@ -10277,7 +10464,7 @@ require.define("/models_view/NodeModelView.js",function(require,module,exports,_
             this.otherEntities = _(v1State.get('models').pluck('name')).without(this.model.get('name'));
         },
 
-        render: function() {
+        render: function () {
             this.el.innerHTML = _.template(tableTemplate, this.model.toJSON());
             this.el.id = 'table-' + this.model.cid;
             this.renderDescription();
@@ -10285,7 +10472,7 @@ require.define("/models_view/NodeModelView.js",function(require,module,exports,_
             return this;
         },
 
-        renderDescription: function() {
+        renderDescription: function () {
             this.$el.find('.current-content').html('');
             this.$el.find('.current-content').append(new NodeModelDescriptionView(this.model).render().el);
             var nodeModelPlugins = new NodeModelPluginsView(this.model);
@@ -10295,13 +10482,13 @@ require.define("/models_view/NodeModelView.js",function(require,module,exports,_
             this.$el.find('.description-li').addClass('active');
         },
 
-        renderData: function() {
+        renderData: function () {
             this.$el.find('.current-content').html('');
             this.$el.find('.current-content').append(new TableDataView(this.model).render().el);
             this.$el.find('.data-li').addClass('active');
         },
 
-        renderCode: function() {
+        renderCode: function () {
             var tableCodeView = new TableCodeView(this.model);
             this.$el.find('.current-content').html('');
             this.$el.find('.current-content').append(tableCodeView.render().el);
@@ -10309,43 +10496,41 @@ require.define("/models_view/NodeModelView.js",function(require,module,exports,_
             this.$el.find('.code-li').addClass('active');
         },
 
-        tabClicked: function(e) {
+        tabClicked: function (e) {
             this.$el.find('.active').removeClass('active');
-            if($(e.currentTarget).hasClass('description-li')) {
+            if ($(e.currentTarget).hasClass('description-li')) {
                 this.renderDescription();
-            }
-            else if($(e.currentTarget).hasClass('data-li')) {
+            } else if ($(e.currentTarget).hasClass('data-li')) {
                 this.renderData();
-            }
-            else if($(e.currentTarget).hasClass('code-li')) {
+            } else if ($(e.currentTarget).hasClass('code-li')) {
                 this.renderCode();
             }
         },
 
-        addedEntity: function(item) {
+        addedEntity: function (item) {
             var optString = '<option value="{{' + item.get('name') + '}}">List of ' + item.get('name') + 's</option>';
             $('.attribs', this.el).append(optString);
         },
 
-        clickedDelete: function(e) {
+        clickedDelete: function (e) {
             this.askToDelete(v1State.get('tables'));
         },
 
-        askToDelete: function(tableColl) {
+        askToDelete: function (tableColl) {
             var widgets = v1State.getWidgetsRelatedToTable(this.model);
             var model = this.model;
             if (widgets.length) {
 
-                var widgetsNL = _.map(widgets, function(widget) {
+                var widgetsNL = _.map(widgets, function (widget) {
                     return widget.widget.get('type') + ' on ' + widget.pageName;
                 });
                 var widgetsNLString = widgetsNL.join('\n');
                 new DialogueView({
                     text: "The related widgets listed below will be deleted with this table. Do you want to proceed? <br><br> " + widgetsNLString
-                }, function() {
+                }, function () {
                     tableColl.remove(model.cid);
                     v1State.get('pages').removePagesWithContext(model);
-                    _.each(widgets, function(widget) {
+                    _.each(widgets, function (widget) {
                         widget.widget.collection.remove(widget.widget);
                     });
                 });
@@ -10356,13 +10541,13 @@ require.define("/models_view/NodeModelView.js",function(require,module,exports,_
             }
         },
 
-        typeClicked: function(e) {
+        typeClicked: function (e) {
             var cid = e.target.id.replace('type-row-', '');
             $('#type-' + cid).click();
             e.preventDefault();
         },
 
-        showTableTutorial: function(e) {
+        showTableTutorial: function (e) {
             v1.showTutorial("Tables");
         }
 
@@ -10372,83 +10557,83 @@ require.define("/models_view/NodeModelView.js",function(require,module,exports,_
 
 });
 
-require.define("/models/FieldModel.js",function(require,module,exports,__dirname,__filename,process,global){
-    var FieldModel = Backbone.Model.extend({
-        defaults: {
-            "name": "Property Name",
-            "type": "String"
-        },
+require.define("/models/FieldModel.js",function(require,module,exports,__dirname,__filename,process,global){var FieldModel = Backbone.Model.extend({
+    defaults: {
+        "name": "Property Name",
+        "type": "String"
+    },
 
-        // return a string version of the relationship
-        getNLType: function() {
-            var type = this.get('type');
+    // return a string version of the relationship
+    getNLType: function () {
+        var type = this.get('type');
 
-            if (type == "o2o" || type == "fk") {
-                return "Has one " + this.get('entity_name');
-            }
-            if (type == "m2m") {
-                return "List of " + this.get('entity_name');
-            }
-
-            var nlType = this.nlTable[type];
-
-            return nlType;
-        },
-
-        isRelatedField: function() {
-            var type = this.get('type');
-            return (type == "o2o" || type == "fk" || type == "m2m");
-        },
-
-        // return the relationship type
-        getNL: function() {
-            var type = this.get('type');
-
-            // if(type == "o2o"){
-            //   return
-            // } || type == "fk") {
-            //   return this.get('entity_name');
-            // }
-            // if(type == "m2m") {
-            //   return "List of " + this.get('entity_name');
-            // }
-
-            // var nlType = this.nlTable[type];
-
-            // return nlType;
-        },
-
-        // since o2m relationships are stored in the other entity as an fk,
-        // find entities which relate to this model with an fk
-        getOneToManyRelationships: function() {
-            var self = this;
-            var otherEntities = Array.prototype.concat.apply(v1State.get('tables').models, v1State.get('users').models);
-            otherEntities = _.without(otherEntities, this);
-            return _.filter(otherEntities, function(entity) {
-                return (entity.get('type') === 'fk' && entity.get('entity_name') == self.get('name'));
-            });
-        },
-
-        validate: function() {
-            var valid = true;
-            var name = this.get('name');
-            if (!util.isAlphaNumeric(name) || util.doesStartWithKeywords(name)) {
-                return false;
-            }
-        },
-
-        nlTable: {
-            "text": 'Text',
-            "number": 'Number',
-            "email": 'Email',
-            "image": 'Image',
-            "date": 'Date',
-            "file": 'File'
+        if (type == "o2o" || type == "fk") {
+            return "Has one " + this.get('entity_name');
+        }
+        if (type == "m2m") {
+            return "List of " + this.get('entity_name');
         }
 
-    });
+        var nlType = this.nlTable[type];
 
-    exports.FieldModel = FieldModel;
+        return nlType;
+    },
+
+    isRelatedField: function () {
+        var type = this.get('type');
+        return (type == "o2o" || type == "fk" || type == "m2m");
+    },
+
+    // return the relationship type
+    getNL: function () {
+        var type = this.get('type');
+
+        // if(type == "o2o"){
+        //   return
+        // } || type == "fk") {
+        //   return this.get('entity_name');
+        // }
+        // if(type == "m2m") {
+        //   return "List of " + this.get('entity_name');
+        // }
+
+        // var nlType = this.nlTable[type];
+
+        // return nlType;
+    },
+
+    // since o2m relationships are stored in the other entity as an fk,
+    // find entities which relate to this model with an fk
+    getOneToManyRelationships: function () {
+        var self = this;
+        var otherEntities = Array.prototype.concat.apply(v1State.get('tables').models, v1State.get('users').models);
+        otherEntities = _.without(otherEntities, this);
+        return _.filter(otherEntities, function (entity) {
+            return (entity.get('type') === 'fk' && entity.get('entity_name') == self.get('name'));
+        });
+    },
+
+    validate: function () {
+        var valid = true;
+        var name = this.get('name');
+        if (!util.isAlphaNumeric(name) || util.doesStartWithKeywords(name)) {
+            return false;
+        }
+    },
+
+    nlTable: {
+        "text": 'Text',
+        "number": 'Number',
+        "email": 'Email',
+        "image": 'Image',
+        "date": 'Date',
+        "file": 'File'
+    }
+
+});
+
+exports.FieldModel = FieldModel;
+
 });
 
 require.define("/models_view/NodeModelPluginsView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -10456,20 +10641,20 @@ require.define("/models_view/NodeModelPluginsView.js",function(require,module,ex
     var NodeModelMethodModel = require('../models/NodeModelMethodModel');
 
     var pluginAttribsTemplate = [
-    '<div class="plugins-list">',
+        '<div class="plugins-list">',
         '<% _.each(plugins, function(plugin, i) { %>',
         '<div class="plugin-li">',
-            '<h4><%= plugin.name %></h4>',
-            '<div class="onoffswitch nodemodel" id="myonoffswitch-wrapper-<%=i%>">',
-                '<input type="checkbox" name="onoffswitch<%=i%>" class="onoffswitch-checkbox <%= plugin.isChecked %>" id="myonoffswitch<%=i%>" >',
-                '<label class="onoffswitch-label" for="myonoffswitch<%=i%>">',
-                    '<div class="onoffswitch-inner"></div>',
-                    '<div class="onoffswitch-switch"></div>',
-                '</label>',
-            '</div>',
+        '<h4><%= plugin.name %></h4>',
+        '<div class="onoffswitch nodemodel" id="myonoffswitch-wrapper-<%=i%>">',
+        '<input type="checkbox" name="onoffswitch<%=i%>" class="onoffswitch-checkbox <%= plugin.isChecked %>" id="myonoffswitch<%=i%>" >',
+        '<label class="onoffswitch-label" for="myonoffswitch<%=i%>">',
+        '<div class="onoffswitch-inner"></div>',
+        '<div class="onoffswitch-switch"></div>',
+        '</label>',
+        '</div>',
         '</div>',
         '<% }); %>',
-    '</div>'
+        '</div>'
     ].join('\n');
 
     var NodeModelPluginsView = Backbone.View.extend({
@@ -10482,60 +10667,59 @@ require.define("/models_view/NodeModelPluginsView.js",function(require,module,ex
         },
 
 
-        initialize: function(tableModel) {
+        initialize: function (tableModel) {
             _.bindAll(this);
             this.model = tableModel;
         },
 
-        render: function() {
+        render: function () {
             var plugins = v1State.get('plugins').getAllPluginsWithModule('model_methods');
-            
 
-            var gens = _.map(plugins, function(pluginM) {
+
+            var gens = _.map(plugins, function (pluginM) {
                 var gen = {};
                 try {
                     gen.name = pluginM.name || pluginM.get('metadata').name
-                }
-                catch(e) {
+                } catch (e) {
                     gen.name = "Unnamed";
                     alert("There is an unnamed plugin.");
-                } 
-
-                if(v1State.get('plugins').isPluginInstalledToModel(pluginM, this.model)) {
-                    gen.isChecked = "checked";
                 }
-                else {
-                    gen.isChecked ="";
+
+                if (v1State.get('plugins').isPluginInstalledToModel(pluginM, this.model)) {
+                    gen.isChecked = "checked";
+                } else {
+                    gen.isChecked = "";
                 }
 
                 return gen;
             }, this);
 
-            this.plugins = plugins; 
-            var html = _.template(pluginAttribsTemplate, { plugins : gens });
+            this.plugins = plugins;
+            var html = _.template(pluginAttribsTemplate, {
+                plugins: gens
+            });
             this.el.innerHTML = html;
 
             return this;
         },
 
-        clickedPluginToggle: function(e) {
+        clickedPluginToggle: function (e) {
 
-            var pluginInd = e.currentTarget.id.replace('myonoffswitch-wrapper-','');
-            var isChecked = this.$el.find('#myonoffswitch'+pluginInd).hasClass('checked');
+            var pluginInd = e.currentTarget.id.replace('myonoffswitch-wrapper-', '');
+            var isChecked = this.$el.find('#myonoffswitch' + pluginInd).hasClass('checked');
 
             if (isChecked) {
                 v1State.get("plugins").uninstallPluginToModel(this.plugins[pluginInd], this.model);
-                this.$el.find('#myonoffswitch'+pluginInd).removeClass('checked');
-            }
-            else {
+                this.$el.find('#myonoffswitch' + pluginInd).removeClass('checked');
+            } else {
                 v1State.get("plugins").installPluginToModel(this.plugins[pluginInd], this.model);
-                this.$el.find('#myonoffswitch'+pluginInd).addClass('checked');
+                this.$el.find('#myonoffswitch' + pluginInd).addClass('checked');
             }
 
             e.preventDefault();
         },
 
-        changedAttribs: function(e) {
+        changedAttribs: function (e) {
             var props = String(e.target.id).split('-');
             var cid = props[1];
             var attrib = props[0];
@@ -10543,18 +10727,18 @@ require.define("/models_view/NodeModelPluginsView.js",function(require,module,ex
             this.fieldsCollection.get(cid).set(attrib, value);
         },
 
-        addedEntity: function(item) {
+        addedEntity: function (item) {
             var optString = '<option value="{{' + item.get('name') + '}}">List of ' + item.get('name') + 's</option>';
             $('.attribs', this.el).append(optString);
         },
 
-        clickedPropDelete: function(e) {
+        clickedPropDelete: function (e) {
             var cid = String(e.target.id || e.target.parentNode.id).replace('delete-', '');
 
             var model = this.fieldsCollection.get(cid);
             var widgets = v1State.getWidgetsRelatedToField(model);
 
-            _.each(widgets, function(widget) {
+            _.each(widgets, function (widget) {
                 widget.widget.getForm().removeFieldsConnectedToField(model);
             });
 
@@ -10562,11 +10746,11 @@ require.define("/models_view/NodeModelPluginsView.js",function(require,module,ex
             $('#column-' + cid).remove();
         },
 
-        clickedUploadExcel: function(e) {
+        clickedUploadExcel: function (e) {
             new AdminPanelView();
         },
 
-        showTableTutorial: function(e) {
+        showTableTutorial: function (e) {
             v1.showTutorial("Tables");
         }
 
@@ -10585,42 +10769,42 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
     require('../mixins/BackboneCardView');
 
     var descriptionTemplate = [
-    '<div class="description">',
+        '<div class="description">',
         '<span class="tbl-wrapper">',
-            '<span class="tbl">',
-                '<ul class="property-list">',
-                    '<div class="column header">',
-                        '<div class="hdr">Property</div>',
-                        '<div class="type-field desc">Type</div>',
-                    '</div>',
-                '</ul>',
-                '<div class="column add-property-column">',
-                    '<form class="add-property-form" style="display:none">',
-                            '<input type="text" class="property-name-input" placeholder="Property Name...">',
-                        '<input type="submit" class="done-btn" value="Done">',
-                    '</form>',
-                    '<span class="add-property-button box-button"><span class="plus-icon"></span>Add Property</span>',
-                '</div>',
-            '</span>',
+        '<span class="tbl">',
+        '<ul class="property-list">',
+        '<div class="column header">',
+        '<div class="hdr">Property</div>',
+        '<div class="type-field desc">Type</div>',
+        '</div>',
+        '</ul>',
+        '<div class="column add-property-column">',
+        '<form class="add-property-form" style="display:none">',
+        '<input type="text" class="property-name-input" placeholder="Property Name...">',
+        '<input type="submit" class="done-btn" value="Done">',
+        '</form>',
+        '<span class="add-property-button box-button"><span class="plus-icon"></span>Add Property</span>',
+        '</div>',
         '</span>',
-    '</div>'
+        '</span>',
+        '</div>'
     ].join('\n');
 
 
     var propertyTemplate = [
-    '<div class="column <% if(isNew) { %>newcol<% } %>" id="column-<%- cid %>">',
-      '<div class="hdr"><%- name %></div>',
-      '<div class="type-field" id="type-row-<%- cid %>">',
+        '<div class="column <% if(isNew) { %>newcol<% } %>" id="column-<%- cid %>">',
+        '<div class="hdr"><%- name %></div>',
+        '<div class="type-field" id="type-row-<%- cid %>">',
         '<select class="attribs" id="type-<%- cid %>">',
-            '<% _.each(fieldTypes, function(fieldType) { %>',
-                '<option value="<%= fieldType %>" <% if(type == fieldType) %> selected <% %>><%= fieldType %></option>',
-            '<% }); %>',
+        '<% _.each(fieldTypes, function(fieldType) { %>',
+        '<option value="<%= fieldType %>" <% if(type == fieldType) %> selected <% %>><%= fieldType %></option>',
+        '<% }); %>',
         '</select>',
-      '</div>',
-      '<div class="prop-cross" id="delete-<%- cid %>">',
+        '</div>',
+        '<div class="prop-cross" id="delete-<%- cid %>">',
         '<div class="remove hoff1">Remove</div>',
-      '</div>',
-    '</div>'
+        '</div>',
+        '</div>'
     ].join('\n');
 
     var mongooseTypes = [
@@ -10652,7 +10836,7 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
         },
 
 
-        initialize: function(tableModel) {
+        initialize: function (tableModel) {
             _.bindAll(this);
             this.model = tableModel;
             this.fieldsCollection = tableModel.getFieldsColl();
@@ -10666,7 +10850,7 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
             this.bindDupeWarning();
         },
 
-        render: function() {
+        render: function () {
 
             var html = _.template(descriptionTemplate, this.model.serialize());
 
@@ -10681,8 +10865,8 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
             return this;
         },
 
-        renderProperties: function() {
-            this.fieldsCollection.each(function(field) {
+        renderProperties: function () {
+            this.fieldsCollection.each(function (field) {
                 // only render non-relational properties
                 if (!field.isRelatedField()) {
                     this.appendField(field);
@@ -10690,8 +10874,8 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
             }, this);
         },
 
-        bindDupeWarning: function() {
-            this.listenTo(this.fieldsCollection, 'duplicate', function(key, val) {
+        bindDupeWarning: function () {
+            this.listenTo(this.fieldsCollection, 'duplicate', function (key, val) {
                 new SoftErrorView({
                     text: "Duplicate entry should not be duplicate. " + key + " of the field should not be the same: " + val,
                     path: ""
@@ -10699,13 +10883,13 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
             });
         },
 
-        clickedAddProperty: function(e) {
+        clickedAddProperty: function (e) {
             this.$el.find('.add-property-button').hide();
             this.$el.find('.add-property-form').fadeIn();
             $('.property-name-input', this.el).focus();
         },
 
-        createNewProperty: function(val) {
+        createNewProperty: function (val) {
             var name = val;
             if (!name.length) return;
             var newField = new FieldModel({
@@ -10714,7 +10898,7 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
             this.fieldsCollection.push(newField);
         },
 
-        appendField: function(fieldModel, isNew) {
+        appendField: function (fieldModel, isNew) {
             // don't append field if it's a relational field
             if (fieldModel.isRelatedField()) {
                 return false;
@@ -10725,11 +10909,11 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
             page_context.entityName = this.model.get('name');
             page_context.entities = this.otherEntities;
             page_context.isNew = isNew;
-            
-            var types = v1State.get('models').map(function(nodeModelModel) {
+
+            var types = v1State.get('models').map(function (nodeModelModel) {
                 // { type: Schema.Types.ObjectId, ref: "Studio" }
-                if(page_context.type ==  "{ type: Schema.Types.ObjectId, ref: '" + nodeModelModel.get('name') +"'}") {
-                   page_context.type = "{ ref: '" + nodeModelModel.get('name') + "',  type: Schema.Types.ObjectId}";
+                if (page_context.type == "{ type: Schema.Types.ObjectId, ref: '" + nodeModelModel.get('name') + "'}") {
+                    page_context.type = "{ ref: '" + nodeModelModel.get('name') + "',  type: Schema.Types.ObjectId}";
                 }
 
                 return "{ ref: '" + nodeModelModel.get('name') + "',  type: Schema.Types.ObjectId}";
@@ -10743,40 +10927,40 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
             this.$el.find('.property-list').append(template);
         },
 
-        removeField: function(fieldModel) {
+        removeField: function (fieldModel) {
             this.$el.find('#column-' + fieldModel.cid).remove();
         },
 
-        changedAttribs: function(e) {
-            var cid = String(e.currentTarget.id).replace('type-','');
+        changedAttribs: function (e) {
+            var cid = String(e.currentTarget.id).replace('type-', '');
             var value = e.currentTarget.value;
             this.fieldsCollection.get(cid).set("type", value);
         },
 
-        addedEntity: function(item) {
+        addedEntity: function (item) {
             var optString = '<option value="{{' + item.get('name') + '}}">List of ' + item.get('name') + 's</option>';
             $('.attribs', this.el).append(optString);
         },
 
-        clickedDelete: function(e) {
+        clickedDelete: function (e) {
             this.askToDelete(v1State.get('tables'));
         },
 
-        askToDelete: function(tableColl) {
+        askToDelete: function (tableColl) {
             var widgets = v1State.getWidgetsRelatedToTable(this.model);
             var model = this.model;
             if (widgets.length) {
 
-                var widgetsNL = _.map(widgets, function(widget) {
+                var widgetsNL = _.map(widgets, function (widget) {
                     return widget.widget.get('type') + ' on ' + widget.pageName;
                 });
                 var widgetsNLString = widgetsNL.join('\n');
                 new DialogueView({
                     text: "The related widgets listed below will be deleted with this table. Do you want to proceed? <br><br> " + widgetsNLString
-                }, function() {
+                }, function () {
                     tableColl.remove(model.cid);
                     v1State.get('pages').removePagesWithContext(model);
-                    _.each(widgets, function(widget) {
+                    _.each(widgets, function (widget) {
                         widget.widget.collection.remove(widget.widget);
                     });
                 });
@@ -10787,19 +10971,19 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
             }
         },
 
-        clickedPropDelete: function(e) {
+        clickedPropDelete: function (e) {
             var cid = String(e.target.id || e.target.parentNode.id).replace('delete-', '');
             this.fieldsCollection.remove(cid);
         },
 
-        clickedUploadExcel: function(e) {
+        clickedUploadExcel: function (e) {
             new AdminPanelView();
         },
 
-        renderRelations: function() {
+        renderRelations: function () {
             var tableRelations = v1State.get('models').getRelationsWithEntityName(this.model.get('name'));
             var list = this.$el.find('.related-fields').empty();
-            _(tableRelations).each(function(relation) {
+            _(tableRelations).each(function (relation) {
                 var suffix;
                 var text = 'Has ' + relation.related_name;
                 if (relation.type == "m2m" || relation.type == "fk") suffix = 'List of ' + util.pluralize(relation.entity);
@@ -10809,7 +10993,7 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
             list.append('<a href="#relation-new" class="related-tag offset1"><span style="font-size: 13px">+</span>  Add a data relationship</a>');
         },
 
-        initializeTableWidth: function() {
+        initializeTableWidth: function () {
             var width = (this.model.getFieldsColl().length + 2) * 100;
             width += 120;
             this.width = width;
@@ -10823,7 +11007,7 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
             }
         },
 
-        slideRight: function() {
+        slideRight: function () {
             var left = this.$el.find('.tbl-wrapper').scrollLeft();
             this.$el.find('.tbl-wrapper').scrollLeft(left + 6);
             if (!this.hasLeftArrow) {
@@ -10834,7 +11018,7 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
             }
         },
 
-        slideLeft: function() {
+        slideLeft: function () {
             var tblWrapper = this.$el.find('.tbl-wrapper');
             var left = tblWrapper.scrollLeft();
             tblWrapper.scrollLeft(left - 6);
@@ -10844,19 +11028,20 @@ require.define("/models_view/NodeModelDescriptionView.js",function(require,modul
             }
         },
 
-        typeClicked: function(e) {
+        typeClicked: function (e) {
             var cid = e.target.id.replace('type-row-', '');
             $('#type-' + cid).click();
             e.preventDefault();
         },
 
-        showTableTutorial: function(e) {
+        showTableTutorial: function (e) {
             v1.showTutorial("Tables");
         }
 
     });
 
     exports.NodeModelDescriptionView = NodeModelDescriptionView;
+
 });
 
 require.define("/models_view/NodeModelDataView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -10872,16 +11057,15 @@ require.define("/models_view/NodeModelDataView.js",function(require,module,expor
         className: 'data-view',
         subviews: [],
 
-        events: {
-        },
+        events: {},
 
 
-        initialize: function(tableModel) {
+        initialize: function (tableModel) {
             _.bindAll(this);
             this.model = tableModel;
         },
 
-        render: function() {
+        render: function () {
             this.el.innerHTML = 'Coming soon...';
             return this;
         },
@@ -10890,6 +11074,7 @@ require.define("/models_view/NodeModelDataView.js",function(require,module,expor
     });
 
     exports.NodeModelDataView = NodeModelDataView;
+
 });
 
 require.define("/models_view/NodeModelCodeView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -10901,12 +11086,12 @@ require.define("/models_view/NodeModelCodeView.js",function(require,module,expor
 
     var funcTemplate = [
         '<div class="code-chunk" id="func-chunk-<%= cid %>">',
-            '<span class="title">',
-                '<%= name %>',
-                '<div class="option-button settings blue pull-right" id="func-settings-<%= cid %>"></div>',
-                '<span class="func-type-container"></span>',
-            '</span>',
-            '<div class="code-editor" id="func-editor-<%= cid %>"></div>',
+        '<span class="title">',
+        '<%= name %>',
+        '<div class="option-button settings blue pull-right" id="func-settings-<%= cid %>"></div>',
+        '<span class="func-type-container"></span>',
+        '</span>',
+        '<div class="code-editor" id="func-editor-<%= cid %>"></div>',
         '</div>'
     ].join('\n');
 
@@ -10916,19 +11101,21 @@ require.define("/models_view/NodeModelCodeView.js",function(require,module,expor
         events: {
             'click .func-type-change': 'changeTypeHandler',
         },
-        initialize: function(el, methodModel) {
+        initialize: function (el, methodModel) {
             this.setElement(el);
             this.methodModel = methodModel;
             _.bindAll(this);
         },
-        render: function() {
+        render: function () {
             var funcTypeTemplate = '<span class="func-type"><%= funcType %></span>';
             if (!this.methodModel.isGenerator())
                 funcTypeTemplate += '<button class="func-type-change" type="button">Change type</button>';
-            this.$el.html(_.template(funcTypeTemplate, {funcType: this.methodModel.getType()}));
+            this.$el.html(_.template(funcTypeTemplate, {
+                funcType: this.methodModel.getType()
+            }));
             return this;
         },
-        changeTypeHandler: function() {
+        changeTypeHandler: function () {
             var newType = this.methodModel.toggleType();
             this.$el.find('.func-type').text(newType);
         },
@@ -10946,7 +11133,7 @@ require.define("/models_view/NodeModelCodeView.js",function(require,module,expor
         },
 
 
-        initialize: function(tableModel) {
+        initialize: function (tableModel) {
             _.bindAll(this);
             this.model = tableModel;
 
@@ -10954,19 +11141,19 @@ require.define("/models_view/NodeModelCodeView.js",function(require,module,expor
             this.listenTo(this.model.get('functions'), 'remove', this.removeMethod);
         },
 
-        render: function() {
+        render: function () {
 
             this.el.innerHTML = [
                 '<div class="static sect">',
-                    '<span class="title">Functions</span>',
-                    '<div id="static-methods-list"></div>',
-                    '<div id="add-static-box">',
-                        '<form style="display:none;">',
-                            '<input type="text" class="property-name-input" placeholder="Property Name...">',
-                            '<input type="submit" class="done-btn" value="Done">',
-                        '</form>',
-                        '<div class="add-button box-button">+ Create a New Function</div>',
-                    '</div>',
+                '<span class="title">Functions</span>',
+                '<div id="static-methods-list"></div>',
+                '<div id="add-static-box">',
+                '<form style="display:none;">',
+                '<input type="text" class="property-name-input" placeholder="Property Name...">',
+                '<input type="submit" class="done-btn" value="Done">',
+                '</form>',
+                '<div class="add-button box-button">+ Create a New Function</div>',
+                '</div>',
                 '</div>'
             ].join('\n');
 
@@ -10975,11 +11162,14 @@ require.define("/models_view/NodeModelCodeView.js",function(require,module,expor
             var list = this.$el.find('#static-methods-list')[0];
             this.list = list;
 
-            this.model.get('functions').each(function(methodModel, i){
+            this.model.get('functions').each(function (methodModel, i) {
                 var methodObj = methodModel.getGenerated();
-                list.innerHTML += _.template(funcTemplate, { name: methodObj.name, cid: methodModel.cid });
+                list.innerHTML += _.template(funcTemplate, {
+                    name: methodObj.name,
+                    cid: methodModel.cid
+                });
             });
-            _.each($(list).find('.func-type-container'), function(el, i) {
+            _.each($(list).find('.func-type-container'), function (el, i) {
                 var methodModel = self.model.get('functions').at(i);
                 var fcv = new FuncChooserView(el, methodModel);
                 fcv.render();
@@ -10991,8 +11181,8 @@ require.define("/models_view/NodeModelCodeView.js",function(require,module,expor
             return this;
         },
 
-        setupAce: function() {
-            this.model.get('functions').each(function(methodModel) {
+        setupAce: function () {
+            this.model.get('functions').each(function (methodModel) {
                 this.setupSingleAce(methodModel);
             }, this);
 
@@ -11001,7 +11191,7 @@ require.define("/models_view/NodeModelCodeView.js",function(require,module,expor
             // this.editor.on("change", this.keyup);
         },
 
-        setupSingleAce: function(methodModel) {
+        setupSingleAce: function (methodModel) {
             /* pass true as second argument to render this as a model_method from some plugin */
             /* this breaks when this.el is not rendered */
             var self = this;
@@ -11015,15 +11205,18 @@ require.define("/models_view/NodeModelCodeView.js",function(require,module,expor
                 console.log('setting read only');
                 editor.setReadOnly(true);
             } else {
-                editor.on("change", function() {
+                editor.on("change", function () {
                     self.codeChanged(methodModel, editor.getValue());
                 });
             }
         },
 
-        renderStaticMethod: function(methodModel) {
+        renderStaticMethod: function (methodModel) {
             var methodObj = methodModel.getGenerated();
-            this.list.innerHTML += _.template(funcTemplate, { name: methodObj.name, cid: methodModel.cid });
+            this.list.innerHTML += _.template(funcTemplate, {
+                name: methodObj.name,
+                cid: methodModel.cid
+            });
             var el = $(this.list).find('.func-type-container').last();
             var fcv = new FuncChooserView(el, methodModel);
             fcv.render();
@@ -11034,21 +11227,24 @@ require.define("/models_view/NodeModelCodeView.js",function(require,module,expor
             }
         },
 
-        clickedSettings: function(e) {
-            var cid = e.currentTarget.id.replace('func-settings-','');
+        clickedSettings: function (e) {
+            var cid = e.currentTarget.id.replace('func-settings-', '');
             var methodModel = this.model.get('functions').get(cid);
             new WidgetSettingsView(methodModel).render();
         },
 
-        removeMethod: function(methodModel) {
+        removeMethod: function (methodModel) {
             this.$el.find('#func-chunk-', methodModel.cid).remove();
         },
 
-        createStaticFunction: function(functionName) {
-            this.model.get('functions').add(new NodeModelMethodModel({ name: functionName, code: '' }));
+        createStaticFunction: function (functionName) {
+            this.model.get('functions').add(new NodeModelMethodModel({
+                name: functionName,
+                code: ''
+            }));
         },
 
-        codeChanged: function(methodModel, newValue) {
+        codeChanged: function (methodModel, newValue) {
             methodModel.set('code', newValue);
         }
 
@@ -11063,52 +11259,52 @@ require.define("/AppInfoView.js",function(require,module,exports,__dirname,__fil
     var ErrorDialogueView = require('./mixins/ErrorDialogueView');
 
     var app_info_view_temp = [
-            '<div class="span40 domains w-pane pb2 hoff4" id="domain-settings">',
-              '<h3 class="span36 offset2 hoff1">Domain Settings</h3>',
-              '<hr class="span40">',
-              '<div class="span36 offset2 hi5 hoff1">',
-                '<h4>Current subdomain:</h4>',
-                '<div><a href="{{ app.url }}" target="_blank">{{ app.hostname }}</a></div>',
-              '</div>',
-              '<hr class="span40">',
-              '<div class="span36 offset2 hi5 hoff1">',
-                '<h4>Change subdomain</h4>',
-                '<form class="register-subdomain-form hi7">',
-                    '<p class="span18"><input type="text" class="span10 register-subdomain-input" placeholder="Your subdomain"/>',
-                    '<span style="line-height:50px">.appcubator.com</span></p>',
-                  '<a class="register-subdomain-button btn span13" style="display:none;">Claim subdomain</a>',
-                '</form>',
-              '</div>',
-            '</div>',
+        '<div class="span40 domains w-pane pb2 hoff4" id="domain-settings">',
+        '<h3 class="span36 offset2 hoff1">Domain Settings</h3>',
+        '<hr class="span40">',
+        '<div class="span36 offset2 hi5 hoff1">',
+        '<h4>Current subdomain:</h4>',
+        '<div><a href="{{ app.url }}" target="_blank">{{ app.hostname }}</a></div>',
+        '</div>',
+        '<hr class="span40">',
+        '<div class="span36 offset2 hi5 hoff1">',
+        '<h4>Change subdomain</h4>',
+        '<form class="register-subdomain-form hi7">',
+        '<p class="span18"><input type="text" class="span10 register-subdomain-input" placeholder="Your subdomain"/>',
+        '<span style="line-height:50px">.appcubator.com</span></p>',
+        '<a class="register-subdomain-button btn span13" style="display:none;">Claim subdomain</a>',
+        '</form>',
+        '</div>',
+        '</div>',
 
-            '<div class="w-pane span40 hoff4 pb2" id="danger-zone">',
-              '<h3 class="span36 offset2 hoff1">Danger Zone</h3>',
-              '<hr class="span40">',
-              '<a class="btn btn-danger hoff1 span8 offset2" id="delete">Delete App</a>',
-            '</div>'
+        '<div class="w-pane span40 hoff4 pb2" id="danger-zone">',
+        '<h3 class="span36 offset2 hoff1">Danger Zone</h3>',
+        '<hr class="span40">',
+        '<a class="btn btn-danger hoff1 span8 offset2" id="delete">Delete App</a>',
+        '</div>'
     ].join('\n');
 
 
     var AppInfoView = Backbone.View.extend({
 
         events: {
-            'click #delete'         : 'deleteApp',
-            'keyup #app-name'       : 'changeName',
-            'keyup #app-keywords'   : 'changeKeywords',
+            'click #delete': 'deleteApp',
+            'keyup #app-name': 'changeName',
+            'keyup #app-keywords': 'changeKeywords',
             'keyup #app-description': 'changeDescription',
 
-            'keyup .register-subdomain-input'  : 'checkForSubDomain',
-            'click #register-new-subdomain'    : 'showSubDomainRegistrationForm',
-            'click .register-subdomain-button' : 'registerSubDomain',
-            'submit .register-subdomain-form'  : 'cancelFormSubmission',
+            'keyup .register-subdomain-input': 'checkForSubDomain',
+            'click #register-new-subdomain': 'showSubDomainRegistrationForm',
+            'click .register-subdomain-button': 'registerSubDomain',
+            'submit .register-subdomain-form': 'cancelFormSubmission',
 
-            'keyup .register-domain-input'  : 'checkForDomain',
-            'click #register-new-domain'    : 'showDomainRegistrationForm',
-            'click .register-domain-button' : 'registerDomain',
-            'submit .register-domain-form'  : 'cancelFormSubmission'
+            'keyup .register-domain-input': 'checkForDomain',
+            'click #register-new-domain': 'showDomainRegistrationForm',
+            'click .register-domain-button': 'registerDomain',
+            'submit .register-domain-form': 'cancelFormSubmission'
         },
 
-        initialize: function() {
+        initialize: function () {
             _.bindAll(this);
 
             this.model = v1State.get('info');
@@ -11116,7 +11312,7 @@ require.define("/AppInfoView.js",function(require,module,exports,__dirname,__fil
             this.striper = new Striper();
         },
 
-        render: function() {
+        render: function () {
             var page_context = {};
             page_context.name = this.model.get('name');
             page_context.keywords = this.model.get('keywords');
@@ -11127,7 +11323,7 @@ require.define("/AppInfoView.js",function(require,module,exports,__dirname,__fil
             this.$nav = $('.navigator .left-nav');
 
             // make left nav links scroll page
-            this.$nav.find('a').click(function() {
+            this.$nav.find('a').click(function () {
                 var elem = this.getAttribute('href');
                 var topPos = $(elem).offset().top - 75;
                 $('html,body').animate({
@@ -11135,7 +11331,7 @@ require.define("/AppInfoView.js",function(require,module,exports,__dirname,__fil
                 });
                 return false;
             });
-            this.$nav.find('li').click(function() {
+            this.$nav.find('li').click(function () {
                 this.children[0].click();
             });
 
@@ -11145,28 +11341,28 @@ require.define("/AppInfoView.js",function(require,module,exports,__dirname,__fil
             return this;
         },
 
-        changeName: function(e) {
+        changeName: function (e) {
             this.model.set('name', e.target.value);
             util.askBeforeLeave();
         },
 
-        changeKeywords: function(e) {
+        changeKeywords: function (e) {
             this.model.set('keywords', e.target.value);
             util.askBeforeLeave();
         },
 
-        changeDescription: function(e) {
+        changeDescription: function (e) {
             this.model.set('description', e.target.value);
             util.askBeforeLeave();
         },
 
-        deleteApp: function() {
+        deleteApp: function () {
             var r = confirm("Are you sure you want to delete this App?");
             if (r === true) {
                 $.ajax({
                     type: "POST",
                     url: '/app/' + appId + '/delete/',
-                    complete: function() {
+                    complete: function () {
                         var url = '/app/';
                         window.location.href = url;
                     },
@@ -11177,26 +11373,26 @@ require.define("/AppInfoView.js",function(require,module,exports,__dirname,__fil
             }
         },
 
-        showDomainRegistrationForm: function(e) {
+        showDomainRegistrationForm: function (e) {
             $(e.target).hide();
             this.$el.find('.register-domain-form').fadeIn();
             this.$el.find('.register-domain-input').focus();
         },
 
-        registerDomain: function(e) {
+        registerDomain: function (e) {
             alert('register');
         },
 
-        registerSubDomain: function(e) {
+        registerSubDomain: function (e) {
             var subdomain = $('.register-subdomain-input').val();
             $.ajax({
                 type: "POST",
                 url: '/app/' + appId + '/subdomain/' + subdomain + '/',
                 data: {},
-                success: function(d) {
+                success: function (d) {
                     location.reload(true);
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     util.stopAjaxLoading();
                     console.log(JSON.parse(xhr.responseText).errors.replace("\n", '\n'));
                     alert("error: see logs");
@@ -11205,19 +11401,19 @@ require.define("/AppInfoView.js",function(require,module,exports,__dirname,__fil
             util.startAjaxLoading();
         },
 
-        showSubDomainRegistrationForm: function(e) {
+        showSubDomainRegistrationForm: function (e) {
             $(e.target).hide();
             this.$el.find('.register-subdomain-form').fadeIn();
             this.$el.find('.register-subdomain-input').focus();
         },
 
-        checkForDomain: function(e) {
+        checkForDomain: function (e) {
             var name = $('.register-domain-input').val();
 
             $.ajax({
                 type: "POST",
                 url: '/domains/' + name + '/available_check/',
-                success: function(domainIsAvailable) {
+                success: function (domainIsAvailable) {
                     if (domainIsAvailable) {
                         $('.register-domain-input').removeClass('not-available');
                         $('.register-domain-input').addClass('available');
@@ -11228,20 +11424,22 @@ require.define("/AppInfoView.js",function(require,module,exports,__dirname,__fil
                         $('.register-domain-button').hide();
                     }
                 },
-                error: function(resp) {
-                    new ErrorDialogueView({text: "There seems to be a problem with the server. Please refresh the page and try again."});
+                error: function (resp) {
+                    new ErrorDialogueView({
+                        text: "There seems to be a problem with the server. Please refresh the page and try again."
+                    });
                 },
                 dataType: "JSON"
             });
         },
 
-        checkForSubDomain: function(e) {
+        checkForSubDomain: function (e) {
             var name = $('.register-subdomain-input').val();
 
             $.ajax({
                 type: "POST",
                 url: '/subdomains/' + name + '/available_check/',
-                success: function(domainIsAvailable) {
+                success: function (domainIsAvailable) {
                     if (domainIsAvailable) {
                         $('.register-subdomain-input').removeClass('not-available');
                         $('.register-subdomain-input').addClass('available');
@@ -11252,14 +11450,16 @@ require.define("/AppInfoView.js",function(require,module,exports,__dirname,__fil
                         $('.register-subdomain-button').hide();
                     }
                 },
-                error: function(resp) {
-                    new ErrorDialogueView({text: "There seems to be a problem with the server. Please refresh the page and try again."});
+                error: function (resp) {
+                    new ErrorDialogueView({
+                        text: "There seems to be a problem with the server. Please refresh the page and try again."
+                    });
                 },
                 dataType: "JSON"
             });
         },
 
-        cancelFormSubmission: function(e) {
+        cancelFormSubmission: function (e) {
             e.preventDefault();
         }
     });
@@ -11269,165 +11469,168 @@ require.define("/AppInfoView.js",function(require,module,exports,__dirname,__fil
 });
 
 require.define("/pages/PagesView.js",function(require,module,exports,__dirname,__filename,process,global){    var RouteModel = require('../models/RouteModel').RouteModel;
-        // 'models/UrlModel',
-        // 'collections/RouteCollection',
-        // 'app/pages/PageView',
-        // 'mixins/ErrorDialogueView',
-        // 'mixins/BackboneNameBox',
+    // 'models/UrlModel',
+    // 'collections/RouteCollection',
+    // 'app/pages/PageView',
+    // 'mixins/ErrorDialogueView',
+    // 'mixins/BackboneNameBox',
 
 
-        var PagesView = Backbone.View.extend({
+    var PagesView = Backbone.View.extend({
 
-            el: document.body,
-            css: 'pages',
-            subviews: [],
+        el: document.body,
+        css: 'pages',
+        subviews: [],
 
-            events: {
-                'click #clone-page-box': 'showCloneBox',
-                'change #pages-list-clone': 'clonePageName',
-                'submit .clone-name-form': 'clonePage'
-            },
+        events: {
+            'click #clone-page-box': 'showCloneBox',
+            'change #pages-list-clone': 'clonePageName',
+            'submit .clone-name-form': 'clonePage'
+        },
 
-            initialize: function() {
-                _.bindAll(this);
+        initialize: function () {
+            _.bindAll(this);
 
-                this.collection = v1State.get('pages');
-                this.listenTo(this.collection, 'add', function(model) {
+            this.collection = v1State.get('pages');
+            this.listenTo(this.collection, 'add', function (model) {
+                this.appendPage(model, false);
+            });
+
+            this.title = "Pages";
+        },
+
+        render: function () {
+            this.$el.html(_.template(util.getHTML('pages-page'), {}));
+            this.listView = document.getElementById('list-pages');
+
+            if (this.collection.length === 0) {
+
+            } else {
+                this.collection.each(function (model) {
                     this.appendPage(model, false);
-                });
-
-                this.title = "Pages";
-            },
-
-            render: function() {
-                this.$el.html(_.template(util.getHTML('pages-page'), {}));
-                this.listView = document.getElementById('list-pages');
-
-                if (this.collection.length === 0) {
-
-                } else {
-                    this.collection.each(function(model) {
-                        this.appendPage(model, false);
-                    }, this);
-                }
-
-                var createBox = new Backbone.NameBox({
-                    el: document.getElementById('create-page-box')
-                });
-                this.subviews.push(createBox);
-                createBox.on('submit', this.createPage);
-
-                $("#list-pages").sortable({ cancel: "select" });
-            },
-
-            renderAddMobile: function() {
-                //this.$el.append('<div class="add-mobile-section pane span40 offset10 hi6"><span class="mw mobile-image"></span><span>Add Mobile Functionality</span></div>');
-            },
-
-            renderAddWeb: function() {
-                //this.$el.append('<div class="add-web-section pane span40 offset10 hi6"><span class="mw web-image"></span><span>Add Web Functionality</span></div>');
-            },
-
-            createPage: function(name, b) {
-                var pageM = this.collection.push({
-                    name: name,
-                });
-                pageM.setupUrl(name);
-
-                v1.save();
-            },
-
-            createMobilePage: function(name, b) {
-                var pageUrlPart = name.replace(' ', '_');
-                var pageUrl = {
-                    urlparts: [pageUrlPart]
-                };
-
-                if (!v1State.get('mobilePages').isUnique(name)) {
-                    new ErrorDialogueView({
-                        text: 'Page name should be unique.'
-                    });
-                    return;
-                }
-                this.mobileCollection.add({
-                    name: name,
-                    url: pageUrl,
-                    navbar: {
-                        brandName: v1State.get('name'),
-                        links: [{
-                            "url": "internal://Homepage",
-                            "title": "Homepage"
-                        }]
-                    }
-                });
-
-                v1.save();
-            },
-
-            appendPage: function(model, isMobile) {
-                if (!isMobile) {
-                    var ind = _.indexOf(this.collection.models, model);
-                    var pageView = new PageView(model, ind, false);
-                    this.listView.appendChild(pageView.render().el);
-                    this.subviews.push(pageView);
-                } else {
-                    var ind = _.indexOf(this.mobileCollection.models, model);
-                    var mobilePageView = new PageView(model, ind, true);
-                    this.mobileListView.appendChild(mobilePageView.render().el);
-                    this.subviews.push(mobilePageView);
-                }
-            },
-
-            showCloneBox: function() {
-                var list = document.getElementById('pages-list-clone');
-                list.innerHTML = '';
-                v1State.get('pages').each(function(pageM) {
-                    var liEl = document.createElement('option');
-                    liEl.value = 'clone-page-' + pageM.cid;
-                    liEl.innerHTML = pageM.get('name');
-                    list.appendChild(liEl);
-                });
-
-                this.$el.find('.box-button-clone').hide();
-                this.$el.find('.clone-options').fadeIn();
-            },
-
-            clonePageName: function(e) {
-                //this.$el.find('.box-button-clone').fadeIn();
-                var el = document.getElementById('pages-list-clone');
-                this.pageCidToClone = el.value.replace('clone-page-', '');
-                this.$el.find('.clone-options').hide();
-                this.$el.find('.clone-name-form').fadeIn();
-                $('.clone-page-name').focus();
-            },
-
-            clonePage: function(e) {
-                e.preventDefault();
-
-                var pageM = v1State.get('pages').get(this.pageCidToClone);
-                var pageName = $('.clone-page-name').val();
-
-                var initModel = pageM.serialize();
-                var pageUrlPart = pageName.replace(/ /g, '_');
-                initModel.url.urlparts[0] = pageUrlPart;
-                initModel.name = pageName;
-                initModel = new PageModel(initModel);
-
-                this.collection.add(initModel);
-
-                this.$el.find('.clone-name-form').hide();
-                this.$el.find('.box-button-clone').fadeIn();
-                $('.clone-page-name').val('');
-            },
-
-            close: function() {
-                $("#list-pages").sortable("destroy");
-                PagesView.__super__.close.call(this);
+                }, this);
             }
 
-        });
+            var createBox = new Backbone.NameBox({
+                el: document.getElementById('create-page-box')
+            });
+            this.subviews.push(createBox);
+            createBox.on('submit', this.createPage);
 
-        exports.PagesView = PagesView;
+            $("#list-pages").sortable({
+                cancel: "select"
+            });
+        },
+
+        renderAddMobile: function () {
+            //this.$el.append('<div class="add-mobile-section pane span40 offset10 hi6"><span class="mw mobile-image"></span><span>Add Mobile Functionality</span></div>');
+        },
+
+        renderAddWeb: function () {
+            //this.$el.append('<div class="add-web-section pane span40 offset10 hi6"><span class="mw web-image"></span><span>Add Web Functionality</span></div>');
+        },
+
+        createPage: function (name, b) {
+            var pageM = this.collection.push({
+                name: name,
+            });
+            pageM.setupUrl(name);
+
+            v1.save();
+        },
+
+        createMobilePage: function (name, b) {
+            var pageUrlPart = name.replace(' ', '_');
+            var pageUrl = {
+                urlparts: [pageUrlPart]
+            };
+
+            if (!v1State.get('mobilePages').isUnique(name)) {
+                new ErrorDialogueView({
+                    text: 'Page name should be unique.'
+                });
+                return;
+            }
+            this.mobileCollection.add({
+                name: name,
+                url: pageUrl,
+                navbar: {
+                    brandName: v1State.get('name'),
+                    links: [{
+                        "url": "internal://Homepage",
+                        "title": "Homepage"
+                    }]
+                }
+            });
+
+            v1.save();
+        },
+
+        appendPage: function (model, isMobile) {
+            if (!isMobile) {
+                var ind = _.indexOf(this.collection.models, model);
+                var pageView = new PageView(model, ind, false);
+                this.listView.appendChild(pageView.render().el);
+                this.subviews.push(pageView);
+            } else {
+                var ind = _.indexOf(this.mobileCollection.models, model);
+                var mobilePageView = new PageView(model, ind, true);
+                this.mobileListView.appendChild(mobilePageView.render().el);
+                this.subviews.push(mobilePageView);
+            }
+        },
+
+        showCloneBox: function () {
+            var list = document.getElementById('pages-list-clone');
+            list.innerHTML = '';
+            v1State.get('pages').each(function (pageM) {
+                var liEl = document.createElement('option');
+                liEl.value = 'clone-page-' + pageM.cid;
+                liEl.innerHTML = pageM.get('name');
+                list.appendChild(liEl);
+            });
+
+            this.$el.find('.box-button-clone').hide();
+            this.$el.find('.clone-options').fadeIn();
+        },
+
+        clonePageName: function (e) {
+            //this.$el.find('.box-button-clone').fadeIn();
+            var el = document.getElementById('pages-list-clone');
+            this.pageCidToClone = el.value.replace('clone-page-', '');
+            this.$el.find('.clone-options').hide();
+            this.$el.find('.clone-name-form').fadeIn();
+            $('.clone-page-name').focus();
+        },
+
+        clonePage: function (e) {
+            e.preventDefault();
+
+            var pageM = v1State.get('pages').get(this.pageCidToClone);
+            var pageName = $('.clone-page-name').val();
+
+            var initModel = pageM.serialize();
+            var pageUrlPart = pageName.replace(/ /g, '_');
+            initModel.url.urlparts[0] = pageUrlPart;
+            initModel.name = pageName;
+            initModel = new PageModel(initModel);
+
+            this.collection.add(initModel);
+
+            this.$el.find('.clone-name-form').hide();
+            this.$el.find('.box-button-clone').fadeIn();
+            $('.clone-page-name').val('');
+        },
+
+        close: function () {
+            $("#list-pages").sortable("destroy");
+            PagesView.__super__.close.call(this);
+        }
+
+    });
+
+    exports.PagesView = PagesView;
+
 });
 
 require.define("/main.js",function(require,module,exports,__dirname,__filename,process,global){var Generator = require('./Generator').Generator;
@@ -11441,7 +11644,7 @@ var AppRouter = require('./AppRouter').AppRouter;
 
 if (window) {
 
-    window.onerror = function(){
+    window.onerror = function () {
         //alert("I\'m a bug, please squash me.");
     }
 
@@ -11451,7 +11654,9 @@ if (window) {
     /* Initialize v1State */
     window.v1State = new Backbone.Model();
     /* Global code generator for this app. */
-    window.G = new Generator(function(){ return v1State.serialize().plugins; });
+    window.G = new Generator(function () {
+        return v1State.serialize().plugins;
+    });
     v1State = new AppModel(appState);
     v1State.set('routes', new RouteCollection(appState.routes || []));
 
@@ -11459,7 +11664,7 @@ if (window) {
     v1UIEState = new ThemeModel(uieState);
 
     /* Help with debugging */
-    v1State.on('error', function(message) {
+    v1State.on('error', function (message) {
         alert(message);
     });
 
@@ -11471,13 +11676,13 @@ if (window) {
 
     v1 = {};
     v1 = new AppRouter();
-    v1.appmain(0,0);
+    v1.appmain(0, 0);
     // Backbone.history.start({
     //     pushState: true
     // });
 
     // handle all click events for routing
-    $(document).on('click', 'a[rel!="external"]', function(e) {
+    $(document).on('click', 'a[rel!="external"]', function (e) {
         var href = e.currentTarget.getAttribute('href') || "";
         var appId = appId || {};
         // if internal link, navigate with router

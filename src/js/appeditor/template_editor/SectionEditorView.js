@@ -5,20 +5,20 @@
     var SectionEditorView = Backbone.View.extend({
 
         events: {
-            'keyup .class_name'     : 'classNameChaged',
-            'click .remove-section' : 'removeSection',
-            'click .settings'       : 'openSettingsView',
-            'click .section-up'     : 'moveSectionUp',
-            'click .section-down'   : 'moveSectionDown',
+            'keyup .class_name': 'classNameChaged',
+            'click .remove-section': 'removeSection',
+            'click .settings': 'openSettingsView',
+            'click .section-up': 'moveSectionUp',
+            'click .section-down': 'moveSectionDown',
             'click .dropdown-toggle': 'toggleDropdown',
-            'mouseover'             : 'menuHovered',
-            'mouseout'              : 'menuUnhovered'
+            'mouseover': 'menuHovered',
+            'mouseout': 'menuUnhovered'
         },
 
         className: "section-editor-view",
         isActive: true,
 
-        initialize: function(sectionModel) {
+        initialize: function (sectionModel) {
             _.bindAll(this);
             this.model = sectionModel;
             this.listenTo(this.model, 'hovered', this.hovered);
@@ -26,22 +26,23 @@
             this.listenTo(this.model, 'remove', this.close);
         },
 
-        render: function() {
+        render: function () {
             var template = [
-                    '<div class="btn-group">',
-                        '<div class="section-editor-button">',
-                            '<div class="dropdown-toggle"><img width="24" class="icon" src="' + STATIC_URL + 'img/edit.png"></div>',
-                            '<div class="section-up move">▲</div>',
-                            '<div class="section-down move">▼</div>',
-                        '</div>',
-                        '<ul class="section-editor-menu animated">',
-                            '<div class="top-arrow arw"></div>',
-     
-                            '<li><a><input type="text" class="class_name" value="<%= className %>" placeholder="Class Name"></a></li>',
-                            '<li><span class="option-button delete-button tt remove-section"></span><div class="option-button settings"></div></li>',
-                            // '<li class="remove-section"><a>Remove Section</a></li>',
-                        '</ul>',
-                    '</div>'].join('');
+                '<div class="btn-group">',
+                '<div class="section-editor-button">',
+                '<div class="dropdown-toggle"><img width="24" class="icon" src="' + STATIC_URL + 'img/edit.png"></div>',
+                '<div class="section-up move">▲</div>',
+                '<div class="section-down move">▼</div>',
+                '</div>',
+                '<ul class="section-editor-menu animated">',
+                '<div class="top-arrow arw"></div>',
+
+                '<li><a><input type="text" class="class_name" value="<%= className %>" placeholder="Class Name"></a></li>',
+                '<li><span class="option-button delete-button tt remove-section"></span><div class="option-button settings"></div></li>',
+                // '<li class="remove-section"><a>Remove Section</a></li>',
+                '</ul>',
+                '</div>'
+            ].join('');
 
             var data = this.model.toJSON();
             data.className = data.className || "";
@@ -66,7 +67,7 @@
             return this;
         },
 
-        renderShadow: function() {
+        renderShadow: function () {
 
             this.shadowEl = util.addShadow(this.$sectionEl[0], document.getElementById('page-wrapper'), this.iframe, this.iframeDoc);
             this.shadowEl.className = "section-shadow";
@@ -75,19 +76,18 @@
 
         },
 
-        positionShadow: function() {
+        positionShadow: function () {
             this.$sectionEl = $(this.iframeDoc).find('[data-cid="' + this.model.cid + '"]');
             var positionRightTop = util.getRightTop(this.$sectionEl[0], document.getElementById('page-wrapper'), this.iframe, this.iframeDoc);
             this.shadowEl.style.top = (positionRightTop.top) + "px";
             this.shadowEl.style.height = this.$sectionEl.outerHeight() + 'px';
         },
 
-        toggleDropdown: function() {
+        toggleDropdown: function () {
             if (this.expanded) {
                 this.$menu.hide();
                 this.expanded = false;
-            }
-            else {
+            } else {
                 this.$menu.addClass('fadeInUp');
                 this.$menu.show();
                 this.$el.find('.class_name').focus();
@@ -95,7 +95,7 @@
             }
         },
 
-        setPosition: function() {
+        setPosition: function () {
             var $el = $(this.iframeDoc).find('[data-cid="' + this.model.cid + '"]');
             var el = $el[0];
 
@@ -104,20 +104,20 @@
             this.el.style.top = (positionRightTop.top + 15) + 'px';
         },
 
-        classNameChaged: function(e) {
+        classNameChaged: function (e) {
             var value = e.currentTarget.value;
             this.model.set('className', value);
         },
 
-        openSettingsView: function() {
+        openSettingsView: function () {
             new WidgetSettingsView(this.model).render();
             this.isActive = true;
         },
 
-        moveSectionUp: function() {
+        moveSectionUp: function () {
             var fromInd = _.indexOf(this.model.collection.models, this.model);
             var toInd = fromInd - 1;
-            if(fromInd == 0) return;
+            if (fromInd == 0) return;
             this.model.collection.arrangeSections(fromInd, toInd);
             this.setPosition();
             this.positionShadow();
@@ -126,47 +126,47 @@
         moveSectionDown: function () {
             var fromInd = _.indexOf(this.model.collection.models, this.model);
             var toInd = fromInd + 1;
-            if(this.model.collection.models.length == toInd) return;
+            if (this.model.collection.models.length == toInd) return;
             this.model.collection.arrangeSections(fromInd, toInd);
             this.setPosition();
             this.positionShadow();
         },
 
-        removeSection: function() {
+        removeSection: function () {
             this.model.collection.remove(this.model);
         },
 
-        menuHovered: function() {
+        menuHovered: function () {
             this.positionShadow();
             this.$shadowView.show();
             this.isActive = true;
         },
 
-        menuUnhovered: function() {
+        menuUnhovered: function () {
             this.isActive = false;
             var self = this;
-            var timer = setTimeout(function() {
-            	console.log(self.isActive);
-            	if (!self.isActive) {
-            		self.$shadowView.hide();
-            	}
+            var timer = setTimeout(function () {
+                console.log(self.isActive);
+                if (!self.isActive) {
+                    self.$shadowView.hide();
+                }
 
-            	clearTimeout(timer);
+                clearTimeout(timer);
             }, 600);
         },
 
-        hovered: function() {
+        hovered: function () {
             this.setPosition();
             this.$el.show();
         },
 
-        unhovered: function() {
+        unhovered: function () {
             this.$el.hide();
             this.$menu.hide();
             this.expanded = false;
         },
 
-        close: function() {
+        close: function () {
             this.$shadowView.remove();
             SectionEditorView.__super__.close.call(this);
         }

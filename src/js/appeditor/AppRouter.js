@@ -8,30 +8,30 @@
     var AppRouter = Backbone.Router.extend({
 
         routes: {
-            "app/new/"                     : "newapp",
-            "app/:appid/info/*tutorial"    : "info",
-            "app/:appid/tables/*tutorial"  : "tables",
-            "app/:appid/gallery/*tutorial" : "themes",
-            "app/:appid/template/:pageid/" : "appmain",
-            "app/:appid/plugins/*tutorial" : "plugins",
+            "app/new/": "newapp",
+            "app/:appid/info/*tutorial": "info",
+            "app/:appid/tables/*tutorial": "tables",
+            "app/:appid/gallery/*tutorial": "themes",
+            "app/:appid/template/:pageid/": "appmain",
+            "app/:appid/plugins/*tutorial": "plugins",
             "app/:appid/mobile-editor/:pageid/": "mobileEditor",
-            "app/:appid/emails/*tutorial"  : "emails",
-            "/"                            : "appmain",
-            "*anything"                    : "appmain",
-            "account"                      : "accountPage",
+            "app/:appid/emails/*tutorial": "emails",
+            "/": "appmain",
+            "*anything": "appmain",
+            "account": "accountPage",
         },
 
         tutorialPage: 0,
 
-        initialize: function() {
+        initialize: function () {
             var self = this;
             v1.view = null;
 
             this.currentApp = null;
         },
 
-        configApp: function() {
-            if(this.currentApp) return;
+        configApp: function () {
+            if (this.currentApp) return;
 
             this.currentApp = new AppView({
                 model: v1State,
@@ -60,28 +60,28 @@
             v1.currentApp.themes(tutorial);
         },
 
-        pages: function(appId, tutorial) {
+        pages: function (appId, tutorial) {
             v1.configApp();
             v1.currentApp.pages(tutorial);
         },
 
-        appmain: function(appId, pageId) {
+        appmain: function (appId, pageId) {
             v1.configApp();
             if (!pageId) pageId = 0;
             v1.currentApp.pageWithIndex(pageId);
         },
 
-        emails: function(appId, tutorial) {
+        emails: function (appId, tutorial) {
             v1.configApp();
             v1.currentApp.emails(tutorial);
         },
 
-        plugins: function(appId, tutorial) {
+        plugins: function (appId, tutorial) {
             v1.configApp();
             //v1.currentApp.plugins(tutorial);
         },
 
-        showTutorial: function(dir) {
+        showTutorial: function (dir) {
             var inp = (dir) ? dir : this.tutorialPage;
             if (this.tutorialIsVisible) {
                 this.tutorial.chooseSlide(inp);
@@ -93,11 +93,11 @@
             }
         },
 
-        accountPage: function() {
-            var PaymentsMain = function() {
+        accountPage: function () {
+            var PaymentsMain = function () {
                 var striper = new Striper();
                 striper.bindChangeCard('.change-card', 'change-card-form');
-                striper.onSuccess = function() {
+                striper.onSuccess = function () {
                     window.location = "/account/";
                 };
 
@@ -111,7 +111,7 @@
             this.$nav = $('.navigator .left-nav');
 
             // make left nav links scroll page
-            this.$nav.find('a').click(function() {
+            this.$nav.find('a').click(function () {
                 var elem = this.getAttribute('href');
                 var topPos = $(elem).offset().top - 75;
                 $('html,body').animate({
@@ -124,25 +124,25 @@
                 offset: 0
             });
 
-            $('#add-key-btn').on('click', function() {
+            $('#add-key-btn').on('click', function () {
                 $('#add-key-btn').hide();
                 $('#add-key-panel').fadeIn();
             });
 
             // @ksikka's code
-            $(document).ready(function() {
-                $('form').not('.no-ajax').each(function(ind, node) {
-                    $(node).submit(function(e) {
+            $(document).ready(function () {
+                $('form').not('.no-ajax').each(function (ind, node) {
+                    $(node).submit(function (e) {
                         var self = this;
                         var ajax_info = {
                             type: $(node).attr('method'),
                             url: $(node).attr('action'),
                             data: $(node).serialize(),
-                            success: function(data, statusStr, xhr) {
-                                if (typeof(data.redirect_to) !== 'undefined') {
+                            success: function (data, statusStr, xhr) {
+                                if (typeof (data.redirect_to) !== 'undefined') {
                                     location.href = data.redirect_to;
                                 } else {
-                                    _.each(data, function(val, key, ind) {
+                                    _.each(data, function (val, key, ind) {
                                         if (key === '__all__') {
                                             $(self).find('.form-error.field-all').html(val.join('<br />')).show();
                                         } else {
@@ -160,39 +160,39 @@
             });
         },
 
-        newapp: function() {
+        newapp: function () {
 
-            $('#skip-racoon').hover(function() {
+            $('#skip-racoon').hover(function () {
                 $('#mascot').addClass('happy');
-            }, function() {
+            }, function () {
                 $('#mascot').removeClass('happy');
             });
 
         },
 
-        dashboard: function() {
+        dashboard: function () {
             console.log("DASHBOARD");
 
             var dboard = new DashboardsView();
 
-            $( document ).tooltip({
-              position: {
-                my: "center bottom-10",
-                at: "center top",
-                using: function( position, feedback ) {
-                  $( this ).css( position );
-                  $( "<div>" )
-                    .addClass( "arrow" )
-                    .addClass( feedback.vertical )
-                    .addClass( feedback.horizontal )
-                    .appendTo( this );
+            $(document).tooltip({
+                position: {
+                    my: "center bottom-10",
+                    at: "center top",
+                    using: function (position, feedback) {
+                        $(this).css(position);
+                        $("<div>")
+                            .addClass("arrow")
+                            .addClass(feedback.vertical)
+                            .addClass(feedback.horizontal)
+                            .appendTo(this);
+                    }
                 }
-              }
             });
 
         },
 
-        changeTitle: function(title) {
+        changeTitle: function (title) {
             var newTitle = "";
             if (title) {
                 newTitle = " | " + title;

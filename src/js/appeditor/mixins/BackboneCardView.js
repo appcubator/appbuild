@@ -10,7 +10,7 @@
                 'click .done': 'closeModal'
             },
 
-            _configure: function(options) {
+            _configure: function (options) {
                 Backbone.ModalView.__super__._configure.call(this, options);
                 if (options.height) {
                     this.height = options.height;
@@ -21,15 +21,15 @@
                 _.bindAll(this);
             },
 
-            _ensureElement: function(options) {
+            _ensureElement: function (options) {
                 Backbone.ModalView.__super__._ensureElement.call(this, options);
             },
 
-            setBodyEl: function(el) {
+            setBodyEl: function (el) {
                 this.bodyEl = el;
             },
 
-            setupModal: function() {
+            setupModal: function () {
                 var self = this;
                 var div = document.createElement('div');
                 div.className = "modal-bg";
@@ -43,13 +43,13 @@
                 div.style.zIndex = 3000;
                 this.bodyEl.appendChild(div);
 
-                var closeHandler = function(e) {
+                var closeHandler = function (e) {
                     if (e.keyCode == 27) {
                         self.closeModal(closeHandler);
                     }
                 };
 
-                $(div).on('click', function() {
+                $(div).on('click', function () {
                     self.closeModal(closeHandler);
                 });
 
@@ -59,7 +59,7 @@
                 return div;
             },
 
-            setupModalWindow: function() {
+            setupModalWindow: function () {
                 var self = this;
 
                 var div = document.createElement('div');
@@ -90,7 +90,7 @@
                         qMark = '<div class="q-mark"></div>';
                     }
                     $(div).append('<div class="bottom-sect">' + qMark + '<div class="btn done">Done</div></div>');
-                    $(div).find('.done').on('click', function() {
+                    $(div).find('.done').on('click', function () {
                         self.closeModal();
                     });
                 }
@@ -113,7 +113,7 @@
 
                 this.bodyEl.appendChild(div);
 
-                $(span).on('click', function() {
+                $(span).on('click', function () {
                     self.closeModal();
                 });
 
@@ -121,19 +121,19 @@
                 return div;
             },
 
-            closeModal: function(closeHandlerFn) {
+            closeModal: function (closeHandlerFn) {
                 var self = this;
                 this.undelegateEvents();
                 if (this.callback) this.callback();
                 if (this.onClose) this.onClose();
-                
+
                 $(self.modalWindow).addClass('animated');
                 $(self.modalWindow).removeClass('bounceInUp');
                 $(self.modalWindow).addClass('bounceOutDown');
-                
+
                 $(self.backgroundDiv).fadeOut();
 
-                setTimeout(function() {
+                setTimeout(function () {
                     self.$el.remove();
                     self.remove();
                     $(self.modalWindow).remove();
@@ -147,7 +147,7 @@
                 this.close();
             },
 
-            handleKey: function(e) {
+            handleKey: function (e) {
                 if (e.keyCode == 27) { //escape
                     this.closeModal();
                     e.stopPropagation();
@@ -155,5 +155,3 @@
             }
 
         });
-
-     

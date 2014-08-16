@@ -7,42 +7,42 @@
     require('../mixins/BackboneCardView');
 
     var descriptionTemplate = [
-    '<div class="description">',
+        '<div class="description">',
         '<span class="tbl-wrapper">',
-            '<span class="tbl">',
-                '<ul class="property-list">',
-                    '<div class="column header">',
-                        '<div class="hdr">Property</div>',
-                        '<div class="type-field desc">Type</div>',
-                    '</div>',
-                '</ul>',
-                '<div class="column add-property-column">',
-                    '<form class="add-property-form" style="display:none">',
-                            '<input type="text" class="property-name-input" placeholder="Property Name...">',
-                        '<input type="submit" class="done-btn" value="Done">',
-                    '</form>',
-                    '<span class="add-property-button box-button"><span class="plus-icon"></span>Add Property</span>',
-                '</div>',
-            '</span>',
+        '<span class="tbl">',
+        '<ul class="property-list">',
+        '<div class="column header">',
+        '<div class="hdr">Property</div>',
+        '<div class="type-field desc">Type</div>',
+        '</div>',
+        '</ul>',
+        '<div class="column add-property-column">',
+        '<form class="add-property-form" style="display:none">',
+        '<input type="text" class="property-name-input" placeholder="Property Name...">',
+        '<input type="submit" class="done-btn" value="Done">',
+        '</form>',
+        '<span class="add-property-button box-button"><span class="plus-icon"></span>Add Property</span>',
+        '</div>',
         '</span>',
-    '</div>'
+        '</span>',
+        '</div>'
     ].join('\n');
 
 
     var propertyTemplate = [
-    '<div class="column <% if(isNew) { %>newcol<% } %>" id="column-<%- cid %>">',
-      '<div class="hdr"><%- name %></div>',
-      '<div class="type-field" id="type-row-<%- cid %>">',
+        '<div class="column <% if(isNew) { %>newcol<% } %>" id="column-<%- cid %>">',
+        '<div class="hdr"><%- name %></div>',
+        '<div class="type-field" id="type-row-<%- cid %>">',
         '<select class="attribs" id="type-<%- cid %>">',
-            '<% _.each(fieldTypes, function(fieldType) { %>',
-                '<option value="<%= fieldType %>" <% if(type == fieldType) %> selected <% %>><%= fieldType %></option>',
-            '<% }); %>',
+        '<% _.each(fieldTypes, function(fieldType) { %>',
+        '<option value="<%= fieldType %>" <% if(type == fieldType) %> selected <% %>><%= fieldType %></option>',
+        '<% }); %>',
         '</select>',
-      '</div>',
-      '<div class="prop-cross" id="delete-<%- cid %>">',
+        '</div>',
+        '<div class="prop-cross" id="delete-<%- cid %>">',
         '<div class="remove hoff1">Remove</div>',
-      '</div>',
-    '</div>'
+        '</div>',
+        '</div>'
     ].join('\n');
 
     var mongooseTypes = [
@@ -74,7 +74,7 @@
         },
 
 
-        initialize: function(tableModel) {
+        initialize: function (tableModel) {
             _.bindAll(this);
             this.model = tableModel;
             this.fieldsCollection = tableModel.getFieldsColl();
@@ -88,7 +88,7 @@
             this.bindDupeWarning();
         },
 
-        render: function() {
+        render: function () {
 
             var html = _.template(descriptionTemplate, this.model.serialize());
 
@@ -103,8 +103,8 @@
             return this;
         },
 
-        renderProperties: function() {
-            this.fieldsCollection.each(function(field) {
+        renderProperties: function () {
+            this.fieldsCollection.each(function (field) {
                 // only render non-relational properties
                 if (!field.isRelatedField()) {
                     this.appendField(field);
@@ -112,8 +112,8 @@
             }, this);
         },
 
-        bindDupeWarning: function() {
-            this.listenTo(this.fieldsCollection, 'duplicate', function(key, val) {
+        bindDupeWarning: function () {
+            this.listenTo(this.fieldsCollection, 'duplicate', function (key, val) {
                 new SoftErrorView({
                     text: "Duplicate entry should not be duplicate. " + key + " of the field should not be the same: " + val,
                     path: ""
@@ -121,13 +121,13 @@
             });
         },
 
-        clickedAddProperty: function(e) {
+        clickedAddProperty: function (e) {
             this.$el.find('.add-property-button').hide();
             this.$el.find('.add-property-form').fadeIn();
             $('.property-name-input', this.el).focus();
         },
 
-        createNewProperty: function(val) {
+        createNewProperty: function (val) {
             var name = val;
             if (!name.length) return;
             var newField = new FieldModel({
@@ -136,7 +136,7 @@
             this.fieldsCollection.push(newField);
         },
 
-        appendField: function(fieldModel, isNew) {
+        appendField: function (fieldModel, isNew) {
             // don't append field if it's a relational field
             if (fieldModel.isRelatedField()) {
                 return false;
@@ -147,11 +147,11 @@
             page_context.entityName = this.model.get('name');
             page_context.entities = this.otherEntities;
             page_context.isNew = isNew;
-            
-            var types = v1State.get('models').map(function(nodeModelModel) {
+
+            var types = v1State.get('models').map(function (nodeModelModel) {
                 // { type: Schema.Types.ObjectId, ref: "Studio" }
-                if(page_context.type ==  "{ type: Schema.Types.ObjectId, ref: '" + nodeModelModel.get('name') +"'}") {
-                   page_context.type = "{ ref: '" + nodeModelModel.get('name') + "',  type: Schema.Types.ObjectId}";
+                if (page_context.type == "{ type: Schema.Types.ObjectId, ref: '" + nodeModelModel.get('name') + "'}") {
+                    page_context.type = "{ ref: '" + nodeModelModel.get('name') + "',  type: Schema.Types.ObjectId}";
                 }
 
                 return "{ ref: '" + nodeModelModel.get('name') + "',  type: Schema.Types.ObjectId}";
@@ -165,40 +165,40 @@
             this.$el.find('.property-list').append(template);
         },
 
-        removeField: function(fieldModel) {
+        removeField: function (fieldModel) {
             this.$el.find('#column-' + fieldModel.cid).remove();
         },
 
-        changedAttribs: function(e) {
-            var cid = String(e.currentTarget.id).replace('type-','');
+        changedAttribs: function (e) {
+            var cid = String(e.currentTarget.id).replace('type-', '');
             var value = e.currentTarget.value;
             this.fieldsCollection.get(cid).set("type", value);
         },
 
-        addedEntity: function(item) {
+        addedEntity: function (item) {
             var optString = '<option value="{{' + item.get('name') + '}}">List of ' + item.get('name') + 's</option>';
             $('.attribs', this.el).append(optString);
         },
 
-        clickedDelete: function(e) {
+        clickedDelete: function (e) {
             this.askToDelete(v1State.get('tables'));
         },
 
-        askToDelete: function(tableColl) {
+        askToDelete: function (tableColl) {
             var widgets = v1State.getWidgetsRelatedToTable(this.model);
             var model = this.model;
             if (widgets.length) {
 
-                var widgetsNL = _.map(widgets, function(widget) {
+                var widgetsNL = _.map(widgets, function (widget) {
                     return widget.widget.get('type') + ' on ' + widget.pageName;
                 });
                 var widgetsNLString = widgetsNL.join('\n');
                 new DialogueView({
                     text: "The related widgets listed below will be deleted with this table. Do you want to proceed? <br><br> " + widgetsNLString
-                }, function() {
+                }, function () {
                     tableColl.remove(model.cid);
                     v1State.get('pages').removePagesWithContext(model);
-                    _.each(widgets, function(widget) {
+                    _.each(widgets, function (widget) {
                         widget.widget.collection.remove(widget.widget);
                     });
                 });
@@ -209,19 +209,19 @@
             }
         },
 
-        clickedPropDelete: function(e) {
+        clickedPropDelete: function (e) {
             var cid = String(e.target.id || e.target.parentNode.id).replace('delete-', '');
             this.fieldsCollection.remove(cid);
         },
 
-        clickedUploadExcel: function(e) {
+        clickedUploadExcel: function (e) {
             new AdminPanelView();
         },
 
-        renderRelations: function() {
+        renderRelations: function () {
             var tableRelations = v1State.get('models').getRelationsWithEntityName(this.model.get('name'));
             var list = this.$el.find('.related-fields').empty();
-            _(tableRelations).each(function(relation) {
+            _(tableRelations).each(function (relation) {
                 var suffix;
                 var text = 'Has ' + relation.related_name;
                 if (relation.type == "m2m" || relation.type == "fk") suffix = 'List of ' + util.pluralize(relation.entity);
@@ -231,7 +231,7 @@
             list.append('<a href="#relation-new" class="related-tag offset1"><span style="font-size: 13px">+</span>  Add a data relationship</a>');
         },
 
-        initializeTableWidth: function() {
+        initializeTableWidth: function () {
             var width = (this.model.getFieldsColl().length + 2) * 100;
             width += 120;
             this.width = width;
@@ -245,7 +245,7 @@
             }
         },
 
-        slideRight: function() {
+        slideRight: function () {
             var left = this.$el.find('.tbl-wrapper').scrollLeft();
             this.$el.find('.tbl-wrapper').scrollLeft(left + 6);
             if (!this.hasLeftArrow) {
@@ -256,7 +256,7 @@
             }
         },
 
-        slideLeft: function() {
+        slideLeft: function () {
             var tblWrapper = this.$el.find('.tbl-wrapper');
             var left = tblWrapper.scrollLeft();
             tblWrapper.scrollLeft(left - 6);
@@ -266,13 +266,13 @@
             }
         },
 
-        typeClicked: function(e) {
+        typeClicked: function (e) {
             var cid = e.target.id.replace('type-row-', '');
             $('#type-' + cid).click();
             e.preventDefault();
         },
 
-        showTableTutorial: function(e) {
+        showTableTutorial: function (e) {
             v1.showTutorial("Tables");
         }
 

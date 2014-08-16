@@ -4,7 +4,7 @@
 
     var ThemeModel = Backbone.Model.extend({
 
-        initialize: function(themeState) {
+        initialize: function (themeState) {
             this.set('basecss', themeState.basecss || "font-size:14px;");
             //this.set('pages', new PageDesignCollection(themeState.pages));
 
@@ -24,25 +24,25 @@
             this.set('fonts', new Backbone.Collection(themeState["fonts"] || []));
         },
 
-        getUIElementCollections: function() {
+        getUIElementCollections: function () {
 
             return [this.get('buttons'), this.get('images'), this.get('headerTexts'),
                 this.get('texts'), this.get('links'), this.get('textInputs'),
                 this.get('passwords'), this.get('textAreas'), this.get('lines'),
                 this.get('dropdowns'), this.get('boxes'), this.get('forms'),
-                this.get('lists')];
+                this.get('lists')
+            ];
         },
 
-        getStyleWithClassAndType: function(className, type) {
+        getStyleWithClassAndType: function (className, type) {
             var model = null;
 
-            if (!this.has(type))
-            {
+            if (!this.has(type)) {
                 type = this.rectifier(type);
                 if (!this.has(type)) return null;
             }
 
-            this.get(type).each(function(styleModel) {
+            this.get(type).each(function (styleModel) {
                 if (styleModel.get('class_name') == className) {
                     model = styleModel;
                 }
@@ -51,49 +51,49 @@
             return model;
         },
 
-        getUIEVals: function(type) {
+        getUIEVals: function (type) {
 
-            if(this.has(type)) {
+            if (this.has(type)) {
                 return this.get(type);
             }
 
-            switch(type) {
-                case "button":
-                    return this.getUIEVals("buttons");
-                case "header":
-                    return this.getUIEVals("headerTexts");
-                case "image":
-                    return this.getUIEVals("images");
-                case "text":
-                    return this.getUIEVals("texts");
-                case "link":
-                    return this.getUIEVals("links");
-                case "line":
-                    return this.getUIEVals("lines");
-                case "box":
-                    return this.getUIEVals("boxes");
-                case "create-form":
-                case "form":
-                    return this.getUIEVals("forms");
+            switch (type) {
+            case "button":
+                return this.getUIEVals("buttons");
+            case "header":
+                return this.getUIEVals("headerTexts");
+            case "image":
+                return this.getUIEVals("images");
+            case "text":
+                return this.getUIEVals("texts");
+            case "link":
+                return this.getUIEVals("links");
+            case "line":
+                return this.getUIEVals("lines");
+            case "box":
+                return this.getUIEVals("boxes");
+            case "create-form":
+            case "form":
+                return this.getUIEVals("forms");
             }
 
             return this.getUIEVals("texts");
         },
 
         getBaseClass: function (type) {
-            if(this.has(type)) {
+            if (this.has(type)) {
                 return this.get(type).first().get('class_name');
             }
             return null;
         },
 
-        getBaseStyleOf: function(type) {
+        getBaseStyleOf: function (type) {
 
-            if(this.has(type)) {
+            if (this.has(type)) {
                 return this.get(type).first();
             }
 
-            if(this.has(this.rectifier(type))) {
+            if (this.has(this.rectifier(type))) {
                 return this.get(this.rectifier(type)).first();
             }
 
@@ -101,29 +101,29 @@
         },
 
         rectifier: function (falseType) {
-            switch(falseType) {
-                case "button":
-                    return "buttons";
-                case "header":
-                    return "headerTexts";
-                case "image":
-                    return "images";
-                case "text":
-                    return "texts";
-                case "link":
-                    return "links";
-                case "line":
-                    return "lines";
-                case "box":
-                    return "boxes";
-                case "form":
-                    return "forms";
+            switch (falseType) {
+            case "button":
+                return "buttons";
+            case "header":
+                return "headerTexts";
+            case "image":
+                return "images";
+            case "text":
+                return "texts";
+            case "link":
+                return "links";
+            case "line":
+                return "lines";
+            case "box":
+                return "boxes";
+            case "form":
+                return "forms";
             }
 
             return null;
         },
 
-        serialize: function() {
+        serialize: function () {
             var json = _.clone(this.attributes);
 
             json["buttons"] = this.get('buttons').serialize();

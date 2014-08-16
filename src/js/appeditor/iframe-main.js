@@ -18,12 +18,12 @@ statics = top.statics;
 g_marqueeView = {};
 
 var proxy = {
-    setupSectionsManager: function(sectionsCollection) {
+    setupSectionsManager: function (sectionsCollection) {
         this.sectionsManager = new SectionsManagerView(sectionsCollection);
         return this.sectionsManager;
     },
 
-    setupMarqueeView: function(widgetsCollection) {
+    setupMarqueeView: function (widgetsCollection) {
         this.marqueeView = new MarqueeView(widgetsCollection);
         this.marqueeView.render();
         g_marqueeView = this.marqueeView;
@@ -32,7 +32,7 @@ var proxy = {
         return this.marqueeView;
     },
 
-    reArrangeCSSTag: function() {
+    reArrangeCSSTag: function () {
 
         uieState = top.uieState;
 
@@ -46,7 +46,7 @@ var proxy = {
             newstyle = document.createElement("link");
             newstyle.setAttribute("rel", "stylesheet");
             newstyle.setAttribute("type", "text/css");
-            newstyle.setAttribute("href", '/app/'+ appId +'/uiestate.css');
+            newstyle.setAttribute("href", '/app/' + appId + '/uiestate.css');
             newstyle.id = "css-uiestate";
         }
 
@@ -59,110 +59,108 @@ var proxy = {
                 newStyle.setAttribute('href', "");
                 newStyle.id = "css-uiestate";
                 newStyle.setAttribute('rel', 'stylesheet');
-                        // $.ajax({
-                        //     type: "GET",
-                        //     url: '/app/' + appId + '/uiestate.css',
-                        //     statusCode: {
-                        //         200: function(data) {
-                        //             $(style).attr('href', '');
-                        //             $(style).text(data.responseText);
-                        //         }
-                        //     },
-                        //     dataType: "JSON"
-                        // });
+                // $.ajax({
+                //     type: "GET",
+                //     url: '/app/' + appId + '/uiestate.css',
+                //     statusCode: {
+                //         200: function(data) {
+                //             $(style).attr('href', '');
+                //             $(style).text(data.responseText);
+                //         }
+                //     },
+                //     dataType: "JSON"
+                // });
 
-} else {
-    head.appendChild(newstyle);
-    newstyle.onload = function() {
-                            //newstyle.setAttribute('href', "/app/"+appId+"/uiestate.css");
-                            $('.tempStyle').remove();
-                            if(style && style.parentNode) style.parentNode.removeChild(style);
-                        };
-                    }
+            } else {
+                head.appendChild(newstyle);
+                newstyle.onload = function () {
+                    //newstyle.setAttribute('href', "/app/"+appId+"/uiestate.css");
+                    $('.tempStyle').remove();
+                    if (style && style.parentNode) style.parentNode.removeChild(style);
+                };
+            }
 
-                }
-                catch(e) {
+        } catch (e) {
 
-                }
-            },
-
-            addTempStyleSheet: function(url, callback) {
-
-                uieState = top.uieState;
-                var templStyles = $('.tempStyle');
-                var style = document.getElementById("css-uiestate");
-                var head = document.getElementsByTagName('head')[0];
-                var newstyle = document.createElement("link");
-                newstyle.setAttribute("rel", "stylesheet");
-                newstyle.setAttribute("type", "text/css");
-                newstyle.setAttribute("href", url);
-                newstyle.className = "tempStyle";
-
-                var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-
-                if (is_firefox) {
-                    newStyle = document.createElement('style');
-                    newStyle.type = 'text/css';
-                    newStyle.setAttribute('href', "");
-                    newStyle.id = "css-uiestate";
-                    newStyle.setAttribute('rel', 'stylesheet');
-                    // $.ajax({
-                    //     type: "GET",
-                    //     url: '/app/' + appId + '/uiestate.css',
-                    //     statusCode: {
-                    //         200: function(data) {
-                    //             $(style).attr('href', '');
-                    //             $(style).text(data.responseText);
-                    //         }
-                    //     },
-                    //     dataType: "JSON"
-                    // });
-
-} else {
-    head.appendChild(newstyle);
-    newstyle.onload = function() {
-                        //newstyle.setAttribute('href', "/app/"+appId+"/uiestate.css");
-                        templStyles.remove();
-                        if (style) {
-                            try {
-                                style.parentNode.removeChild(style);
-                            } catch (e) {
-
-                            }
-                        }
-                        if(callback) callback.call(this);
-                    };
-                }
+        }
     },
 
-            removeTempStyleSheet: function() {
-                this.reArrangeCSSTag();
-            },
+    addTempStyleSheet: function (url, callback) {
 
-            updateScrollbar: function() {
-                $(document.body).niceScroll();
-            },
+        uieState = top.uieState;
+        var templStyles = $('.tempStyle');
+        var style = document.getElementById("css-uiestate");
+        var head = document.getElementsByTagName('head')[0];
+        var newstyle = document.createElement("link");
+        newstyle.setAttribute("rel", "stylesheet");
+        newstyle.setAttribute("type", "text/css");
+        newstyle.setAttribute("href", url);
+        newstyle.className = "tempStyle";
 
-            reloadPage: function() {
-                location.reload();
-            },
+        var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
-            injectHeader: function(headerContent) {
-                $('head').append(headerContent);
-            }
-        };
+        if (is_firefox) {
+            newStyle = document.createElement('style');
+            newStyle.type = 'text/css';
+            newStyle.setAttribute('href', "");
+            newStyle.id = "css-uiestate";
+            newStyle.setAttribute('rel', 'stylesheet');
+            // $.ajax({
+            //     type: "GET",
+            //     url: '/app/' + appId + '/uiestate.css',
+            //     statusCode: {
+            //         200: function(data) {
+            //             $(style).attr('href', '');
+            //             $(style).text(data.responseText);
+            //         }
+            //     },
+            //     dataType: "JSON"
+            // });
 
-        $(window).on('mouseup', function() {
-            top.v1.shrinkDropdowns();
-        });
+        } else {
+            head.appendChild(newstyle);
+            newstyle.onload = function () {
+                //newstyle.setAttribute('href', "/app/"+appId+"/uiestate.css");
+                templStyles.remove();
+                if (style) {
+                    try {
+                        style.parentNode.removeChild(style);
+                    } catch (e) {
 
-        $(document).ready(function() {
-            util.askBeforeLeave();
-        })
-
-        console.log(top.v1);
-        console.log(top.v1.currentApp);
-        if (top.v1.currentApp) {
-            top.v1.currentApp.renderIFrameContent(proxy);
+                    }
+                }
+                if (callback) callback.call(this);
+            };
         }
+    },
 
+    removeTempStyleSheet: function () {
+        this.reArrangeCSSTag();
+    },
+
+    updateScrollbar: function () {
+        $(document.body).niceScroll();
+    },
+
+    reloadPage: function () {
+        location.reload();
+    },
+
+    injectHeader: function (headerContent) {
+        $('head').append(headerContent);
+    }
+};
+
+$(window).on('mouseup', function () {
+    top.v1.shrinkDropdowns();
+});
+
+$(document).ready(function () {
+    util.askBeforeLeave();
+})
+
+console.log(top.v1);
+console.log(top.v1.currentApp);
+if (top.v1.currentApp) {
+    top.v1.currentApp.renderIFrameContent(proxy);
+}

@@ -21,12 +21,12 @@
             'click': 'select',
             'click .delete': 'remove',
             'mouseover': 'hovered',
-            'mouseout' : 'unhovered',
+            'mouseout': 'unhovered',
             'mousedown': 'mousedown',
-            'mouseup'  : 'mouseup'
+            'mouseup': 'mouseup'
         },
 
-        initialize: function(widgetModel) {
+        initialize: function (widgetModel) {
             var self = this;
             _.bindAll(this);
 
@@ -36,19 +36,19 @@
             this.listenTo(this.model, "rerender", this.reRender, this);
             this.listenTo(this.model, "change", this.reRender, this);
 
-            if(this.model.has('layout')) {
+            if (this.model.has('layout')) {
                 this.listenTo(this.model.get('layout'), "change", this.changedPadding, this);
             }
 
             this.listenTo(this.model, "startEditing", this.switchEditModeOn, this);
 
-            this.listenTo(this.model, "deselected", function() {
+            this.listenTo(this.model, "deselected", function () {
                 this.model.trigger('stopEditing');
                 this.$el.removeClass('selected');
                 this.selected = false;
             }, this);
 
-            this.listenTo(this.model, "selected", function() {
+            this.listenTo(this.model, "selected", function () {
                 this.$el.addClass('selected');
             });
 
@@ -60,28 +60,27 @@
             this.listenTo(this.model, "startEditingRow", this.switchRowEditorOn);
             this.listenTo(this.model, "stopEditingRow", this.switchRowEditorOff);
 
-            keyDispatcher.bind('meta+return', function() {
+            keyDispatcher.bind('meta+return', function () {
                 self.model.trigger('stopEditing');
             });
 
-            keyDispatcher.bind('esc', function() {
+            keyDispatcher.bind('esc', function () {
                 self.model.trigger('cancelEditing');
             });
 
         },
 
-        setFreeMovement: function() {
+        setFreeMovement: function () {
             this.positionVerticalGrid = 1;
             this.positionHorizontalGrid = 1;
         },
 
-        render: function() {
+        render: function () {
 
-            var $e = $('[data-cid="'+ this.model.cid +'"]');
+            var $e = $('[data-cid="' + this.model.cid + '"]');
             if ($e.length) {
                 this.setElement($e, true);
-            }
-            else {
+            } else {
                 var expanded = this.model.expand();
                 this.setElement($(expanded.html), true);
                 this.placeCSS(expanded);
@@ -97,11 +96,11 @@
 
             // this.$el.on('click', function(e) { e.preventDefault(); });
             // this.$el.find('a').on('click', function(e) { e.preventDefault(); });
-            
+
             return this;
         },
 
-        reRender: function() {
+        reRender: function () {
             var expanded = this.model.expand();
             var $el = $(expanded.html);
 
@@ -111,13 +110,17 @@
             this.placeJS(expanded);
             this.$el.addClass(this.className);
 
-            this.$el.find('a').on('click', function(e) { e.preventDefault(); });
-            this.$el.find('form').on('submit', function(e) { e.preventDefault(); });
+            this.$el.find('a').on('click', function (e) {
+                e.preventDefault();
+            });
+            this.$el.find('form').on('submit', function (e) {
+                e.preventDefault();
+            });
 
             return this;
         },
 
-        renderElement: function(expanded) {
+        renderElement: function (expanded) {
             var html = "";
             if (!expanded.html || expanded.html == "") {
                 expanded.html = "Custom Widget";
@@ -125,7 +128,7 @@
             return expanded.html;
         },
 
-        placeCSS: function(expanded) {
+        placeCSS: function (expanded) {
 
             var styleTag = document.getElementById('custom-css-widget-' + this.model.cid);
             if (styleTag) $(styleTag).remove();
@@ -143,9 +146,9 @@
             document.getElementsByTagName('head')[0].appendChild(style);
         },
 
-        placeJS: function(expanded) {
+        placeJS: function (expanded) {
 
-            if(!expanded.js || expanded.js === '') return;
+            if (!expanded.js || expanded.js === '') return;
 
             var self = this;
 
@@ -154,7 +157,7 @@
             var jsTag = 'custom-js-widget-' + this.model.cid;
             if (jsTag) $(jsTag).remove();
 
-            var appendJSTag = function() {
+            var appendJSTag = function () {
 
                 var customJSTemp = [
                     'try {',
@@ -167,7 +170,9 @@
                     jsTag.id = 'custom-js-widget-' + self.model.cid;
                     jsTag.setAttribute("type", "text/javascript");
 
-                    jsTag.text = _.template(customJSTemp, { code: expanded.js });
+                    jsTag.text = _.template(customJSTemp, {
+                        code: expanded.js
+                    });
 
                     console.log(jsTag);
                     document.body.appendChild(jsTag);
@@ -176,11 +181,13 @@
                 }
             };
 
-            setTimeout(function() { $(document).ready(appendJSTag); }, 3000);
+            setTimeout(function () {
+                $(document).ready(appendJSTag);
+            }, 3000);
             // this.listenTo(v1, 'editor-loaded', appendJSTag, this);
         },
 
-        select: function(e) {
+        select: function (e) {
             if (this.selected && !this.editMode) {
                 this.model.trigger('doubleClicked');
                 return;
@@ -193,12 +200,12 @@
             }
         },
 
-        changedAlignment: function() {
+        changedAlignment: function () {
             this.el.style.textAlign = this.model.get('layout').get('alignment');
         },
 
-        staticsAdded: function(files) {
-            _(files).each(function(file) {
+        staticsAdded: function (files) {
+            _(files).each(function (file) {
                 file.name = file.filename;
                 statics.push(file);
             });
@@ -206,19 +213,19 @@
             //this.show(this.model);
         },
 
-        hovered: function() {
+        hovered: function () {
             if (this.editMode || mouseDispatcher.isMousedownActive) return;
             if (this.model.isBgElement()) return;
             this.hovered = true;
             this.model.trigger('hovered');
         },
 
-        unhovered: function(e) {
+        unhovered: function (e) {
             if (this.isMouseOn(e)) return;
             this.model.trigger('unhovered');
         },
 
-        isMouseOn: function(e) {
+        isMouseOn: function (e) {
             var self = this;
 
             var mouseX = e.pageX;
@@ -232,7 +239,7 @@
             var divBottom = divTop + div.height();
 
             if (mouseX >= divLeft && mouseX <= divRight && mouseY >= divTop && mouseY <= divBottom) {
-                $('#hover-div').bind('mouseout', function(e) {
+                $('#hover-div').bind('mouseout', function (e) {
                     self.unhovered(e);
                     $(e.target).unbind('mouseout');
                 });
@@ -242,7 +249,7 @@
             return false;
         },
 
-        switchEditModeOn: function() {
+        switchEditModeOn: function () {
 
             if (this.model.get('content') && this.el.childNodes.length < 2) {
                 this.editMode = true;
@@ -284,7 +291,7 @@
 
         },
 
-        switchEditModeOff: function(e) {
+        switchEditModeOff: function (e) {
             if (e) e.preventDefault();
             if (this.editMode === false) return;
 
@@ -298,7 +305,7 @@
             util.unselectText();
         },
 
-        cancelEditing: function() {
+        cancelEditing: function () {
             if (this.editMode === false) return;
 
             this.editMode = false;
@@ -312,24 +319,24 @@
 
         switchRowEditorOn: function () {
 
-            this.model.get('row').get('columns').each(function(columnModel) {
+            this.model.get('row').get('columns').each(function (columnModel) {
 
                 var self = this;
-                var $col = this.$el.find('[data-cid="'+columnModel.cid+'"]');
+                var $col = this.$el.find('[data-cid="' + columnModel.cid + '"]');
                 $col.attr('data-rowcolumn', "true");
                 $col.sortable({
                     connectWith: "[data-rowcolumn]",
-                    update: function() {
+                    update: function () {
                         self.updatedRowCol(columnModel, $col);
                     },
-                    sort: function(e, ui) {
+                    sort: function (e, ui) {
                         var amt = $(window).scrollTop();
                         ui.position.top += amt;
                     },
-                    start: function(e, ui) {
+                    start: function (e, ui) {
                         self.highlightCols();
                     },
-                    stop: function(e, ui) {
+                    stop: function (e, ui) {
                         self.unhighlightCols();
                     }
                 });
@@ -341,8 +348,8 @@
         switchRowEditorOff: function () {
 
             this.reRender();
-            this.model.get('row').get('columns').each(function(columnModel) {
-                var $col = this.$el.find('[data-cid="'+columnModel.cid+'"]');
+            this.model.get('row').get('columns').each(function (columnModel) {
+                var $col = this.$el.find('[data-cid="' + columnModel.cid + '"]');
                 $col.attr('data-rowcolumn', "true");
                 if ($col.hasClass('ui-sortable')) {
                     $col.sortable("destroy");
@@ -352,23 +359,28 @@
         },
 
         updatedRowCol: function (columnModel, $col) {
-            var newArr = $col.sortable( "toArray", {attribute  : "data-cid"});
+            var newArr = $col.sortable("toArray", {
+                attribute: "data-cid"
+            });
             var curArr = _(columnModel.get('uielements').models).pluck('cid');
 
-            if(!_.isEqual(curArr, newArr)) {
+            if (!_.isEqual(curArr, newArr)) {
 
-                _.each(newArr, function(elCid, ind) {
+                _.each(newArr, function (elCid, ind) {
 
                     var widgetModel = {};
 
                     if (columnModel.get('uielements').get(elCid)) {
                         widgetModel = columnModel.get('uielements').get(elCid);
-                    }
-                    else {
+                    } else {
                         var coll = this.model.getWidgetsCollection();
                         widgetModel = coll.get(elCid);
-                        widgetModel.collection.remove(widgetModel, { silent: true });
-                        columnModel.get('uielements').add(widgetModel, { silent: true });
+                        widgetModel.collection.remove(widgetModel, {
+                            silent: true
+                        });
+                        columnModel.get('uielements').add(widgetModel, {
+                            silent: true
+                        });
                     }
 
                 }, this);
@@ -376,18 +388,20 @@
             }
         },
 
-        highlightCols: function() {
+        highlightCols: function () {
             this.$el.find('.ycol').addClass("fancy-borders");
         },
 
-        unhighlightCols: function() {
+        unhighlightCols: function () {
             this.$el.find('.ycol').removeClass("fancy-borders");
         },
 
         highlight: function () {
 
             var $el = this.$el;
-            if (this.$el.find('.row').length) { $el = this.$el.find('.row').first(); }
+            if (this.$el.find('.row').length) {
+                $el = this.$el.find('.row').first();
+            }
 
             var position = $el.offset();
 
@@ -398,7 +412,7 @@
             topDiv.className = "shadow-elem";
 
             var bottomDiv = document.createElement('div');
-            bottomDiv.style.top = ($el.outerHeight() + position.top)  + "px";
+            bottomDiv.style.top = ($el.outerHeight() + position.top) + "px";
             bottomDiv.style.width = "100%";
             bottomDiv.style.height = "100%";
             bottomDiv.className = "shadow-elem";
@@ -407,14 +421,14 @@
             leftDiv.style.top = position.top + "px";
             leftDiv.style.left = 0;
             leftDiv.style.width = position.left + "px";
-            leftDiv.style.height = $el.outerHeight()+ "px";
+            leftDiv.style.height = $el.outerHeight() + "px";
             leftDiv.className = "shadow-elem";
 
             var rightDiv = document.createElement('div');
             rightDiv.style.top = position.top + "px";
             rightDiv.style.left = (position.left + $el.outerWidth()) + "px";
             rightDiv.style.width = "100%";
-            rightDiv.style.height = $el.outerHeight()+ "px";
+            rightDiv.style.height = $el.outerHeight() + "px";
             rightDiv.className = "shadow-elem";
 
             this.highlightDivs = [topDiv, bottomDiv, leftDiv, rightDiv];
@@ -429,23 +443,23 @@
         },
 
         unhighlight: function () {
-            _.each(this.highlightDivs, function(el) {
+            _.each(this.highlightDivs, function (el) {
                 $(el).remove();
             });
             this.$el.addClass("widget-wrapper");
         },
 
-        mousedown: function(e) {
+        mousedown: function (e) {
             mouseDispatcher.isMousedownActive = true;
         },
 
-        mouseup: function() {
+        mouseup: function () {
             mouseDispatcher.isMousedownActive = false;
         },
 
-        close: function() {
-        	this.stopListening();
-        	WidgetView.__super__.close.call(this);
+        close: function () {
+            this.stopListening();
+            WidgetView.__super__.close.call(this);
         }
 
     });

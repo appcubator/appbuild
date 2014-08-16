@@ -1,11 +1,11 @@
   var UIElementModel = Backbone.Model.extend({
-    initialize: function(bone) {
+      initialize: function (bone) {
 
-      this.set('style', bone.style||'');
-      this.set('hoverStyle', bone.hoverStyle||'');
-      this.set('activeStyle', bone.activeStyle||'');
+          this.set('style', bone.style || '');
+          this.set('hoverStyle', bone.hoverStyle || '');
+          this.set('activeStyle', bone.activeStyle || '');
 
-    }
+      }
   });
 
   exports.UIElementModel = UIElementModel;

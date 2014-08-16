@@ -11,16 +11,15 @@
         className: 'data-view',
         subviews: [],
 
-        events: {
-        },
+        events: {},
 
 
-        initialize: function(tableModel) {
+        initialize: function (tableModel) {
             _.bindAll(this);
             this.model = tableModel;
         },
 
-        render: function() {
+        render: function () {
             this.el.innerHTML = 'Coming soon...';
             return this;
         },

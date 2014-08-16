@@ -9,14 +9,14 @@
 
         events: {
             'mouseover': 'hovered',
-            'mouseout' : 'unhovered'
+            'mouseout': 'unhovered'
         },
 
         className: "section-view",
 
         subviews: [],
 
-        initialize: function(sectionModel) {
+        initialize: function (sectionModel) {
             _.bindAll(this);
 
             this.model = sectionModel;
@@ -32,12 +32,11 @@
 
         },
 
-        render: function() {
+        render: function () {
 
-            if($("[data-cid='"+ this.model.cid +"']").length) {
-                this.setElement($('[data-cid="'+ this.model.cid +'"]'), true);
-            }
-            else {
+            if ($("[data-cid='" + this.model.cid + "']").length) {
+                this.setElement($('[data-cid="' + this.model.cid + '"]'), true);
+            } else {
                 var expanded = this.model.expand();
                 this.setElement($(expanded.html), true);
             }
@@ -46,7 +45,7 @@
             return this;
         },
 
-        reRender: function() {
+        reRender: function () {
             var expanded = this.model.expand();
             var $el = $(expanded.html);
 
@@ -56,25 +55,30 @@
             this.layoutElements();
         },
 
-        updated: function(columnModel, $col) {
+        updated: function (columnModel, $col) {
 
-            var newArr = $col.sortable( "toArray", {attribute  : "data-cid"});
+            var newArr = $col.sortable("toArray", {
+                attribute: "data-cid"
+            });
             var curArr = _(columnModel.get('uielements').models).pluck('cid');
 
-            if(!_.isEqual(curArr, newArr)) {
-            	var new_models = [];
-                _.each(newArr, function(elCid, ind) {
+            if (!_.isEqual(curArr, newArr)) {
+                var new_models = [];
+                _.each(newArr, function (elCid, ind) {
 
                     var widgetModel = {};
 
                     if (columnModel.get('uielements').get(elCid)) {
                         widgetModel = this.widgetsCollection.get(elCid);
-                    }
-                    else {
+                    } else {
                         var coll = v1.currentApp.view.sectionsCollection.getAllWidgets();
                         widgetModel = coll.get(elCid);
-                        widgetModel.collection.remove(widgetModel, { silent: true });
-                        columnModel.get('uielements').add(widgetModel, { silent: true });
+                        widgetModel.collection.remove(widgetModel, {
+                            silent: true
+                        });
+                        columnModel.get('uielements').add(widgetModel, {
+                            silent: true
+                        });
                     }
 
                     new_models.push(widgetModel);
@@ -85,41 +89,41 @@
             }
         },
 
-        layoutElements: function() {
+        layoutElements: function () {
             if (!this.model.has('columns')) return;
-            this.model.get('columns').each(function(columnModel) {
+            this.model.get('columns').each(function (columnModel) {
 
-                this.listenTo(columnModel.get('uielements'), 'add', function(widgetModel) {
+                this.listenTo(columnModel.get('uielements'), 'add', function (widgetModel) {
                     this.placeUIElement(widgetModel, columnModel)
                 });
 
                 var self = this;
-                var $col = this.$el.find('[data-cid="'+columnModel.cid+'"]');
+                var $col = this.$el.find('[data-cid="' + columnModel.cid + '"]');
                 $col.attr('data-column', "true");
                 $col.sortable({
                     connectWith: "[data-column]",
-                    update: function() {
+                    update: function () {
                         self.updated(columnModel, $col);
                     },
-                    sort: function(e, ui) {
+                    sort: function (e, ui) {
                         var amt = $(window).scrollTop();
                         ui.position.top += amt;
                     },
-                    start: function(e, ui) {
+                    start: function (e, ui) {
                         self.model.trigger('startedSortingElements');
                     },
-                    stop: function(e, ui) {
+                    stop: function (e, ui) {
                         self.model.trigger('stoppedSortingElements');
                     },
-                    over: function() {
+                    over: function () {
                         $col.addClass('active');
                     },
-                    out: function() {
+                    out: function () {
                         $col.removeClass('active');
                     }
                 });
 
-                columnModel.get('uielements').each(function(widgetModel) {
+                columnModel.get('uielements').each(function (widgetModel) {
                     var widgetView = this.createSubview(WidgetView, widgetModel);
                     widgetView.render();
                     //$col.append(widgetView.render().el);
@@ -129,12 +133,12 @@
 
         },
 
-        placeUIElement: function(model) {
+        placeUIElement: function (model) {
             var widgetView = new WidgetView(model).render();
             var self = this;
-            this.model.get('columns').each(function(columnModel) {
+            this.model.get('columns').each(function (columnModel) {
                 if (columnModel.get('uielements').get(model.cid)) {
-                    var $col = self.$el.find('[data-cid="'+columnModel.cid+'"]');
+                    var $col = self.$el.find('[data-cid="' + columnModel.cid + '"]');
                     $col.append(widgetView.el);
                     model.trigger('rendered');
                 }
@@ -142,38 +146,38 @@
 
         },
 
-        highlightCols: function() {
+        highlightCols: function () {
             this.$el.find('.ycol').addClass("fancy-borders");
         },
 
-        unhighlightCols: function() {
+        unhighlightCols: function () {
             this.$el.find('.ycol').removeClass("fancy-borders");
         },
 
-        startEditing: function() {
-            this.$el.find('.ycol.ui-sortable').each(function() {
+        startEditing: function () {
+            this.$el.find('.ycol.ui-sortable').each(function () {
                 $(this).sortable("disable");
             });
         },
 
-        stopEditing: function() {
-            this.$el.find('.ycol').each(function() {
-                if($(this).hasClass("ui-sortable")) {
+        stopEditing: function () {
+            this.$el.find('.ycol').each(function () {
+                if ($(this).hasClass("ui-sortable")) {
                     $(this).sortable("enable");
                 }
             });
         },
 
-        removeSection: function() {
+        removeSection: function () {
             this.model.collection.remove(this.model);
         },
 
-        hovered: function() {
+        hovered: function () {
             if (mouseDispatcher.isMousedownActive) return;
             this.model.trigger('hovered');
         },
 
-        unhovered: function(e) {
+        unhovered: function (e) {
             // if (this.isMouseOn(e)) return;
             this.model.trigger('unhovered');
         }

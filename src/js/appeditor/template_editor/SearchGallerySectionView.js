@@ -6,7 +6,7 @@
 
         className: 'search elements-panel',
 
-        render: function() {
+        render: function () {
             if (this.el) {
                 this.el.innerHTML = '';
             }
@@ -17,19 +17,19 @@
             return this;
         },
 
-        expand: function() {
-            if(this.isExpanded) return;
+        expand: function () {
+            if (this.isExpanded) return;
             this.$el.addClass("open");
             this.isExpanded = true;
         },
 
-        hide: function() {
-            if(!this.isExpanded) return;
+        hide: function () {
+            if (!this.isExpanded) return;
             this.isExpanded = false;
             this.$el.removeClass("open");
         },
 
-        clear: function() {
+        clear: function () {
             this.list.innerHTML = '';
         }
 

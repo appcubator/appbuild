@@ -7,7 +7,7 @@ exports.LinkEditorView = Backbone.View.extend({
         'keyup input.link-title': 'updateTitle',
         'click .remove': 'removeLink'
     },
-    initialize: function(options) {
+    initialize: function (options) {
         _.bindAll(this);
 
         this.model = options.model;
@@ -15,7 +15,7 @@ exports.LinkEditorView = Backbone.View.extend({
 
         // generate list of link options
         console.log(v1.currentApp.model.get('routes'));
-        this.linkOptions = v1.currentApp.model.get('routes').map(function(routeModel) {
+        this.linkOptions = v1.currentApp.model.get('routes').map(function (routeModel) {
             console.log(routeModel.getUrlString());
             console.log(routeModel);
             return {
@@ -31,7 +31,7 @@ exports.LinkEditorView = Backbone.View.extend({
         // }
     },
 
-    render: function() {
+    render: function () {
         var self = this;
         this.$el.html(_.template(Templates.LinkEditor, this.model.serialize()));
         this.renderLinkOptions();
@@ -43,19 +43,19 @@ exports.LinkEditorView = Backbone.View.extend({
         return this;
     },
 
-    renderTitle: function() {
+    renderTitle: function () {
         this.$el.find('input.link-title').val(this.model.get('title'));
     },
 
-    renderUrl: function(model, newUrl) {
+    renderUrl: function (model, newUrl) {
         this.$el.find('input.url').val(newUrl);
     },
 
-    renderLinkOptions: function() {
+    renderLinkOptions: function () {
         var self = this;
         var select = this.$el.find('.link-options');
         var htmlString = '';
-        _(this.linkOptions).each(function(link) {
+        _(this.linkOptions).each(function (link) {
             // if the link model doesn't have a URL,
             // 'Choose a Page' must be selected
             var selected = (link.url === self.model.get('url')) ? "selected" : "";
@@ -67,7 +67,7 @@ exports.LinkEditorView = Backbone.View.extend({
         select.html(htmlString);
     },
 
-    pageSelected: function(e) {
+    pageSelected: function (e) {
         var select = e.target;
         var selectedIndex = select.selectedIndex;
         var selectedItem = {
@@ -82,15 +82,15 @@ exports.LinkEditorView = Backbone.View.extend({
 
 
         if (selectedItem.url === 'external') {
-                var newLink = {
-                    title: 'External Link Title',
-                    url: 'http://'
-                };
-                this.model.set(newLink);
-                this.linkOptions.push(newLink);
-                this.renderLinkOptions();
-                this.$select.hide();
-                this.$urlContainer.show().find('input').focus();
+            var newLink = {
+                title: 'External Link Title',
+                url: 'http://'
+            };
+            this.model.set(newLink);
+            this.linkOptions.push(newLink);
+            this.renderLinkOptions();
+            this.$select.hide();
+            this.$urlContainer.show().find('input').focus();
         }
 
         this.renderTitle();
@@ -101,7 +101,7 @@ exports.LinkEditorView = Backbone.View.extend({
         }
     },
 
-    updateUrl: function(e) {
+    updateUrl: function (e) {
         e.stopPropagation();
         // user can't modify internal urls
         if (this.model.get('url').indexOf('internal://') > -1) {
@@ -112,7 +112,7 @@ exports.LinkEditorView = Backbone.View.extend({
         this.model.set('url', newUrl);
     },
 
-    updateTitle: function(e) {
+    updateTitle: function (e) {
         var newTitle = e.target.value;
         var oldAttrs = this.model.serialize();
         this.model.set({
@@ -121,11 +121,11 @@ exports.LinkEditorView = Backbone.View.extend({
         var newAttrs = _.clone(oldAttrs);
         newAttrs.title = newTitle;
         // this.updateLinkOptions(oldAttrs, newAttrs);
-        
+
         return false;
     },
 
-    updateLinkOptions: function(oldAttrs, newAttrs) {
+    updateLinkOptions: function (oldAttrs, newAttrs) {
         for (var i = 0; i < this.linkOptions.length; i++) {
             if (_.isEqual(oldAttrs, this.linkOptions[i])) {
                 this.linkOptions[i] = newAttrs;
@@ -134,12 +134,12 @@ exports.LinkEditorView = Backbone.View.extend({
         }
     },
 
-    removeLink: function(e) {
+    removeLink: function (e) {
         this.model.destroy();
         this.$el.remove();
     },
 
-    isInternalLink: function(url) {
+    isInternalLink: function (url) {
         url = url || this.model.get('url');
         return (url.indexOf('internal://') === 0);
     }

@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function (require, exports, module) {
     'use strict';
 
     // require('app/templates/AnalyticsTemplates');
@@ -7,29 +7,29 @@ define(function(require, exports, module) {
     var AnalyticsTemplates = {};
     AnalyticsTemplates.main_stats = [
         '<div class="span40">',
-            '<div class="row hoff1">',
-                '<div class="span18 pane hi10">',
-                    '<strong class="total-active-users">-</strong>',
-                    '<span class="analyitcs-title">Active Users</span>',
-                '</div>',
-                '<div class="span18 offset2 pane hi10">',
-                    '<strong class="total-page-views">-</strong>',
-                    '<span class="analyitcs-title">Total Page Views</span>',
-                '</div>',
-            '</div>',
-            '<div class="row hoff1">',
-                '<div class="span18 pane hi10">',
-                    '<strong class="total-users">-</strong>',
-                    '<span class="analyitcs-title">Total Users</span>',
-                '</div>',
-                '<div class="span18 offset2 pane hi10">',
-                    '<strong class="total-visitors">-</strong>',
-                    '<span class="analyitcs-title">Total Visitors</span>',
-                '</div>',
-            '</div>',
+        '<div class="row hoff1">',
+        '<div class="span18 pane hi10">',
+        '<strong class="total-active-users">-</strong>',
+        '<span class="analyitcs-title">Active Users</span>',
+        '</div>',
+        '<div class="span18 offset2 pane hi10">',
+        '<strong class="total-page-views">-</strong>',
+        '<span class="analyitcs-title">Total Page Views</span>',
+        '</div>',
+        '</div>',
+        '<div class="row hoff1">',
+        '<div class="span18 pane hi10">',
+        '<strong class="total-users">-</strong>',
+        '<span class="analyitcs-title">Total Users</span>',
+        '</div>',
+        '<div class="span18 offset2 pane hi10">',
+        '<strong class="total-visitors">-</strong>',
+        '<span class="analyitcs-title">Total Visitors</span>',
+        '</div>',
+        '</div>',
         '</div>',
         '<div class="span16 pane hi21 hoff1 total-page-visits">',
-            '<span class="analyitcs-title">Page Visits</span>',
+        '<span class="analyitcs-title">Page Visits</span>',
         '</div>'
     ].join('\n');
 
@@ -40,7 +40,7 @@ define(function(require, exports, module) {
         className: 'row hoff1',
         events: {},
 
-        initialize: function(options) {
+        initialize: function (options) {
             var self = this;
             _.bindAll(this);
 
@@ -49,19 +49,19 @@ define(function(require, exports, module) {
 
             var v1 = (v1 || null);
             if (v1) {
-                v1.on('deployed', function() {
+                v1.on('deployed', function () {
                     self.$('.coming-soon-overlay').hide();
                 });
             }
         },
 
-        render: function() {
+        render: function () {
             this.setElement(document.getElementById('dashboard-' + this.appId));
             this.fetchInfo();
             return this;
         },
 
-        renderData: function(data) {
+        renderData: function (data) {
 
             var self = this;
 
@@ -72,12 +72,12 @@ define(function(require, exports, module) {
             var blackList = ['/favicon.ico', '/robots.txt'];
             var total_page_views = data.total_page_views || 0;
 
-            _.each(_.pick(data.total_page_views_dict, blackList), function(val, key) {
+            _.each(_.pick(data.total_page_views_dict, blackList), function (val, key) {
                 total_page_views -= val;
             });
 
             var innerHTML = '<span class="analyitcs-title">Page Visits</span><br>';
-            _.each(_.omit(data.total_page_views_dict, blackList), function(val, key) {
+            _.each(_.omit(data.total_page_views_dict, blackList), function (val, key) {
                 innerHTML += '<em>' + key + '</em> :  ' + val + ' views<br>';
             });
 
@@ -86,15 +86,15 @@ define(function(require, exports, module) {
 
         },
 
-        fetchInfo: function() {
+        fetchInfo: function () {
             var self = this;
             $.ajax({
                 type: "GET",
                 url: '/app/' + self.appId + '/analytics/',
-                success: function(data) {
+                success: function (data) {
                     self.renderData(data);
                 },
-                error: function(data) {
+                error: function (data) {
                     console.log("No analytics data.");
                 },
                 dataType: "JSON"

@@ -13,8 +13,9 @@
     */
     /* uielement.displayProps.iconType may be one of these values, which happen to be class names for sprites . */
     var validIconClasses = ['button', 'image', 'header', 'text',
-                            'link', 'line', 'box', 'imageslider',
-                            'fbshare', 'embedvideo', 'custom-widget'];
+        'link', 'line', 'box', 'imageslider',
+        'fbshare', 'embedvideo', 'custom-widget'
+    ];
 
     var EditorGalleryView = Backbone.View.extend({
 
@@ -31,13 +32,13 @@
         editorContext: "Page",
 
         events: {
-            'change input.search'    : 'searchInputChage',
-            'click .search-icon'     : 'searchToggle',
-            'keyup input.search'     : 'searchInputChage',
-            'click .search-cancel'   : 'searchCanceled'
+            'change input.search': 'searchInputChage',
+            'click .search-icon': 'searchToggle',
+            'keyup input.search': 'searchInputChage',
+            'click .search-cancel': 'searchCanceled'
         },
 
-        initialize: function(sectionsCollection) {
+        initialize: function (sectionsCollection) {
             _.bindAll(this);
 
             this.sectionsCollection = sectionsCollection;
@@ -48,14 +49,14 @@
             this.subviews = [];
         },
 
-        render: function() {
+        render: function () {
             var self = this;
             this.setElement(util.get('top-panel-bb'));
 
             this.allList = util.get('all-list');
             this.allList.innerHTML = '';
             this.renderSearchPart();
-            /* To see the old random render<Type>Elements, refer to 4b40213136b3006bf7eb83b3e93998d81c71346b or prior. */ 
+            /* To see the old random render<Type>Elements, refer to 4b40213136b3006bf7eb83b3e93998d81c71346b or prior. */
             this.renderPluginElements();
 
             // hide all sections except first
@@ -70,17 +71,17 @@
             return this;
         },
 
-        bindDraggable: function() {
+        bindDraggable: function () {
             var self = this;
 
             $(this.allList).find('li:not(.ui-draggable)').draggable({
                 cursor: "move",
                 helper: "clone",
-                start: function(e) {
+                start: function (e) {
                     self.dragActive = true;
                     v1.currentApp.view.sectionShadowView.displayColumnShadows();
                 },
-                stop: function(e) {
+                stop: function (e) {
                     self.dragActive = false;
                     v1.currentApp.view.sectionShadowView.hideColumnShadows();
                     self.hideAllSections();
@@ -90,7 +91,7 @@
 
         },
 
-        renderSearchPart: function() {
+        renderSearchPart: function () {
 
             var self = this;
             var sectionView = new SearchGallerySectionView({
@@ -105,27 +106,27 @@
             this.allList.appendChild(sectionView.render().el);
         },
 
-        searchToggle: function() {
+        searchToggle: function () {
             if (this._search_expanded)
                 this.searchCanceled();
             else
                 this.searchHovered();
         },
 
-        searchHovered: function() {
+        searchHovered: function () {
             $(".search-panel").addClass("hover");
             $('.search').focus();
             this._search_expanded = true;
         },
 
-        searchCanceled: function() {
+        searchCanceled: function () {
             $(".search-panel").removeClass("hover");
             $('.search').val('');
             $('.search').focusout();
             this._search_expanded = false;
         },
 
-        searchInputChage: function(e) {
+        searchInputChage: function (e) {
 
             var val = e.currentTarget.value;
 
@@ -133,29 +134,27 @@
                 this.searchSection.clear();
                 $(".search-panel").removeClass("hover");
                 return;
-            }
-            else {
+            } else {
                 $(".search-panel").addClass("hover");
             }
 
             this.searchSection.clear();
             var results = this.searcher.search(val);
 
-            if(results.length > 0) {
+            if (results.length > 0) {
                 this.searchSection.expand();
-            }
-            else {
+            } else {
                 this.searchSection.hide();
             }
 
-            _.each(results, function(result) {
+            _.each(results, function (result) {
                 this.searchSection.addWidgetItem(result.id, result.className, result.text, result.icon);
             }, this);
 
         },
 
-        /* To see the old random render<Type>Elements, refer to 4b40213136b3006bf7eb83b3e93998d81c71346b or prior. */ 
-        renderPluginElements: function() {
+        /* To see the old random render<Type>Elements, refer to 4b40213136b3006bf7eb83b3e93998d81c71346b or prior. */
+        renderPluginElements: function () {
             var elements = [];
             var createdSections = [];
 
@@ -163,24 +162,24 @@
             var pluginPairs = _.pairs(_.omit(plugins, ['root', 'crud']));
 
             // order should be root, crud, then rest.
-            if(plugins["crud"]) {
+            if (plugins["crud"]) {
                 pluginPairs.unshift(["crud", plugins["crud"]]);
             }
 
-            if(plugins["root"]) {
+            if (plugins["root"]) {
                 pluginPairs.unshift(["root", plugins["root"]]);
             }
 
-            _.each(pluginPairs, function(pair) {
+            _.each(pluginPairs, function (pair) {
                 var pluginName = pair[0],
                     plugin = pair[1];
                 if (plugin.uielements) {
-                    var displayName =  plugin.metadata.displayName || pluginName;
+                    var displayName = plugin.metadata.displayName || pluginName;
 
                     var sect = this.addNewSection(displayName);
                     createdSections.push(sect);
 
-                    _.each(plugin.uielements, function(element) {
+                    _.each(plugin.uielements, function (element) {
                         var className = null || 'plugin-icon';
                         if (element.displayProps && _.contains(validIconClasses, element.displayProps.iconType)) {
                             className = element.displayProps.iconType;
@@ -201,7 +200,7 @@
 
             }, this);
 
-            _.each(this.pluginSections, function(sect) {
+            _.each(this.pluginSections, function (sect) {
                 sect.close();
             });
 
@@ -213,7 +212,7 @@
             this.bindDraggable();
         },
 
-        addNewSection: function(name) {
+        addNewSection: function (name) {
 
             var self = this;
             var sectionView = new EditorGallerySectionView({
@@ -232,11 +231,11 @@
             return sectionView;
         },
 
-        addPlusSign: function() {
+        addPlusSign: function () {
             var text = "You can add more functionality by installing new Plugins from the menu on the top right.";
             var div = document.createElement('div');
             div.className = "gallery-section plus-sign";
-            div.innerHTML = '<div class="gallery-header" title="'+text+'"><span>+</span></div>';
+            div.innerHTML = '<div class="gallery-header" title="' + text + '"><span>+</span></div>';
             this.plusSign = div;
             this.allList.appendChild(div);
 
@@ -256,39 +255,39 @@
             });
         },
 
-        removeSection: function(sectionView) {
+        removeSection: function (sectionView) {
             sectionView.close();
             this.sections.splice(this.sections.indexOf(sectionView), 1);
             this.subviews.splice(this.subviews.indexOf(sectionView), 1);
         },
 
-        expandSection: function(index) {
+        expandSection: function (index) {
             this.sections[index].expand();
         },
 
-        hideSection: function(index) {
+        hideSection: function (index) {
             this.sections[index].hide();
         },
 
-        expandAllSections: function() {
-            _(this.sections).each(function(section) {
+        expandAllSections: function () {
+            _(this.sections).each(function (section) {
                 section.expand();
             });
         },
 
-        hideAllSections: function() {
-            _(this.sections).each(function(section) {
+        hideAllSections: function () {
+            _(this.sections).each(function (section) {
                 section.hide();
             });
         },
 
-        slideDown: function() {
+        slideDown: function () {
             var self = this;
             var itemGallery = document.getElementById('item-gallery');
             var h = $(itemGallery).scrollTop();
             this.slideDownActive = true;
             $(itemGallery).scrollTop(h + 14);
-            var tmr = setTimeout(function() {
+            var tmr = setTimeout(function () {
                 self.slideDownActive = false;
                 clearTimeout(tmr);
             }, 200);
@@ -298,7 +297,7 @@
             this.$el.hide();
         },
 
-        show: function() {
+        show: function () {
             this.$el.fadeIn();
         }
 

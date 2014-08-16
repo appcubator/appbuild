@@ -8,12 +8,12 @@
             'click .static-file': 'clickedStatic'
         },
 
-        initialize: function(themeModel) {
+        initialize: function (themeModel) {
             _.bindAll(this);
             this.model = themeModel;
         },
 
-        render: function() {
+        render: function () {
 
             var temp = [
                 '<div id="theme-statics" class="row"></div>',
@@ -27,27 +27,27 @@
             return this;
         },
 
-        uploadStatic: function() {
+        uploadStatic: function () {
             var self = this;
             util.filepicker.openFilePick(this.staticsAdded, this, appId);
         },
 
-        appendStaticFile: function(file) {
+        appendStaticFile: function (file) {
             this.staticsList.append('<div id="themestatic-' + file.id + '" class="static-file"><img src="' + file.url + '"><p class="name">' + file.name + '</p><a href="#' + file.id + '" class="btn btn-danger remove">Delete</a></div>');
         },
 
-        deleteStaticFile: function(e) {
+        deleteStaticFile: function (e) {
             var self = this;
             var imgNode = e.target.parentNode;
             var id = parseInt(imgNode.id.replace('themestatic-', ''), 10);
             $.ajax({
                 type: 'POST',
                 url: url + '/static/' + id + '/delete/',
-                success: function() {
+                success: function () {
                     console.log('successfully deleted!');
                     util.get('theme-statics').removeChild(imgNode);
                 },
-                error: function(jqxhr, textStatus) {
+                error: function (jqxhr, textStatus) {
                     message = "Error deleting file";
                     if (textStatus) {
                         message += ': ' + textStatus;
@@ -61,14 +61,14 @@
         },
 
 
-        staticsAdded: function(files, self) {
-            _(files).each(function(file) {
+        staticsAdded: function (files, self) {
+            _(files).each(function (file) {
                 file.name = file.filename;
                 self.appendStaticFile(file);
             });
         },
 
-        clickedStatic: function(e) {
+        clickedStatic: function (e) {
             var $el = $(e.currentTarget).find('img');
             link = $el.attr('src');
             util.copyToClipboard(link);

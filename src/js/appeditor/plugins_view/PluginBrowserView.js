@@ -14,14 +14,14 @@
             'click .addPluginButton': 'addPlugin'
         },
 
-        initialize: function() {
+        initialize: function () {
             _.bindAll(this);
             this.render();
         },
 
         currentList: null,
 
-        render: function() {
+        render: function () {
             var self = this;
             var loadingSpin = util.addLoadingSpin(this.el);
 
@@ -29,8 +29,8 @@
                 type: "GET",
                 url: "//plugins.appcubator.com/plugins/list",
                 dataType: "json",
-                success: function(data) {
-                	console.log(data);
+                success: function (data) {
+                    console.log(data);
                     $(loadingSpin).remove();
                     self.layoutPlugins(data);
                 }
@@ -39,7 +39,7 @@
             return this;
         },
 
-        layoutPlugins: function(listPlugins) {
+        layoutPlugins: function (listPlugins) {
             this.currentList = listPlugins;
             var template = util.getHTML('plugin-browser');
             this.el.innerHTML = _.template(template, {
@@ -47,7 +47,7 @@
             });
         },
 
-        addPlugin: function(e) {
+        addPlugin: function (e) {
             /* Installs the plugin */
             var ind = e.currentTarget.id.replace('add-', '');
             var plugin = this.currentList[ind];

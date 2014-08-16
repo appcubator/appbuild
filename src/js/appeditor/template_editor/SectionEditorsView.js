@@ -1,48 +1,48 @@
-    'use strict';
-    var SectionEditorView = require('./SectionEditorView').SectionEditorView;
+'use strict';
+var SectionEditorView = require('./SectionEditorView').SectionEditorView;
 
-    var SectionEditorsView = Backbone.View.extend({
+var SectionEditorsView = Backbone.View.extend({
 
-        el: document.body,
+    el: document.body,
 
-        widgetsContainer: null,
+    widgetsContainer: null,
 
-        events: {
-            'click #addNewSectionTitle' : 'showSectionOptions',
-            'click .section-option': 'selectSectionLayout'
-        },
+    events: {
+        'click #addNewSectionTitle': 'showSectionOptions',
+        'click .section-option': 'selectSectionLayout'
+    },
 
-        optionsHidden : true,
+    optionsHidden: true,
 
-        subviews: [],
+    subviews: [],
 
-        initialize: function(sectionsCollection) {
-            _.bindAll(this);
+    initialize: function (sectionsCollection) {
+        _.bindAll(this);
 
-            var self = this;
-            this.subviews = [];
+        var self = this;
+        this.subviews = [];
 
-            this.sectionsCollection = sectionsCollection;
-            this.listenTo(this.sectionsCollection, 'add', this.placeNewSectionEditor);
-            this.editorViews = [];
-        },
+        this.sectionsCollection = sectionsCollection;
+        this.listenTo(this.sectionsCollection, 'add', this.placeNewSectionEditor);
+        this.editorViews = [];
+    },
 
-        render: function() {
-            this.pageWrapper = document.getElementById('page-wrapper');
-            var iframe = v1.currentApp.view.iframe;
-            this.iframe = iframe;
-            this.iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    render: function () {
+        this.pageWrapper = document.getElementById('page-wrapper');
+        var iframe = v1.currentApp.view.iframe;
+        this.iframe = iframe;
+        this.iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
 
-            this.sectionsCollection.each(this.placeNewSectionEditor);
-        },
+        this.sectionsCollection.each(this.placeNewSectionEditor);
+    },
 
-        placeNewSectionEditor: function(sectionModel) {
-            var sectionEditorView = new SectionEditorView(sectionModel).render();
-            this.pageWrapper.appendChild(sectionEditorView.el);
+    placeNewSectionEditor: function (sectionModel) {
+        var sectionEditorView = new SectionEditorView(sectionModel).render();
+        this.pageWrapper.appendChild(sectionEditorView.el);
 
-            this.editorViews.push(sectionEditorView);
+        this.editorViews.push(sectionEditorView);
 
-        }
-    });
+    }
+});
 
-    exports.SectionEditorsView = SectionEditorsView;
+exports.SectionEditorsView = SectionEditorsView;

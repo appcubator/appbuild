@@ -5,11 +5,11 @@
     var NodeModelMethodModel = Backbone.Model.extend({
         /* Note that this may have name/code or it may be a generator */
 
-        isGenerator: function() {
+        isGenerator: function () {
             return this.generate !== undefined;
         },
 
-        getGenerated: function() {
+        getGenerated: function () {
             // TODO stop making objects of Generator every time
             if (this.isGenerator()) {
                 return G.generate(this.generate, this.toJSON());
@@ -18,7 +18,7 @@
             }
         },
 
-        getCode: function() {
+        getCode: function () {
             if (this.isGenerator()) {
                 return String(G.generate(this.generate, this.toJSON()).code);
             } else {
@@ -27,7 +27,7 @@
         },
 
         /* mutating the type */
-        getType: function() {
+        getType: function () {
             var obj = this.getGenerated();
             if (obj.instancemethod)
                 return 'instancemethod';
@@ -36,17 +36,19 @@
             else
                 return 'staticmethod';
         },
-        setType: function(type) {
+        setType: function (type) {
             if (this.isGenerator()) {
                 alert('cant set type of a plugin\'s function');
                 return;
             }
             var enableAPI = type === 'enableAPI' ? true : undefined;
             var instancemethod = type === 'instancemethod' ? true : undefined;
-            this.set('enableAPI', enableAPI, {silent: true}); // only need to fire one change event
+            this.set('enableAPI', enableAPI, {
+                silent: true
+            }); // only need to fire one change event
             this.set('instancemethod', instancemethod);
         },
-        toggleType: function() {
+        toggleType: function () {
             var currType = this.getType();
             var newType;
             if (currType === 'staticmethod')

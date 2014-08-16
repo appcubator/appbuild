@@ -5,17 +5,17 @@
         widgetsContainer: null,
 
         events: {
-            'mouseover'       : 'hovered',
-            'mouseup'         : 'hovered',
-            'mouseover .ycol' : 'hoveredColumn',
-            'mouseup .ycol'   : 'hoveredColumn'
+            'mouseover': 'hovered',
+            'mouseup': 'hovered',
+            'mouseover .ycol': 'hoveredColumn',
+            'mouseup .ycol': 'hoveredColumn'
         },
 
         className: "section-shadow-view",
 
         subviews: [],
 
-        initialize: function(sectionCollection) {
+        initialize: function (sectionCollection) {
             _.bindAll(this);
 
             this.collection = sectionCollection;
@@ -24,7 +24,7 @@
             this.listenTo(this.collection, 'remove', this.removeSectionShadow);
         },
 
-        render: function() {
+        render: function () {
 
             this.shadowFrame = document.getElementById('shadow-frame');
             var iframe = v1.currentApp.view.iframe;
@@ -38,7 +38,7 @@
             return this;
         },
 
-        renderSectionShadow: function(sectionModel) {
+        renderSectionShadow: function (sectionModel) {
 
             var $el = $(this.iframeDoc).find('[data-cid="' + sectionModel.cid + '"]');
             var ycols = $el.find('[data-column]');
@@ -52,7 +52,7 @@
             // overallShadowEl.className = "section-shodow-wrapper";
 
             /* DOM el for each column */
-            ycols.each(function() {
+            ycols.each(function () {
                 var colCid = this.dataset.cid;
                 var shadowEl = util.addShadow(this, document.getElementById('page-wrapper'), self.iframe, self.iframeDoc);
                 shadowEl.className = "section-shadow";
@@ -61,23 +61,23 @@
 
                 $(shadowEl).droppable({
                     accept: ".ui-draggable",
-                    drop: function( event, ui ) {
+                    drop: function (event, ui) {
 
                         var extraData = {};
 
                         var type = $(ui.draggable).data("type");
 
                         // try {
-                            if($(ui.draggable).data("extraData")) {
-                                extraData = $(ui.draggable).data("extraData");
-                            }
+                        if ($(ui.draggable).data("extraData")) {
+                            extraData = $(ui.draggable).data("extraData");
+                        }
 
-                            if($(ui.draggable).data("genpath")) {
-                                sectionModel.get('columns').get(colCid).addElementWithPath(type, $(ui.draggable).data("genpath"), extraData);
-                                return;
-                            }
+                        if ($(ui.draggable).data("genpath")) {
+                            sectionModel.get('columns').get(colCid).addElementWithPath(type, $(ui.draggable).data("genpath"), extraData);
+                            return;
+                        }
 
-                            sectionModel.get('columns').get(colCid).addElement(type, extraData);
+                        sectionModel.get('columns').get(colCid).addElement(type, extraData);
 
                         // }
                         // catch(e) {
@@ -87,10 +87,10 @@
 
                         // }
                     },
-                    over: function() {
+                    over: function () {
                         shadowEl.className = "section-shadow active";
                     },
-                    out: function() {
+                    out: function () {
                         shadowEl.className = "section-shadow";
                     }
                 });
@@ -100,29 +100,29 @@
 
         },
 
-        reRenderSectionShadow: function() {
-            _.each(this.shadows, function(el) {
+        reRenderSectionShadow: function () {
+            _.each(this.shadows, function (el) {
                 $(el).remove();
             });
             this.shadows = [];
             this.render();
         },
 
-        removeSectionShadow: function(sectionModel) {
+        removeSectionShadow: function (sectionModel) {
             // TODO: Fix this
         },
 
-        displayColumnShadows: function() {
+        displayColumnShadows: function () {
             this.reRenderSectionShadow();
             $(this.shadowFrame).show();
-            _.each(this.shadows, function(shadowEl) {
+            _.each(this.shadows, function (shadowEl) {
                 $(shadowEl).show();
             });
         },
 
-        hideColumnShadows: function() {
+        hideColumnShadows: function () {
             $(this.shadowFrame).hide();
-            _.each(this.shadows, function(shadowEl) {
+            _.each(this.shadows, function (shadowEl) {
                 $(shadowEl).hide();
             });
         }

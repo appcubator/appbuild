@@ -1,32 +1,34 @@
 var WidgetContainerModel = require('../models/WidgetContainerModel').WidgetContainerModel;
 
-  var ContainersCollection = Backbone.Collection.extend({
+var ContainersCollection = Backbone.Collection.extend({
 
-    model : WidgetContainerModel,
+    model: WidgetContainerModel,
     selectedEl: null,
 
-    initialize: function() {
+    initialize: function () {
 
     },
 
-    unselectAll: function() {
-      this.each(function(model) { model.set('selected', false); });
-      this.selectedEl = null;
-    },
-
-    select : function(model) {
-      this.unselectAll();
-      this.selectedEl = model;
-      this.trigger('selected');
-    },
-
-    removeSelected  : function(e) {
-      if(this.editMode !== true) {
-        this.remove(this.selectedEl);
+    unselectAll: function () {
+        this.each(function (model) {
+            model.set('selected', false);
+        });
         this.selectedEl = null;
-        e.preventDefault();
-      }
-    }
-  });
+    },
 
-  exports.ContainersCollection = ContainersCollection;
+    select: function (model) {
+        this.unselectAll();
+        this.selectedEl = model;
+        this.trigger('selected');
+    },
+
+    removeSelected: function (e) {
+        if (this.editMode !== true) {
+            this.remove(this.selectedEl);
+            this.selectedEl = null;
+            e.preventDefault();
+        }
+    }
+});
+
+exports.ContainersCollection = ContainersCollection;

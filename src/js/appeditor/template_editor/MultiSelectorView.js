@@ -12,13 +12,13 @@ exports.WidgetSelectorView = Backbone.UIView.extend({
         // 'mouseup #select-div'  : 'mouseup'
     },
 
-    initialize: function() {
+    initialize: function () {
         _.bindAll(this);
         var self = this;
         this.doKeyBindings();
     },
 
-    setContents: function(arr) {
+    setContents: function (arr) {
         this.unselectAll();
         this.contents = arr;
         this.selectAll();
@@ -27,62 +27,62 @@ exports.WidgetSelectorView = Backbone.UIView.extend({
     // mousedown: function(e) { mouseDispatcher.isMousedownActive = true; },
     // mouseup  : function(e) { mouseDispatcher.isMousedownActive = false; },
 
-    render: function() {
+    render: function () {
         $(window).on('mousedown', this.clickedPage);
         return this;
     },
 
-    bindWidget: function(widget) {
+    bindWidget: function (widget) {
 
     },
 
-    unbindAll: function() {},
+    unbindAll: function () {},
 
 
-    moveSelectedDown: function(e) {
+    moveSelectedDown: function (e) {
         if (!this.contents.length) return;
         if (keyDispatcher.textEditing === true) return;
-        _(this.contents).each(function(widgetModel) {
+        _(this.contents).each(function (widgetModel) {
             widgetModel.moveDown();
         });
 
         e.preventDefault();
     },
 
-    moveSelectedUp: function() {
+    moveSelectedUp: function () {
         if (!this.contents.length) return;
         if (keyDispatcher.textEditing === true) return;
-        _(this.contents).each(function(widgetModel) {
+        _(this.contents).each(function (widgetModel) {
             widgetModel.moveUp();
         });
     },
 
-    moveSelectedLeft: function() {
+    moveSelectedLeft: function () {
         if (!this.contents.length) return;
         if (keyDispatcher.textEditing === true) return;
-        _(this.contents).each(function(widgetModel) {
+        _(this.contents).each(function (widgetModel) {
             widgetModel.moveLeft();
         });
     },
 
-    moveSelectedRight: function() {
+    moveSelectedRight: function () {
         if (!this.contents.length) return;
         if (keyDispatcher.textEditing === true) return;
-        _(this.contents).each(function(widgetModel) {
+        _(this.contents).each(function (widgetModel) {
             widgetModel.moveRight();
         });
     },
 
-    moving: function(e, ui, model ,pHorizontalGrid, pVerticalGrid) {
+    moving: function (e, ui, model, pHorizontalGrid, pVerticalGrid) {
         var cid = model.cid;
         g_guides.hideAll();
 
         var deltaTop = (model.get('layout').get('top') * pVerticalGrid) - ui.position.top;
         var deltaLeft = (model.get('layout').get('left') * pHorizontalGrid) - ui.position.left;
 
-        _.each(this.contents, function(wModel) {
+        _.each(this.contents, function (wModel) {
             var elem = util.get('widget-wrapper-' + wModel.cid);
-            var topPosition = (wModel.get('layout').get('top') * pVerticalGrid)  - deltaTop;
+            var topPosition = (wModel.get('layout').get('top') * pVerticalGrid) - deltaTop;
             var leftPosition = (wModel.get('layout').get('left') * pHorizontalGrid) - deltaLeft;
             elem.style.top = topPosition + 'px';
             elem.style.left = leftPosition + 'px';
@@ -90,15 +90,15 @@ exports.WidgetSelectorView = Backbone.UIView.extend({
 
     },
 
-    moved: function(e, ui, model ,pHorizontalGrid, pVerticalGrid, hideHoverDivFn) {
+    moved: function (e, ui, model, pHorizontalGrid, pVerticalGrid, hideHoverDivFn) {
 
         var deltaTop = (model.get('layout').get('top') * pVerticalGrid) - ui.position.top;
         var deltaLeft = (model.get('layout').get('left') * pHorizontalGrid) - ui.position.left;
 
         var deltaTopUnit = Math.round(deltaTop / pVerticalGrid);
-        var deltaLeftUnit =  Math.round(deltaLeft / pHorizontalGrid);
+        var deltaLeftUnit = Math.round(deltaLeft / pHorizontalGrid);
 
-        _.each(this.contents, function(wModel) {
+        _.each(this.contents, function (wModel) {
 
             var top = wModel.get('layout').get('top') - deltaTopUnit;
             var left = wModel.get('layout').get('left') - deltaLeftUnit;
@@ -123,16 +123,16 @@ exports.WidgetSelectorView = Backbone.UIView.extend({
         hideHoverDivFn.call(this);
     },
 
-    deleteSelected: function(e) {
+    deleteSelected: function (e) {
         if (!this.contents.length) return;
         if (keyDispatcher.textEditing === true) return;
         e.preventDefault();
-        _(this.contents).each(function(widgetModel) {
+        _(this.contents).each(function (widgetModel) {
             widgetModel.remove();
         });
     },
 
-    doKeyBindings: function() {
+    doKeyBindings: function () {
         keyDispatcher.bind('down', this.moveSelectedDown);
         keyDispatcher.bind('up', this.moveSelectedUp);
         keyDispatcher.bind('left', this.moveSelectedLeft);
@@ -140,39 +140,39 @@ exports.WidgetSelectorView = Backbone.UIView.extend({
         keyDispatcher.bind('backspace', this.deleteSelected);
     },
 
-    selectAll: function() {
-        _(this.contents).each(function(widgetModel) {
+    selectAll: function () {
+        _(this.contents).each(function (widgetModel) {
             $('#widget-wrapper-' + widgetModel.cid).addClass('red-border');
         });
     },
 
-    unselectAll: function() {
-        _(this.contents).each(function(widgetModel) {
+    unselectAll: function () {
+        _(this.contents).each(function (widgetModel) {
             widgetModel.trigger('deselect');
             $('#widget-wrapper-' + widgetModel.cid).removeClass('red-border');
         });
     },
 
-    isEmpty: function() {
+    isEmpty: function () {
 
         return this.contents.length === 0;
     },
 
-    empty: function() {
+    empty: function () {
         this.contents = [];
         this.unselectAll();
     },
 
-    clickedPage: function(e) {
-        if(mouseDispatcher.isMousedownActive === true) return;
+    clickedPage: function (e) {
+        if (mouseDispatcher.isMousedownActive === true) return;
         this.empty();
     },
 
-    contains: function(widgetModel) {
+    contains: function (widgetModel) {
         return _.contains(this.contents, widgetModel);
     },
 
-    remove: function() {
+    remove: function () {
         keyDispatcher.unbind('down', this.moveSelectedDown);
         keyDispatcher.unbind('up', this.moveSelectedUp);
         keyDispatcher.unbind('left', this.moveSelectedLeft);

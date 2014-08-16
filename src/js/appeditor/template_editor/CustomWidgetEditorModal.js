@@ -11,13 +11,13 @@
             'click .sub-title': 'toggle',
         },
 
-        initialize: function(widgetModel) {
+        initialize: function (widgetModel) {
             _.bindAll(this);
             this.model = widgetModel;
             this.render();
         },
 
-        render: function() {
+        render: function () {
             var self = this;
             var htmlStr = this.model.get('htmlC') || '';
             var cssStr = this.model.get('cssC') || '';
@@ -50,18 +50,18 @@
             return this;
         },
 
-        toggle: function(e) {
+        toggle: function (e) {
             if ($(e.currentTarget.parentNode).hasClass('expanded')) return this.shrink(e);
             this.$el.find('.expanded').removeClass('expanded');
             $(e.currentTarget.parentNode).addClass('expanded');
             this.editors[e.currentTarget.id].focus();
         },
 
-        shrink: function(e) {
+        shrink: function (e) {
             $(e.currentTarget.parentNode).removeClass('expanded');
         },
 
-        onClose: function() {
+        onClose: function () {
             this.model.set('cssC', this.editors["e-css"].getValue());
             this.model.set('jsC', this.editors["e-js"].getValue());
             this.model.set('htmlC', this.editors["e-html"].getValue());

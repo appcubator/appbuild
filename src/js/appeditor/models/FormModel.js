@@ -4,7 +4,7 @@ define([
         'collections/LoginRouteCollection',
         'models/ActionModel'
     ],
-    function(
+    function (
         FormFieldCollection,
         ActionCollection,
         LoginRouteCollection,
@@ -12,7 +12,7 @@ define([
 
         var FormModel = Backbone.Model.extend({
 
-            initialize: function(bone) {
+            initialize: function (bone) {
                 alert('ye');
                 this.set('name', bone.name);
                 this.set('fields', new FormFieldCollection());
@@ -48,10 +48,10 @@ define([
                 }
             },
 
-            addAction: function(newActionModel) {
+            addAction: function (newActionModel) {
                 var isUnique = true;
 
-                this.get('actions').each(function(actionModel) {
+                this.get('actions').each(function (actionModel) {
                     if (_.isEqual(actionModel.attributes, newActionModel.attributes)) isUnique = false;
                     return;
                 }, this);
@@ -62,8 +62,8 @@ define([
                 return this.get('actions');
             },
 
-            fillWithProps: function(entity) {
-                entity.getFieldsColl().each(function(fieldModel) {
+            fillWithProps: function (entity) {
+                entity.getFieldsColl().each(function (fieldModel) {
                     var type = fieldModel.get('type');
                     var formFieldModel = {
                         field_name: fieldModel.get('name'),
@@ -104,7 +104,7 @@ define([
                 }, this);
             },
 
-            addToCurrentUser: function(field) {
+            addToCurrentUser: function (field) {
                 var nlDescr = "Add to CurrentUser." + field.get('related_name');
                 var action = {
                     "type": "relation",
@@ -115,8 +115,8 @@ define([
                 this.addAction(action);
             },
 
-            fillWithEditProps: function(entity) {
-                entity.getFieldsColl().each(function(fieldModel) {
+            fillWithEditProps: function (entity) {
+                entity.getFieldsColl().each(function (fieldModel) {
 
                     var type = fieldModel.get('type');
                     var formFieldModel = {
@@ -154,7 +154,7 @@ define([
                 }, this);
             },
 
-            getRelationalActions: function(pageModel) {
+            getRelationalActions: function (pageModel) {
 
                 if (this.get('action') == "login" || this.get('action') == "signup") return (new ActionCollection([]));
 
@@ -162,7 +162,7 @@ define([
                 var possibleActions = new ActionCollection();
                 var userFields = pageModel.getFields();
 
-                _(userFields).each(function(field) {
+                _(userFields).each(function (field) {
                     if (field.get('entity_name') == entity.get('name')) {
                         var action = {
                             "set_fk": "this." + field.get('related_name'),
@@ -172,7 +172,7 @@ define([
                     }
                 });
 
-                entity.get('fields').each(function(field) {
+                entity.get('fields').each(function (field) {
                     if (field.get('entity_name') == "User") {
                         var nlDescr = "Add to CurrentUser." + field.get('related_name');
                         var action = {
@@ -187,8 +187,8 @@ define([
 
                 var pageContextEntities = pageModel.getContextEntities();
 
-                _(pageContextEntities).each(function(entityName) {
-                    entity.get('fields').each(function(field) {
+                _(pageContextEntities).each(function (entityName) {
+                    entity.get('fields').each(function (field) {
                         if (field.get('entity_name') == entityName) {
                             var nlDescr = "Add to Page." + entityName + "." + field.get('related_name');
                             var action = {
@@ -206,18 +206,18 @@ define([
                 return possibleActions;
             },
 
-            removeFieldsConnectedToField: function(fieldM) {
-                this.get('fields').each(function(formFieldM) {
+            removeFieldsConnectedToField: function (fieldM) {
+                this.get('fields').each(function (formFieldM) {
                     if (formFieldM.get('field_name') == fieldM.get('name')) {
                         formFieldM.collection.remove(formFieldM);
                     }
                 });
             },
 
-            getEmailActions: function(argument) {
+            getEmailActions: function (argument) {
                 var possibleActions = new ActionCollection();
 
-                v1State.get('emails').each(function(emailM) {
+                v1State.get('emails').each(function (emailM) {
                     var action = {
                         "type": "email",
                         "email_to": "CurrentUser",
@@ -230,25 +230,25 @@ define([
                 return possibleActions;
             },
 
-            addRedirect: function(pageModel) {
+            addRedirect: function (pageModel) {
                 this.set('redirect', new ActionModel({
                     type: "redirect",
                     page_name: pageModel.get('name')
                 }));
             },
 
-            getPossibleGotos: function() {
+            getPossibleGotos: function () {
                 var entityName = this.get('entity');
                 var listOfPages = new ActionCollection();
 
-                _(v1State.get('pages').getContextFreePageModels()).each(function(pageModel) {
+                _(v1State.get('pages').getContextFreePageModels()).each(function (pageModel) {
                     listOfPages.push({
                         type: "goto",
                         page_name: pageModel.get('name')
                     });
                 });
 
-                _(v1State.get('pages').getPageModelsWithEntityName(entityName)).each(function(pageModel) {
+                _(v1State.get('pages').getPageModelsWithEntityName(entityName)).each(function (pageModel) {
                     listOfPages.push({
                         type: "goto",
                         page_name: pageModel.get('name'),
@@ -259,10 +259,10 @@ define([
                 return listOfPages;
             },
 
-            createLoginRoutes: function() {
+            createLoginRoutes: function () {
                 var routes = new LoginRouteCollection();
 
-                v1State.get('users').each(function(userModel) {
+                v1State.get('users').each(function (userModel) {
                     routes.push({
                         role: userModel.get('name'),
                         redirect: "internal://Homepage"
@@ -273,11 +273,11 @@ define([
             },
 
 
-            isConstant: function() {
+            isConstant: function () {
                 return this.get('isConstant');
             },
 
-            serialize: function() {
+            serialize: function () {
                 var json = _.clone(this.attributes);
                 json.name = json.name || "";
                 json.fields = this.get('fields').serialize();

@@ -44,7 +44,7 @@
             'click .edit-header': 'clickedEditHeader'
         },
 
-        initialize: function(routeModel, templateModel, ind, isMobile) {
+        initialize: function (routeModel, templateModel, ind, isMobile) {
             _.bindAll(this);
 
             if (routeModel !== null) {
@@ -58,7 +58,7 @@
             }
         },
 
-        render: function() {
+        render: function () {
             if (!this.model) {
                 this.el.innerHTML += 'This template has no route. Please add one if you wish to use this template as a page.';
             } else {
@@ -78,7 +78,7 @@
             }
         },
 
-        renderUrl: function() {
+        renderUrl: function () {
             if (!this.model) {
                 // homepage url can't be edited
                 if (this.model.get('name') === 'Homepage') {
@@ -88,7 +88,7 @@
             }
         },
 
-        renderMenu: function() {
+        renderMenu: function () {
             var page_context = {};
             page_context = this.model.attributes;
             page_context.page_name = this.model.get('name');
@@ -102,11 +102,11 @@
             this.el.appendChild(span);
         },
 
-        accessLevelChanged: function(e) {
+        accessLevelChanged: function (e) {
             this.model.set('access_level', e.target.value);
         },
 
-        deletePage: function() {
+        deletePage: function () {
             if (this.model.get('name') == "Homepage" || this.model.get('name') == "Registration Page") {
                 new SimpleModalView({
                     text: "The Hompage is an essential part of " + "your application, and can't be deleted."
@@ -117,9 +117,9 @@
             this.askToDelete();
         },
 
-        askToDelete: function() {
+        askToDelete: function () {
 
-            var translateTypetoNL = function(str) {
+            var translateTypetoNL = function (str) {
                 if (str == "node") {
                     str = "Widget";
                 }
@@ -135,7 +135,7 @@
 
             var widgetsNLString = "";
             if (widgets.length) {
-                var widgetsNL = _.map(widgets, function(widget) {
+                var widgetsNL = _.map(widgets, function (widget) {
                     return translateTypetoNL(widget.widget.get('type')) + ' on ' + widget.pageName;
                 });
                 widgetsNLString = widgetsNL.join('<br>');
@@ -144,7 +144,7 @@
 
             var linksNLString = "";
             if (links.length) {
-                var linksNL = _.map(links, function(link) {
+                var linksNL = _.map(links, function (link) {
                     return 'Link on ' + link.section + ' of ' + link.pageName;
                 });
                 linksNLString = linksNL.join('<br>');
@@ -156,15 +156,15 @@
 
                 new DialogueView({
                     text: "The related widgets listed below will be deleted with this page. Do you want to proceed? <br><br> " + widgetsNLString + linksNLString
-                }, function() {
+                }, function () {
 
                     coll.remove(model.cid);
 
-                    _.each(widgets, function(widget) {
+                    _.each(widgets, function (widget) {
                         widget.widget.collection.remove(widget.widget);
                     });
 
-                    _.each(links, function(link) {
+                    _.each(links, function (link) {
                         link.link.collection.remove(link.link);
                     });
                 });
@@ -172,21 +172,21 @@
 
         },
 
-        clickedEditHeader: function() {
+        clickedEditHeader: function () {
             new HeaderEditorView(this.templateModel);
         },
 
-        expand: function() {
+        expand: function () {
             this.el.className += ' expanded';
             this.el.style.width = "280px";
             this.expanded = true;
         },
 
-        hide: function() {
+        hide: function () {
             this.el.style.width = "";
             this.$el.removeClass('expanded');
             this.expanded = false;
         }
     });
 
-   exports.PageView = PageView;
+    exports.PageView = PageView;

@@ -3,7 +3,7 @@
     require('../mixins/BackboneModal');
 
     var UIElementEditingView = Backbone.View.extend({
-        
+
         tagName: 'div',
         className: 'element-view',
 
@@ -11,7 +11,7 @@
             'click .delete-elem': 'deleteElement'
         },
 
-        initialize: function(options) {
+        initialize: function (options) {
             _.bindAll(this);
 
             this.model = options.model;
@@ -21,7 +21,7 @@
             this.model.bind('change:activeStyle', this.renderStyleTags);
         },
 
-        render: function() {
+        render: function () {
             var tempPane = [
                 '<div class="sect"><h4>Normal State</h4><div id="style-<%= cid %>" class="style style-editor" placeholder="Styling here..."></div></div>',
                 '<div class="sect"><h4>Hover State</h4><div id="hover-style-<%= cid %>" class="hover-style style-editor"></div></div>',
@@ -38,13 +38,13 @@
             return this;
         },
 
-        setupAce: function() {
+        setupAce: function () {
             console.log(this.el);
             console.log($("#style-" + this.model.cid));
             var self = this;
 
             console.trace();
-            setTimeout(function() {
+            setTimeout(function () {
 
                 var cid = self.model.cid;
                 console.log(cid);
@@ -70,18 +70,18 @@
 
         },
 
-        deleteElement: function() {
+        deleteElement: function () {
             var self = this;
             this.model.collection.remove(self.model.cid);
             this.closeModal();
         },
 
-        styleChanged: function(e) {
+        styleChanged: function (e) {
             var value = this.styleEditor.getValue();
             this.model.set('style', value);
         },
 
-        hoverStyleChanged: function(e) {
+        hoverStyleChanged: function (e) {
             var value = this.hoverStyleEditor.getValue();
             console.log(value);
             console.log("YOLO");
@@ -89,7 +89,7 @@
             this.model.set('hoverStyle', value);
         },
 
-        activeStyleChanged: function(e) {
+        activeStyleChanged: function (e) {
             var value = this.activeStyleEditor.getValue();
             this.model.set('activeStyle', value);
         }

@@ -10,7 +10,7 @@
             positionHorizontalGrid: 80,
             positionVerticalGrid: 15,
 
-            initialize: function(widgetsCollection) {
+            initialize: function (widgetsCollection) {
                 _.bindAll(this);
 
                 var self = this;
@@ -24,19 +24,19 @@
                 this.listenTo(this.widgetsCollection, 'remove', this.removeWidget);
             },
 
-            render: function() {
+            render: function () {
                 this.widgetsCollection.each(this.placeWidget);
                 this.setupDummyLines();
             },
 
-            placeWidget: function(widget) {
+            placeWidget: function (widget) {
                 this.placeWidgetLines(widget);
-                this.listenTo(widget.get('layout'), 'change', function() {
+                this.listenTo(widget.get('layout'), 'change', function () {
                     this.changedPosition(widget);
                 }, this);
             },
 
-            placeWidgetLines: function(widget) {
+            placeWidgetLines: function (widget) {
                 var layout = widget.get('layout');
                 var cid = widget.cid;
                 this.placeHorizontal(layout.get('top'), cid);
@@ -45,16 +45,16 @@
                 this.placeVertical(layout.get('left') + layout.get('width'), cid);
             },
 
-            setupDummyLines: function() {
-                for(var ii = 0; ii <= 12; ii++) {
+            setupDummyLines: function () {
+                for (var ii = 0; ii <= 12; ii++) {
                     this.placeVertical(ii, "dum");
                 }
             },
 
-            removeWidget: function(widget) {
+            removeWidget: function (widget) {
 
                 var vKeysToOmit = [];
-                _(this.verticalLinesDict).each(function(lineObj, key) {
+                _(this.verticalLinesDict).each(function (lineObj, key) {
                     lineObj.models = _.without(lineObj.models, widget.cid);
                     if (!lineObj.models.length) {
                         vKeysToOmit.push(key);
@@ -65,7 +65,7 @@
                 this.verticalLinesDict = _.omit(this.verticalLinesDict, vKeysToOmit);
 
                 var hKeysToOmit = [];
-                _(this.horizontalLinesDict).each(function(lineObj, key) {
+                _(this.horizontalLinesDict).each(function (lineObj, key) {
                     lineObj.models = _.without(lineObj.models, widget.cid);
                     if (!lineObj.models.length) {
                         $(lineObj.line).remove();
@@ -76,10 +76,10 @@
                 this.horizontalLinesDict = _.omit(this.horizontalLinesDict, hKeysToOmit);
             },
 
-            changedPosition: function(widget) {
+            changedPosition: function (widget) {
 
                 var vKeysToOmit = [];
-                _(this.verticalLinesDict).each(function(lineObj, key) {
+                _(this.verticalLinesDict).each(function (lineObj, key) {
                     lineObj.models = _.without(lineObj.models, widget.cid);
                     if (!lineObj.models.length) {
                         vKeysToOmit.push(key);
@@ -90,7 +90,7 @@
                 this.verticalLinesDict = _.omit(this.verticalLinesDict, vKeysToOmit);
 
                 var hKeysToOmit = [];
-                _(this.horizontalLinesDict).each(function(lineObj, key) {
+                _(this.horizontalLinesDict).each(function (lineObj, key) {
                     lineObj.models = _.without(lineObj.models, widget.cid);
                     if (!lineObj.models.length) {
                         $(lineObj.line).remove();
@@ -103,7 +103,7 @@
                 this.placeWidgetLines(widget);
             },
 
-            placeHorizontal: function(nmr, cid) {
+            placeHorizontal: function (nmr, cid) {
                 var lineObj = (this.horizontalLinesDict[nmr] || {});
 
                 if (!lineObj.line) {
@@ -120,7 +120,7 @@
                 this.horizontalLinesDict[nmr] = lineObj;
             },
 
-            placeVertical: function(nmr, cid) {
+            placeVertical: function (nmr, cid) {
                 var lineObj = (this.verticalLinesDict[nmr] || {});
 
                 if (!lineObj.line) {
@@ -137,28 +137,28 @@
                 this.verticalLinesDict[nmr] = lineObj;
             },
 
-            showAll: function() {
-                _(this.horizontalLinesDict).each(function(val, key) {
+            showAll: function () {
+                _(this.horizontalLinesDict).each(function (val, key) {
                     $(val.line).addClass('show');
                 });
 
-                _(this.verticalLinesDict).each(function(val, key) {
+                _(this.verticalLinesDict).each(function (val, key) {
                     $(val.line).addClass('show');
                 });
             },
 
-            hideAll: function() {
-                _(this.horizontalLinesDict).each(function(val, key) {
+            hideAll: function () {
+                _(this.horizontalLinesDict).each(function (val, key) {
                     $(val.line).removeClass('show');
                 });
 
-                _(this.verticalLinesDict).each(function(val, key) {
+                _(this.verticalLinesDict).each(function (val, key) {
                     $(val.line).removeClass('show');
                 });
             },
 
-            toggleGuides: function() {
-                if(keyDispatcher.textEditing) return;
+            toggleGuides: function () {
+                if (keyDispatcher.textEditing) return;
 
                 if (this.show) {
                     this.hideAll();
@@ -169,30 +169,30 @@
                 }
             },
 
-            showVertical: function(coor, cid) {
+            showVertical: function (coor, cid) {
                 var coorRounded = Math.round(coor);
                 var delta = coorRounded - coor;
 
                 if (this.verticalLinesDict[coorRounded] && !(this.verticalLinesDict[coorRounded].models.length == 1 && this.verticalLinesDict[coorRounded].models[0] == cid)) {
                     $(this.verticalLinesDict[coorRounded].line).addClass('show');
-                    if(delta > -0.15 && delta < 0.15 && this.verticalLinesDict[coorRounded].models.length != 1) return coorRounded;
+                    if (delta > -0.15 && delta < 0.15 && this.verticalLinesDict[coorRounded].models.length != 1) return coorRounded;
                 }
             },
 
-            showHorizontal: function(coor, cid) {
+            showHorizontal: function (coor, cid) {
                 var coorRounded = Math.round(coor);
                 var delta = coorRounded - coor;
 
                 if (this.horizontalLinesDict[coorRounded] && !(this.horizontalLinesDict[coorRounded].models.length == 1 && this.horizontalLinesDict[coorRounded].models[0] == cid)) {
                     $(this.horizontalLinesDict[coorRounded].line).addClass('show');
-                    if(delta > -0.5 && delta < 0.5) return coorRounded;
+                    if (delta > -0.5 && delta < 0.5) return coorRounded;
                 }
 
 
                 return null;
             },
 
-            close: function() {
+            close: function () {
                 keyDispatcher.unbind(';', this.toggleGuides);
                 Backbone.View.prototype.close.call(this);
             }

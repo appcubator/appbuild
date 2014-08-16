@@ -23,31 +23,29 @@
         css: "bootstrap-editor",
 
         events: {
-            'click .menu-button.help'    : 'help',
+            'click .menu-button.help': 'help',
             'click .menu-button.question': 'question',
-            'click .url-field'           : 'clickedUrl',
-            'click .refresh-page'        : 'refreshPage',
-            'click #page-info'           : 'pageInfo',
-            'click #close-page-info'     : 'closePageInfo',
-            'click #design-mode-button'  : 'switchToDesignMode',
-            'click #close-css-editor'    : 'switchOffDesignMode',
-            'click .mobile-preview'      : 'switchToMobileMode'
+            'click .url-field': 'clickedUrl',
+            'click .refresh-page': 'refreshPage',
+            'click #page-info': 'pageInfo',
+            'click #close-page-info': 'closePageInfo',
+            'click #design-mode-button': 'switchToDesignMode',
+            'click #close-css-editor': 'switchOffDesignMode',
+            'click .mobile-preview': 'switchToMobileMode'
         },
 
-        initialize: function(options) {
+        initialize: function (options) {
             _.bindAll(this);
 
             this.appModel = options.appModel;
 
-            if (options && (options.pageId == "0" || options.pageId  >= 0)) {
+            if (options && (options.pageId == "0" || options.pageId >= 0)) {
                 this.pageId = options.pageId;
                 pageId = options.pageId;
                 this.model = this.appModel.get('templates').models[pageId];
-            }
-            else if (options.templateModel) {
+            } else if (options.templateModel) {
                 this.model = options.templateModel;
-            }
-            else {
+            } else {
                 throw "No Template Model Provided.";
             }
 
@@ -86,7 +84,7 @@
 
             this.title = "Editor";
 
-            if(this.routeModel) {
+            if (this.routeModel) {
                 this.urlModel = this.routeModel.get('url');
                 this.listenTo(this.routeModel.get('url').get('urlparts'), 'add remove', this.renderUrlBar);
             }
@@ -95,7 +93,7 @@
 
         },
 
-        render: function() {
+        render: function () {
 
             this.start = new Date().getTime();
 
@@ -129,7 +127,7 @@
                 position: {
                     my: "left+10 center",
                     at: "right center",
-                    using: function(position, feedback) {
+                    using: function (position, feedback) {
                         $(this).css(position);
                         $("<div>")
                             .addClass("arrow")
@@ -144,7 +142,7 @@
             return this;
         },
 
-        renderIFrameContent: function(proxy) {
+        renderIFrameContent: function (proxy) {
             var self = this;
             var iframe = document.getElementById('page');
             innerDoc = iframe.contentDocument || iframe.contentWindow.document;
@@ -194,28 +192,28 @@
             /* } */
         },
 
-        getCurrentTemplate: function() {
+        getCurrentTemplate: function () {
             return this.templateModel;
         },
 
-        renderUrlBar: function() {
-            if(this.routeModel) {
+        renderUrlBar: function () {
+            if (this.routeModel) {
                 this.$el.find('.url-field').html(this.urlModel.getUrlString());
             }
         },
 
-        help: function(e) {
+        help: function (e) {
             new TutorialView([6]);
         },
 
-        startUIStateUpdater: function(proxy) {
+        startUIStateUpdater: function (proxy) {
             var self = this;
             this.listenTo(v1UIEState, 'synced', proxy.reArrangeCSSTag);
 
-            this.UIStateTimer = setInterval(function() {
-                self.fetchUIState(function(state) {
+            this.UIStateTimer = setInterval(function () {
+                self.fetchUIState(function (state) {
                     /* crappy fix */
-                    _.each(state.texts, function(text) {
+                    _.each(state.texts, function (text) {
                         text.tagName = "div";
                     });
 
@@ -227,7 +225,7 @@
             }, 10000);
         },
 
-        fetchUIState: function(callback) {
+        fetchUIState: function (callback) {
             $.ajax({
                 type: "GET",
                 url: '/app/' + appId + '/uiestate/',
@@ -239,38 +237,38 @@
             });
         },
 
-        renewUIEState: function(newState, proxy) {
+        renewUIEState: function (newState, proxy) {
             uieState = newState;
             proxy.reArrangeCSSTag();
         },
 
-        question: function(e) {
+        question: function (e) {
             olark('api.box.show');
             olark('api.box.expand');
         },
 
-        clickedUrl: function() {
+        clickedUrl: function () {
             var newView = new UrlView(this.urlModel, this.model);
             newView.onClose = this.renderUrlBar;
         },
 
-        refreshPage: function() {
+        refreshPage: function () {
             this.widgetEditorView.clear();
             this.sectionsManager.close();
             this.sectionsManager = null;
             var self = this;
-            v1.currentApp.fetchPlugins(function() {
+            v1.currentApp.fetchPlugins(function () {
                 self.iframeProxy.reloadPage();
             });
         },
 
-        setupPageWrapper: function() {
+        setupPageWrapper: function () {
             var height = window.innerHeight - 90;
             util.get('page-wrapper').style.height = height + 'px';
             this.$el.find('.page.full').css('height', height - 46);
         },
 
-        scrollTo: function(widget) {
+        scrollTo: function (widget) {
 
             var pageHeight = window.innerHeight - 90 - 46;
             var pageTop = $('#page').scrollTop();
@@ -284,47 +282,46 @@
 
         },
 
-        pageInfo: function() {
+        pageInfo: function () {
             this.pageView.expand();
         },
 
-        closePageInfo: function() {
+        closePageInfo: function () {
             this.pageView.hide();
             $('.left-buttons').removeClass('invisible');
             this.$pageContainer.removeClass('packed');
             this.galleryEditor.show();
         },
 
-        switchToDesignMode: function() {
+        switchToDesignMode: function () {
             this.cssEditorView.expand();
             $('.left-buttons').addClass('invisible');
             this.$pageContainer.addClass('packed');
             this.galleryEditor.hide();
         },
 
-        switchOffDesignMode: function() {
+        switchOffDesignMode: function () {
             this.cssEditorView.hide();
             $('.left-buttons').removeClass('invisible');
             this.$pageContainer.removeClass('packed');
             this.galleryEditor.show();
         },
 
-        switchToMobileMode: function() {
-            
+        switchToMobileMode: function () {
+
             if (!this.mobilePreview) {
                 util.get('page-wrapper').style.width = 270 + 'px';
                 this.mobilePreview = true;
                 $('.mobile-preview').addClass('active');
-            }
-            else {
+            } else {
                 util.get('page-wrapper').style.width = "";
                 this.mobilePreview = false;
                 $('.mobile-preview').removeClass('active');
             }
-            
+
         },
 
-        close: function() {
+        close: function () {
 
             g_guides = null;
             window.removeEventListener('resize', this.setupPageWrapper);

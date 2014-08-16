@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function (require, exports, module) {
     'use strict';
 
     require('backbone');
@@ -10,15 +10,15 @@ define(function(require, exports, module) {
             'click .add-collaborator-btn': 'showCollabBox',
         },
 
-        initialize: function(options) {
+        initialize: function (options) {
             _.bindAll(this);
         },
 
-        render: function() {
+        render: function () {
             this.$addCollaboratorForm = this.$el.find('.add-collaborator-form');
         },
 
-        showCollabBox: function(e) {
+        showCollabBox: function (e) {
             console.log("swag");
             $(e.currentTarget).hide();
             this.$addCollaboratorForm.fadeIn();

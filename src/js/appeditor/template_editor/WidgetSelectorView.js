@@ -24,7 +24,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         // 'mouseup #select-div': 'mouseup'
     },
 
-    initialize: function(widgetsCollection) {
+    initialize: function (widgetsCollection) {
         _.bindAll(this);
         var self = this;
         this.widgetsCollection = widgetsCollection;
@@ -32,27 +32,27 @@ var WidgetSelectorView = Backbone.UIView.extend({
         this.widgetEditorView = v1.currentApp.view.widgetEditorView;
         this.widgetEditorView.isMobile = self.isMobile;
 
-        this.widgetsCollection.each(function(widget) {
+        this.widgetsCollection.each(function (widget) {
             self.bindWidget(widget, false);
         });
         this.doKeyBindings();
     },
 
-    selectMousedown: function(e) {
+    selectMousedown: function (e) {
         //if(!this.isMouseOn(e)) { return true; }
         this.mousedown();
     },
 
-    mousedown: function(e) {
+    mousedown: function (e) {
         //g_marqueeView.setZero();
         mouseDispatcher.isMousedownActive = true;
     },
 
-    mouseup: function(e) {
+    mouseup: function (e) {
         mouseDispatcher.isMousedownActive = false;
     },
 
-    render: function() {
+    render: function () {
         var self = this;
 
         this.elContainer = this.el.getElementById('elements-container');
@@ -104,33 +104,33 @@ var WidgetSelectorView = Backbone.UIView.extend({
         return this;
     },
 
-    bindWidget: function(widget, isNew) {
+    bindWidget: function (widget, isNew) {
         var self = this;
 
-        this.listenTo(widget, 'remove', function() {
+        this.listenTo(widget, 'remove', function () {
             self.deselect();
         });
 
-        this.listenTo(widget, 'hovered', function() {
+        this.listenTo(widget, 'hovered', function () {
             self.widgetHover(widget);
         });
 
-        this.listenTo(widget, 'unhovered', function() {
+        this.listenTo(widget, 'unhovered', function () {
             self.widgetUnhover(widget);
         });
 
-        this.listenTo(widget, 'selected', function() {
+        this.listenTo(widget, 'selected', function () {
             self.widgetUnhover(widget);
             self.newSelected(widget);
         });
 
         this.listenTo(widget, 'doubleClicked', this.doubleClicked);
 
-        this.listenTo(widget, 'deselect', function() {
+        this.listenTo(widget, 'deselect', function () {
             self.deselect();
         });
 
-        this.listenTo(widget, 'editModeOn', function(position) {
+        this.listenTo(widget, 'editModeOn', function (position) {
             self.unbindAll(position);
         });
 
@@ -139,9 +139,9 @@ var WidgetSelectorView = Backbone.UIView.extend({
         }
     },
 
-    unbindAll: function(position) {
+    unbindAll: function (position) {
         var widget = this.selectedEl;
-        widget.on('editModeOff', function() {
+        widget.on('editModeOff', function () {
             this.bindWidget(widget);
             this.setLayout(this.selectDiv, this.selectedEl);
             this.makeSelectDivVisible();
@@ -157,27 +157,27 @@ var WidgetSelectorView = Backbone.UIView.extend({
         }
     },
 
-    makeSelectDivInvisible: function() {
+    makeSelectDivInvisible: function () {
         this.selectDiv.style.height = 0;
         this.selectDiv.style.width = 0;
         $(this.selectDiv).hide();
     },
 
-    makeSelectDivVisible: function(argument) {
+    makeSelectDivVisible: function (argument) {
         $(this.selectDiv).fadeIn();
     },
 
-    hideHoverDiv: function() {
+    hideHoverDiv: function () {
         this.hideLayout(this.hoverDiv);
     },
 
-    setLayout: function(node, widgetModel) {
+    setLayout: function (node, widgetModel) {
         if (!widgetModel) return;
         $(node).show();
 
         var $element = $(document).find("[data-cid='" + widgetModel.cid + "']");
         var element = $element[0];
-        if(!element) return;
+        if (!element) return;
 
         // var offsetFrame = util.getWindowRelativeOffset(window.document, window);
         var offset = util.getWindowRelativeOffset(window.document, element);
@@ -193,7 +193,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         return node;
     },
 
-    hideLayout: function(node) {
+    hideLayout: function (node) {
         $(node).hide();
         node.style.width = '0px';
         node.style.height = '0px';
@@ -202,7 +202,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         return node;
     },
 
-    widgetHover: function(widgetModel) {
+    widgetHover: function (widgetModel) {
         if (g_marqueeView.isDrawing) return;
         if (this.selectedEl && widgetModel.cid === this.selectedEl.cid) return;
         // if (g_multiSelectorView.contains(widgetModel)) return;
@@ -210,15 +210,15 @@ var WidgetSelectorView = Backbone.UIView.extend({
         //this.setLayout(this.hoverDiv, widgetModel);
     },
 
-    widgetUnhover: function(widgetModel) {
+    widgetUnhover: function (widgetModel) {
         this.hideNode(this.hoverDiv);
     },
 
-    bindLocation: function() {},
+    bindLocation: function () {},
 
-    newSelected: function(widgetModel) {
+    newSelected: function (widgetModel) {
         var self = this;
-        
+
         if (this.selectedEl && this.selectedEl.cid == widgetModel.cid) {
             this.setLayout(this.selectDiv, widgetModel);
             this.selectedEl.trigger('reselected');
@@ -232,7 +232,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         this.widgetEditorView.setModel(widgetModel).display();
     },
 
-    resizing: function(e, ui) {
+    resizing: function (e, ui) {
         var cid = this.selectedEl.cid;
         var model = this.selectedEl;
 
@@ -245,7 +245,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
 
     },
 
-    resized: function(e, ui) {
+    resized: function (e, ui) {
         // g_guides.hideAll();
 
         var left = Math.round((ui.position.left / this.positionHorizontalGrid));
@@ -272,7 +272,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         if (this.selectedEl.getRow()) this.selectedEl.getRow().resizeElements(deltaWidth);
     },
 
-    moving: function(e, ui) {
+    moving: function (e, ui) {
         var model = null;
 
         if (e.target.id == "hover-div") {
@@ -296,7 +296,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         elem.style.left = ui.position.left + ALIGNMENT + 'px';
     },
 
-    moved: function(e, ui) {
+    moved: function (e, ui) {
 
         var self = this;
         //g_guides.hideAll();
@@ -305,7 +305,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         if (e.target.id == "hover-div") {
             model = this.hoveredEl;
             if (!g_multiSelectorView.isEmpty()) {
-                return g_multiSelectorView.moved(e, ui, model, this.positionHorizontalGrid, this.positionVerticalGrid, function() {
+                return g_multiSelectorView.moved(e, ui, model, this.positionHorizontalGrid, this.positionVerticalGrid, function () {
                     self.hideNode(self.hoverDiv);
                 });
             }
@@ -334,7 +334,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         this.newSelected(model);
     },
 
-    deselect: function() {
+    deselect: function () {
         if (this.selectedEl) {
             this.selectedEl.trigger('deselected');
             this.stopListening(this.selectedEl.get('layout'), 'change');
@@ -345,7 +345,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         this.hideNode(this.hoverDiv);
     },
 
-    moveSelectedDown: function(e) {
+    moveSelectedDown: function (e) {
         if (!this.selectedEl) return;
         if (keyDispatcher.textEditing === true) return;
         if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
@@ -359,7 +359,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         e.preventDefault();
     },
 
-    moveSelectedUp: function(e) {
+    moveSelectedUp: function (e) {
         if (!this.selectedEl) return;
         if (keyDispatcher.textEditing === true) return;
         if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
@@ -368,7 +368,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         e.preventDefault();
     },
 
-    moveSelectedLeft: function(e) {
+    moveSelectedLeft: function (e) {
         if (!this.selectedEl) return;
         if (keyDispatcher.textEditing === true) return;
         if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
@@ -377,7 +377,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         e.preventDefault();
     },
 
-    moveSelectedRight: function(e) {
+    moveSelectedRight: function (e) {
         if (!this.selectedEl) return;
         if (keyDispatcher.textEditing === true) return;
         if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
@@ -386,7 +386,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         e.preventDefault();
     },
 
-    deleteSelected: function(e) {
+    deleteSelected: function (e) {
         if (!this.selectedEl) return;
         if (keyDispatcher.textEditing === true) return;
         if (this.selectedEl.getRow() && this.selectedEl.editMode === true) return;
@@ -395,7 +395,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         e.preventDefault();
     },
 
-    doKeyBindings: function() {
+    doKeyBindings: function () {
         keyDispatcher.bind('down', this.moveSelectedDown);
         keyDispatcher.bind('up', this.moveSelectedUp);
         keyDispatcher.bind('left', this.moveSelectedLeft);
@@ -403,20 +403,20 @@ var WidgetSelectorView = Backbone.UIView.extend({
         keyDispatcher.bind('backspace', this.deleteSelected);
     },
 
-    hoverClicked: function(e) {
+    hoverClicked: function (e) {
         if (this.hoveredEl) {
             this.hoveredEl.trigger('selected');
         }
         mouseDispatcher.isMousedownActive = false;
     },
 
-    clickedPage: function(e) {
+    clickedPage: function (e) {
         if (this.selectedEl && !this.isMouseOn(e) && !mouseDispatcher.isMousedownActive) {
             this.deselect();
         }
     },
 
-    doubleClicked: function(e) {
+    doubleClicked: function (e) {
         //if (!this.isMouseOn(e) || this.selectedEl.editModeOn) return;
 
         if (this.selectedEl.getContent() && !this.selectedEl.isLoginForm()) {
@@ -430,12 +430,12 @@ var WidgetSelectorView = Backbone.UIView.extend({
         }
     },
 
-    stoppedEditing: function() {
+    stoppedEditing: function () {
         this.makeSelectDivVisible();
         this.setLayout(this.selectDiv, this.selectedEl);
     },
 
-    isMouseOn: function(e) {
+    isMouseOn: function (e) {
         if (!this.selectedEl) return false;
 
         var self = this;
@@ -444,7 +444,7 @@ var WidgetSelectorView = Backbone.UIView.extend({
         var mouseY = e.pageY;
 
         var div = $(document).find("[data-cid='" + this.selectedEl.cid + "']");
-        if(!div.length) return;
+        if (!div.length) return;
         var divTop = div.offset().top;
         var divLeft = div.offset().left;
         var divRight = divLeft + div.width();
@@ -455,17 +455,17 @@ var WidgetSelectorView = Backbone.UIView.extend({
         return false;
     },
 
-    clear: function() {
+    clear: function () {
         this.widgetEditorView.clear();
     },
 
-    hideNode: function(node) {
+    hideNode: function (node) {
         // node.style.height = 0;
         // node.style.width = 0;
         // $(node).hide();
     },
 
-    close: function() {
+    close: function () {
         keyDispatcher.unbind('down', this.moveSelectedDown);
         keyDispatcher.unbind('up', this.moveSelectedUp);
         keyDispatcher.unbind('left', this.moveSelectedLeft);

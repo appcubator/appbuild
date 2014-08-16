@@ -1,12 +1,12 @@
 var WidgetCollection = require("./collections/WidgetCollection").WidgetCollection;
 
 exports.BodyModel = Backbone.Model.extend({
-    
-    initialize: function(bone) {
+
+    initialize: function (bone) {
         this.set("uielements", new WidgetCollection(bone.uielements || []));
     },
 
-    toJSON: function() {
+    toJSON: function () {
 
         var json = _.clone(this.attributes);
         json.uielements = json.uielements.serialize();
@@ -14,4 +14,3 @@ exports.BodyModel = Backbone.Model.extend({
         return json;
     }
 });
-

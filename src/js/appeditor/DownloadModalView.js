@@ -2,7 +2,7 @@ define([
         'mixins/BackboneModal',
         'util'
     ],
-    function() {
+    function () {
 
         var DownloadModalView = Backbone.ModalView.extend({
             el: null,
@@ -10,17 +10,17 @@ define([
             width: 600,
             height: 360,
             events: {
-                'click .clone-url'    : 'cloneInputClicked',
-                'click .download-pane' : 'downloaded'
+                'click .clone-url': 'cloneInputClicked',
+                'click .download-pane': 'downloaded'
             },
             theme: null,
 
-            initialize: function() {
+            initialize: function () {
                 _.bindAll(this);
                 this.render();
             },
 
-            render: function() {
+            render: function () {
                 var template = util.getHTML('download-panel');
                 var context = {
                     clone_url: appGitRepo
@@ -29,25 +29,25 @@ define([
                 return this;
             },
 
-            logDownload: function() {
+            logDownload: function () {
                 util.log_to_server('code downloaded', {}, appId);
             },
 
-            cloneInputClicked: function() {
+            cloneInputClicked: function () {
                 //util.copyToClipboard(appGitRepo);
                 $('.clone-url').select();
             },
 
-            downloaded: function() {
-                $(".download-pane .loading-wheel").css('visibility','visible');
+            downloaded: function () {
+                $(".download-pane .loading-wheel").css('visibility', 'visible');
 
-                var hideWheel = function() {
-                    $(".download-pane .loading-wheel").css('visibility','hidden');
+                var hideWheel = function () {
+                    $(".download-pane .loading-wheel").css('visibility', 'hidden');
                 };
 
-                var v1 = v1||null;
-                if(v1) v1.download(hideWheel);
-                else if(dboard) dboard.download(hideWheel);
+                var v1 = v1 || null;
+                if (v1) v1.download(hideWheel);
+                else if (dboard) dboard.download(hideWheel);
             }
         });
 

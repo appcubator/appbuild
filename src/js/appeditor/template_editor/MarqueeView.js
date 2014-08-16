@@ -18,7 +18,7 @@ var MarqueeView = Backbone.UIView.extend({
     events: {},
     subviews: [],
 
-    initialize: function(widgetsCollection) {
+    initialize: function (widgetsCollection) {
         _.bindAll(this);
 
         this.widgetsCollection = widgetsCollection;
@@ -28,7 +28,7 @@ var MarqueeView = Backbone.UIView.extend({
         this.subviews.push(this.multiSelectorView);
     },
 
-    mousedown: function(e) {
+    mousedown: function (e) {
         if (mouseDispatcher.isMousedownActive) {
             return true;
         }
@@ -55,12 +55,12 @@ var MarqueeView = Backbone.UIView.extend({
         this.clientOrigin.y = e.clientY;
     },
 
-    mouseup: function(e) {
+    mouseup: function (e) {
         if (this.isDrawing == false) return;
 
         var Xcor = e.clientX;
         var Ycor = e.clientY;
-        var arr = this.widgetsCollection.filter(function(widget) {
+        var arr = this.widgetsCollection.filter(function (widget) {
             var elem = document.getElementById('widget-wrapper-' + widget.cid);
             return util.isRectangleIntersectElement(this.clientOrigin.x, this.clientOrigin.y, Xcor, Ycor, elem);
         }, this);
@@ -75,7 +75,7 @@ var MarqueeView = Backbone.UIView.extend({
         }
     },
 
-    mousemove: function(e) {
+    mousemove: function (e) {
         if (keyDispatcher.textEditing !== true) e.returnValue = false;
         if (!this.isDrawing) return;
 
@@ -113,12 +113,12 @@ var MarqueeView = Backbone.UIView.extend({
 
     },
 
-    iterateWidgets: function(Xorigin, Yorigin, Xcor, Ycor) {
+    iterateWidgets: function (Xorigin, Yorigin, Xcor, Ycor) {
 
         this.currentPage = v1.currentApp.getCurrentPage();
         if (Xcor % 3 >= 1 & Ycor % 3 >= 1) return;
 
-        this.widgetsCollection.each(function(widget) {
+        this.widgetsCollection.each(function (widget) {
             var elem = document.getElementById('widget-wrapper-' + widget.cid);
             if (util.isRectangleIntersectElement(Xorigin, Yorigin, Xcor, Ycor, elem)) {
                 $(elem).addClass('red-border');
@@ -129,7 +129,7 @@ var MarqueeView = Backbone.UIView.extend({
 
     },
 
-    setZero: function() {
+    setZero: function () {
 
         this.isDrawing = false;
 
@@ -137,13 +137,13 @@ var MarqueeView = Backbone.UIView.extend({
         this.setWidth(0);
         this.setHeight(0);
 
-        this.widgetsCollection.each(function(widget) {
+        this.widgetsCollection.each(function (widget) {
             var elem = document.getElementById('widget-wrapper-' + widget.cid);
             $(elem).removeClass('red-border');
         });
     },
 
-    render: function() {
+    render: function () {
         document.body.addEventListener('mouseup', this.mouseup, true);
         document.body.addEventListener('mousedown', this.mousedown, true);
         document.body.addEventListener('mousemove', this.mousemove, true);
@@ -155,7 +155,7 @@ var MarqueeView = Backbone.UIView.extend({
         return this;
     },
 
-    getPageTopLeft: function() {
+    getPageTopLeft: function () {
         var rect = this.container.getBoundingClientRect();
         var docEl = document.documentElement;
         return {
@@ -164,9 +164,9 @@ var MarqueeView = Backbone.UIView.extend({
         };
     },
 
-    close: function() {
+    close: function () {
         window.removeEventListener('mouseup', this.mouseup);
-        
+
         document.body.removeEventListener('mousedown', this.mousedown);
         document.body.removeEventListener('mousemove', this.mousemove);
 

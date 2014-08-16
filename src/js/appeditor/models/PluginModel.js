@@ -1,6 +1,6 @@
     var PluginModel = Backbone.Model.extend({
 
-        getName: function() {
+        getName: function () {
             return this.get('metadata').name;
         },
 

@@ -1,10 +1,9 @@
+var LayoutModel = Backbone.Model.extend({
 
-    var LayoutModel = Backbone.Model.extend({
-        
-        defaults: {
-            'alignment': 'left'
-        }
+    defaults: {
+        'alignment': 'left'
+    }
 
-    });
+});
 
-    exports.LayoutModel = LayoutModel;
+exports.LayoutModel = LayoutModel;

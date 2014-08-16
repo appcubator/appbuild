@@ -1,6 +1,6 @@
     'use strict';
-    
-    var UIElementEditingView = require('./UIElementEditingView');    
+
+    var UIElementEditingView = require('./UIElementEditingView');
 
     var UIElementView = Backbone.View.extend({
         el: null,
@@ -13,7 +13,7 @@
             'keyup .class_name': 'classNameChaged'
         },
 
-        initialize: function(uieModel) {
+        initialize: function (uieModel) {
             _.bindAll(this);
 
             this.model = uieModel;
@@ -23,7 +23,7 @@
             this.renderStyle();
         },
 
-        render: function() {
+        render: function () {
             this.el.id = 'elem-' + this.model.cid;
 
             var upperDiv = document.createElement('div');
@@ -48,13 +48,13 @@
             return this;
         },
 
-        reRender: function(argument) {
+        reRender: function (argument) {
             this.tempNodeDiv.innerHTML = _.template(this.tempNode(), {
                 info: this.model.attributes
             });
         },
 
-        reRenderStyleTags: function(e) {
+        reRenderStyleTags: function (e) {
             var styleTag = document.getElementById(this.model.cid + '-' + 'style');
             styleTag.innerHTML = '#' + this.model.get('class_name') + '{' + this.model.get('style') + '}';
             var hoverTag = document.getElementById(this.model.cid + '-' + 'hover-style');
@@ -63,7 +63,7 @@
             activeTag.innerHTML = '#' + this.model.get('class_name') + ':active {' + this.model.get('activeStyle') + '}';
         },
 
-        renderStyle: function() {
+        renderStyle: function () {
 
             var styleTag = document.createElement('style');
             styleTag.id = this.model.cid + '-' + 'style';
@@ -82,7 +82,7 @@
             document.head.appendChild(activeStyleTag);
         },
 
-        removeUIE: function(e) {
+        removeUIE: function (e) {
             e.preventDefault();
             e.stopPropagation();
             var model = this.model;
@@ -90,11 +90,11 @@
             $(this.el).remove();
         },
 
-        baseChanged: function() {
+        baseChanged: function () {
 
         },
 
-        toggleElement: function(e) {
+        toggleElement: function (e) {
             if (e.target.tagName == "INPUT") return;
             if (e.target.className.indexOf('ace_') === 0) return;
             console.log(e.target);
@@ -109,7 +109,7 @@
             }
         },
 
-        expandElement: function() {
+        expandElement: function () {
             // this.isExpanded = true;
             // this.expandedView = new UIElementEditingView(this.model);
             // this.el.appendChild(this.expandedView.render().el);
@@ -119,30 +119,30 @@
             this.model.collection.trigger('selected', [this.model]);
         },
 
-        shrinkElement: function() {
+        shrinkElement: function () {
             this.expandedView.close();
             this.isExpanded = false;
             this.el.style.height = '225px';
         },
 
-        classNameChaged: function(e) {
+        classNameChaged: function (e) {
             this.model.set('class_name', e.target.value);
         },
 
-        tempNode: function() {
+        tempNode: function () {
             return [
-              '<div class="element-node">',
-              '<<%= info.tagName %> ',
-              'id="<%= info.class_name %>" ',
-              '<% _(info.cons_attribs).each(function(val, key){ %>',
-              '<%= key %> = <%= val %>',
-              '<% }); %><% _(info.content_attribs).each(function(val, key){ %>',
-              '<%= key %> = <%= val %>',
-              '<% }); %>>',
-              '<% if(!info.isSingle) { %>',
-              '<%= info.content %></<%=info.tagName%>>',
-              '<% } %>',
-              '</div>'
+                '<div class="element-node">',
+                '<<%= info.tagName %> ',
+                'id="<%= info.class_name %>" ',
+                '<% _(info.cons_attribs).each(function(val, key){ %>',
+                '<%= key %> = <%= val %>',
+                '<% }); %><% _(info.content_attribs).each(function(val, key){ %>',
+                '<%= key %> = <%= val %>',
+                '<% }); %>>',
+                '<% if(!info.isSingle) { %>',
+                '<%= info.content %></<%=info.tagName%>>',
+                '<% } %>',
+                '</div>'
             ].join('\n');
         }
 
