@@ -1,21 +1,17 @@
-define(function(require, exports, module) {
+var WidgetCollection = require("./collections/WidgetCollection").WidgetCollection;
 
-    require('backbone');
+exports.BodyModel = Backbone.Model.extend({
+    
+    initialize: function(bone) {
+        this.set("uielements", new WidgetCollection(bone.uielements || []));
+    },
 
-    var BodyModel = Backbone.Model.extend({
-        
-        initialize: function(bone) {
-            this.set("uielements", new WidgetCollection(bone.uielements || []));
-        },
+    toJSON: function() {
 
-        toJSON: function() {
+        var json = _.clone(this.attributes);
+        json.uielements = json.uielements.serialize();
 
-            var json = _.clone(this.attributes);
-            json.uielements = json.uielements.serialize();
-
-            return json;
-        }
-    });
-
-    return BodyModel;
+        return json;
+    }
 });
+

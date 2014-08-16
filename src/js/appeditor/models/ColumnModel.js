@@ -1,10 +1,10 @@
     'use strict';
+    var WidgetCollection = require('../collections/WidgetCollection').WidgetCollection;
 
     var ColumnModel = Backbone.Model.extend({
 
         initialize: function(bone) {
             var bone = bone || {};
-            var WidgetCollection = require('../collections/WidgetCollection');
             this.set("uielements", new WidgetCollection(bone.uielements||[]));
 
             if (!this.generate) {

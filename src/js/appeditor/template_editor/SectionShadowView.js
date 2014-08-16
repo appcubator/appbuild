@@ -1,7 +1,5 @@
     'use strict';
 
-    // var SectionEditorView = require('editor/SectionEditorView');
-
     var SectionShadowView = Backbone.View.extend({
 
         widgetsContainer: null,

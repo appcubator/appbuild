@@ -32646,12 +32646,12 @@ require.define("/appeditor/models/RowModel.js",function(require,module,exports,_
 });
 
 require.define("/appeditor/models/ColumnModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+    var WidgetCollection = require('../collections/WidgetCollection').WidgetCollection;
 
     var ColumnModel = Backbone.Model.extend({
 
         initialize: function(bone) {
             var bone = bone || {};
-            var WidgetCollection = require('../collections/WidgetCollection');
             this.set("uielements", new WidgetCollection(bone.uielements||[]));
 
             if (!this.generate) {
@@ -32684,6 +32684,7 @@ require.define("/appeditor/models/ColumnModel.js",function(require,module,export
     });
 
     exports.ColumnModel = ColumnModel;
+
 });
 
 require.define("/appeditor/models/PluginsModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';

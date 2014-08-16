@@ -1,5 +1,5 @@
     'use strict';
-    var SectionEditorView = require('./SectionEditorView');
+    var SectionEditorView = require('./SectionEditorView').SectionEditorView;
 
     var SectionEditorsView = Backbone.View.extend({
 

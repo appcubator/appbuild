@@ -1518,12 +1518,12 @@ require.define("/models/RowModel.js",function(require,module,exports,__dirname,_
 });
 
 require.define("/models/ColumnModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+    var WidgetCollection = require('../collections/WidgetCollection').WidgetCollection;
 
     var ColumnModel = Backbone.Model.extend({
 
         initialize: function(bone) {
             var bone = bone || {};
-            var WidgetCollection = require('../collections/WidgetCollection');
             this.set("uielements", new WidgetCollection(bone.uielements||[]));
 
             if (!this.generate) {
@@ -1556,6 +1556,7 @@ require.define("/models/ColumnModel.js",function(require,module,exports,__dirnam
     });
 
     exports.ColumnModel = ColumnModel;
+
 });
 
 require.define("/models/PluginsModel.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
@@ -7453,7 +7454,7 @@ require.define("/template_editor/PageTemplatePicker.js",function(require,module,
 });
 
 require.define("/TemplateGenerator.js",function(require,module,exports,__dirname,__filename,process,global){
-  var WidgetCollection = require("./collections/WidgetCollection");
+  var WidgetCollection = require("./collections/WidgetCollection").WidgetCollection;
 
   var AppGenerator = Backbone.View.extend({
     answersDict : {},
@@ -9188,8 +9189,6 @@ require.define("/css-editor/ThemeDisplayView.js",function(require,module,exports
 
 require.define("/template_editor/SectionShadowView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    // var SectionEditorView = require('editor/SectionEditorView');
-
     var SectionShadowView = Backbone.View.extend({
 
         widgetsContainer: null,
@@ -9320,10 +9319,11 @@ require.define("/template_editor/SectionShadowView.js",function(require,module,e
     });
 
     exports.SectionShadowView = SectionShadowView;
+
 });
 
 require.define("/template_editor/SectionEditorsView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
-    var SectionEditorView = require('./SectionEditorView');
+    var SectionEditorView = require('./SectionEditorView').SectionEditorView;
 
     var SectionEditorsView = Backbone.View.extend({
 

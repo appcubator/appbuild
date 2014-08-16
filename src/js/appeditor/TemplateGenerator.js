@@ -1,5 +1,5 @@
 
-  var WidgetCollection = require("./collections/WidgetCollection");
+  var WidgetCollection = require("./collections/WidgetCollection").WidgetCollection;
 
   var AppGenerator = Backbone.View.extend({
     answersDict : {},
