@@ -80,83 +80,6 @@
     </div>
 
     <div id="main-container">
-      <div class="loading-gif" id="loading-gif"></div>
-      <!-- CSS Editor -->
-      <div class="left-menu-panel-l1 css-editor" id="css-editor-panel">
-          <div class="top-row">
-              <div class="navback" id="navigate-back">
-                  ‹
-              </div>
-              <div class="cross" id="close-css-editor">
-                  ×
-              </div>
-          </div>
-      </div>
-      <!-- CSS Editor -->
-      <div class="left-menu-panel-l1 animated css-editor" id="page-view-panel">
-      </div>
-      <!-- Left Menu -->
-      <div class="left-buttons">
-
-          <div class="button-group">
-            <div class="btn info" id="page-info" title="Page Info"></div>
-          </div>
-
-          <div class="button-group">
-            <div class="btn active build-mode" title="Build Mode">
-            </div>
-            <div class="btn design-mode" id="design-mode-button" title="Design Mode">
-            </div>
-          </div>
-
-          <div class="button-group">
-            <div class="btn mobile-preview" title="Mobile Preview">
-            </div>
-          </div>
-      </div>
-      <!-- Inside-Page -->
-      <div class="page-container">
-          <div class="options-area"></div>
-          <div class="loader" style="margin-top: 80px;">
-              <span></span>
-              <span></span>
-              <span></span>
-          </div>
-          <div class="page-wrapper" id="page-wrapper">
-              <div class="url-bar">
-                  <div class="url-field">(This template has no route)</div>
-                  <div class="refresh-page"><img src="./img/refresh-icon.png"></div>
-              </div>
-              <iframe class="page full" id="page" src="./iframe-editor.html">
-              </iframe>
-              <div class="page full" id="shadow-frame"></div>
-          </div>
-      </div>
-      <!-- Right Gallery Panel -->
-      <div id="top-panel-bb" class="right-panel">
-          <div class="top-panel-title">
-              <span>
-                  UI Elements
-              </span>
-          </div>
-          <div class="search-panel">
-              <span class="search-bg">
-                  <span class="search-arrow">
-                      <span class="search-cancel">×</span>
-                      <input type="text" class="search" placeholder="Search Elements...">
-                  </span>
-              </span>
-              <span class="search-icon">
-              </span>
-          </div>
-          <div class="item-gallery section" id="item-gallery">
-              <div class="elements-list" id="elements-list">
-                  <ul id='all-list' class="list">
-                  </ul>
-              </div>
-          </div>
-      </div>
-
     </div>
   </div>
 
@@ -208,8 +131,7 @@
                 <div class="url-field">(This template has no route)</div>
                 <div class="refresh-page"><img src="{{ STATIC_URL }}img/refresh-icon.png"></div>
             </div>
-            <iframe class="page full" id="page" src="/app/{{ app.id }}/editor/3/">
-            </iframe>
+            <iframe class="page full" id="page" src="./iframe-editor.html"></iframe>
             <div class="page full" id="shadow-frame"></div>
         </div>
     </div>

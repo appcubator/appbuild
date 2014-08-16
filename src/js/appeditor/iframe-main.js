@@ -1,5 +1,3 @@
-
-
 var jQuery = require('../libs/node_modules/jquery/dist/jquery');
 var $ = jQuery;
 require('../libs/node_modules/jquery-ui/jquery-ui');

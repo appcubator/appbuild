@@ -37708,9 +37708,7 @@ require.define("/appeditor/template_editor/MouseDispatcher.js",function(require,
   exports.MouseDispatcher = MouseDispatcher;
 });
 
-require.define("/appeditor/iframe-main.js",function(require,module,exports,__dirname,__filename,process,global){
-
-var jQuery = require('../libs/node_modules/jquery/dist/jquery');
+require.define("/appeditor/iframe-main.js",function(require,module,exports,__dirname,__filename,process,global){var jQuery = require('../libs/node_modules/jquery/dist/jquery');
 var $ = jQuery;
 require('../libs/node_modules/jquery-ui/jquery-ui');
 require("../libs/jquery.scrollbar");

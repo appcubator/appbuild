@@ -3195,10 +3195,10 @@ require.define("/AppView.js",function(require,module,exports,__dirname,__filenam
             var pageId = 0;
             this.pageId = 0;
 
-            var cleanDiv = document.createElement('div');
-            cleanDiv.className = "clean-div";
+            this._cleanDiv = document.createElement('div');
+            this._cleanDiv.className = "clean-div test1";
             var mainContainer = document.getElementById('main-container');
-            mainContainer.appendChild(cleanDiv);
+            mainContainer.appendChild(this._cleanDiv);
 
             this.toolBar.setPage(this.pageId);
             this.toolBar.setElement(document.getElementById('tool-bar')).render();
@@ -3307,10 +3307,7 @@ require.define("/AppView.js",function(require,module,exports,__dirname,__filenam
 
             if (this.view) this.view.close();
 
-            var cleanDiv = document.createElement('div');
-            cleanDiv.className = "clean-div";
-            var mainContainer = document.getElementById('main-container');
-            mainContainer.appendChild(cleanDiv);
+            var cleanDiv = this._cleanDiv;
 
             this.view = this.createSubview(NewView, options);
             this.view.setElement(cleanDiv).render();
