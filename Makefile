@@ -34,6 +34,7 @@ build:
 
 	# CSS
 	cp -rf ./src/css/ ./dist/css/
+	cp ./src/temp.css ./dist/temp.css
 	# Images
 	cp -rf ./src/img/ ./dist/img/
 

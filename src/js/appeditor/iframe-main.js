@@ -46,7 +46,7 @@ var proxy = {
             newstyle = document.createElement("link");
             newstyle.setAttribute("rel", "stylesheet");
             newstyle.setAttribute("type", "text/css");
-            newstyle.setAttribute("href", '/app/' + appId + '/uiestate.css');
+            newstyle.setAttribute("href", '/temp.css');
             newstyle.id = "css-uiestate";
         }
 
@@ -59,22 +59,10 @@ var proxy = {
                 newStyle.setAttribute('href', "");
                 newStyle.id = "css-uiestate";
                 newStyle.setAttribute('rel', 'stylesheet');
-                // $.ajax({
-                //     type: "GET",
-                //     url: '/app/' + appId + '/uiestate.css',
-                //     statusCode: {
-                //         200: function(data) {
-                //             $(style).attr('href', '');
-                //             $(style).text(data.responseText);
-                //         }
-                //     },
-                //     dataType: "JSON"
-                // });
 
             } else {
                 head.appendChild(newstyle);
                 newstyle.onload = function () {
-                    //newstyle.setAttribute('href', "/app/"+appId+"/uiestate.css");
                     $('.tempStyle').remove();
                     if (style && style.parentNode) style.parentNode.removeChild(style);
                 };

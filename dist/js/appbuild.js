@@ -3940,7 +3940,7 @@ require.define("/template_editor/EditorView.js",function(require,module,exports,
         fetchUIState: function (callback) {
             $.ajax({
                 type: "GET",
-                url: '/app/' + appId + '/uiestate/',
+                url: '/temp.css',
                 statusCode: {
                     200: callback,
                     400: callback,
