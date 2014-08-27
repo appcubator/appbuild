@@ -3710,357 +3710,358 @@ require.define("/mixins/BackboneNameBox.js",function(require,module,exports,__di
 
 });
 
-require.define("/template_editor/EditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+require.define("/template_editor/EditorView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
-    var UrlView = require('../pages/UrlView').UrlViews;
-    var SimpleModalView = require('../mixins/SimpleModalView').SimpleModalView;
-    var ErrorModalView = require('../mixins/ErrorModalView').ErrorModalView;
-    var DebugOverlay = require('../mixins/DebugOverlay').DebugOverlay;
-    var WidgetEditorView = require('./WidgetEditorView').WidgetEditorView;
-    var EditorGalleryView = require('./EditorGalleryView').EditorGalleryView;
-    var PageView = require('../pages/PageView').PageView;
+var UrlView = require('../pages/UrlView').UrlViews;
+var SimpleModalView = require('../mixins/SimpleModalView').SimpleModalView;
+var ErrorModalView = require('../mixins/ErrorModalView').ErrorModalView;
+var DebugOverlay = require('../mixins/DebugOverlay').DebugOverlay;
+var WidgetEditorView = require('./WidgetEditorView').WidgetEditorView;
+var EditorGalleryView = require('./EditorGalleryView').EditorGalleryView;
+var PageView = require('../pages/PageView').PageView;
 
-    var PageTemplatePicker = require('./PageTemplatePicker').PageTemplatePicker;
-    var GuideView = require('./GuideView').GuideView;
-    var RedoController = require('../RedoController').RedoController;
-    var CSSEditorView = require('../css-editor/CSSEditorView').CSSEditorView;
-    var SectionShadowView = require('./SectionShadowView').SectionShadowView;
-    var SectionEditorsView = require('./SectionEditorsView').SectionEditorsView;
+var PageTemplatePicker = require('./PageTemplatePicker').PageTemplatePicker;
+var GuideView = require('./GuideView').GuideView;
+var RedoController = require('../RedoController').RedoController;
+var CSSEditorView = require('../css-editor/CSSEditorView').CSSEditorView;
+var SectionShadowView = require('./SectionShadowView').SectionShadowView;
+var SectionEditorsView = require('./SectionEditorsView').SectionEditorsView;
 
-    var EditorTemplate = require('./editor-templates').EditorTemplate;
+var EditorTemplate = require('./editor-templates').EditorTemplate;
 
-    /* An EditorView belongs to a TemplateModel */
-    var EditorView = Backbone.View.extend({
-        className: 'editor-page',
-        css: "bootstrap-editor",
+/* An EditorView belongs to a TemplateModel */
+var EditorView = Backbone.View.extend({
+    className: 'editor-page',
+    css: "bootstrap-editor",
 
-        events: {
-            'click .menu-button.help': 'help',
-            'click .menu-button.question': 'question',
-            'click .url-field': 'clickedUrl',
-            'click .refresh-page': 'refreshPage',
-            'click #page-info': 'pageInfo',
-            'click #close-page-info': 'closePageInfo',
-            'click #design-mode-button': 'switchToDesignMode',
-            'click #close-css-editor': 'switchOffDesignMode',
-            'click .mobile-preview': 'switchToMobileMode'
-        },
+    events: {
+        'click .menu-button.help': 'help',
+        'click .menu-button.question': 'question',
+        'click .url-field': 'clickedUrl',
+        'click .refresh-page': 'refreshPage',
+        'click #page-info': 'pageInfo',
+        'click #close-page-info': 'closePageInfo',
+        'click #design-mode-button': 'switchToDesignMode',
+        'click #close-css-editor': 'switchOffDesignMode',
+        'click .mobile-preview': 'switchToMobileMode'
+    },
 
-        initialize: function (options) {
-            _.bindAll(this);
+    initialize: function (options) {
+        _.bindAll(this);
 
-            this.appModel = options.appModel;
+        this.appModel = options.appModel;
 
-            if (options && (options.pageId == "0" || options.pageId >= 0)) {
-                this.pageId = options.pageId;
-                pageId = options.pageId;
-                this.model = this.appModel.get('templates').models[pageId];
-            } else if (options.templateModel) {
-                this.model = options.templateModel;
-            } else {
-                throw "No Template Model Provided.";
+        if (options && (options.pageId == "0" || options.pageId >= 0)) {
+            this.pageId = options.pageId;
+            pageId = options.pageId;
+            this.model = this.appModel.get('templates').models[pageId];
+        } else if (options.templateModel) {
+            this.model = options.templateModel;
+        } else {
+            throw "No Template Model Provided.";
+        }
+
+        this.routeModel = v1State.get('routes').getRouteWithTemplate(this.model);
+        // note that if the template does not have a route, routeModel will be null.
+        this.pageName = this.model.get('name');
+
+        v1State.currentPage = this.model;
+        this.appModel.currentPage = this.model;
+        v1State.isMobile = false;
+        this.appModel.isMobile = false;
+
+
+        this.sectionsCollection = this.model.getSections();
+
+        this.galleryEditor = new EditorGalleryView(this.sectionsCollection);
+        this.sectionsManager = {};
+        //this.guides = new GuideView(this.sectionsCollection);
+        this.cssEditorView = new CSSEditorView();
+        // PageView currently knows how to handle null routeModel
+        this.pageView = new PageView(this.routeModel, this.model, pageId);
+
+        // TODO: setup redo controller again
+        // this.redoController = new RedoController();
+        this.widgetEditorView = new WidgetEditorView();
+        v1.widgetEditorView = this.WidgetEditorView;
+
+        keyDispatcher.bindComb('meta+e', this.refreshPage);
+        keyDispatcher.bindComb('ctrl+e', this.refreshPage);
+
+        // keyDispatcher.bindComb('ctrl+z', this.redoController.undo);
+        // keyDispatcher.bindComb('meta+shift+z', this.redoController.redo);
+        // keyDispatcher.bindComb('ctrl+shift+z', this.redoController.redo);
+
+        //g_guides = this.guides;
+
+        this.title = "Editor";
+
+        if (this.routeModel) {
+            this.urlModel = this.routeModel.get('url');
+            this.listenTo(this.routeModel.get('url').get('urlparts'), 'add remove', this.renderUrlBar);
+        }
+
+        this.listenTo(this.model, 'scroll', this.scrollTo);
+
+    },
+
+    render: function () {
+
+        this.start = new Date().getTime();
+
+        var self = this;
+        if (!this.el.innerHTML) {
+            this.el.innerHTML = _.template(util.getHTML('editor-page'), {
+                pageId: this.pageId
+            });
+        }
+
+        document.body.style.overflow = "hidden";
+
+        this.renderUrlBar();
+        this.galleryEditor.render();
+
+        this.el.appendChild(this.widgetEditorView.render().el);
+        this.cssEditorView.setElement($('#css-editor-panel')).render();
+        this.pageView.setElement($('#page-view-panel')).render();
+
+        /* Access to elements inside iframe */
+        var iframe = document.getElementById('page');
+        this.iframe = iframe;
+
+        this.setupPageWrapper();
+
+        window.addEventListener('resize', this.setupPageWrapper);
+
+        $('#loading-gif').fadeOut().remove();
+
+        $('.left-buttons').tooltip({
+            position: {
+                my: "left+10 center",
+                at: "right center",
+                using: function (position, feedback) {
+                    $(this).css(position);
+                    $("<div>")
+                        .addClass("arrow")
+                        .addClass(feedback.vertical)
+                        .addClass(feedback.horizontal)
+                        .appendTo(this);
+                }
             }
+        });
 
-            this.routeModel = v1State.get('routes').getRouteWithTemplate(this.model);
-            // note that if the template does not have a route, routeModel will be null.
-            this.pageName = this.model.get('name');
+        this.$pageContainer = this.$el.find('.page-container');
+        return this;
+    },
 
-            v1State.currentPage = this.model;
-            this.appModel.currentPage = this.model;
-            v1State.isMobile = false;
-            this.appModel.isMobile = false;
+    renderIFrameContent: function (proxy) {
+        var self = this;
+        var iframe = document.getElementById('page');
+        innerDoc = iframe.contentDocument || iframe.contentWindow.document;
 
+        this.widgetEditorView.setupScrollEvents();
 
-            this.sectionsCollection = this.model.getSections();
+        keyDispatcher.addEnvironment(innerDoc);
 
-            this.galleryEditor = new EditorGalleryView(this.sectionsCollection);
-            this.sectionsManager = {};
-            //this.guides = new GuideView(this.sectionsCollection);
-            this.cssEditorView = new CSSEditorView();
-            // PageView currently knows how to handle null routeModel
-            this.pageView = new PageView(this.routeModel, this.model, pageId);
+        this.iframeProxy = proxy;
+        //this.marqueeView = proxy.setupMarqueeView(this.sectionsCollection.getAllWidgets());
 
-            // TODO: setup redo controller again
-            // this.redoController = new RedoController();
-            this.widgetEditorView = new WidgetEditorView();
-            v1.widgetEditorView = this.WidgetEditorView;
+        this.iframeProxy.injectHeader(this.model.get('head'));
 
-            keyDispatcher.bindComb('meta+e', this.refreshPage);
-            keyDispatcher.bindComb('ctrl+e', this.refreshPage);
+        this.sectionsManager = proxy.setupSectionsManager(this.sectionsCollection);
+        this.sectionShadowView = new SectionShadowView(this.sectionsCollection);
+        this.sectionEditorsView = new SectionEditorsView(this.sectionsCollection);
 
-            // keyDispatcher.bindComb('ctrl+z', this.redoController.undo);
-            // keyDispatcher.bindComb('meta+shift+z', this.redoController.redo);
-            // keyDispatcher.bindComb('ctrl+shift+z', this.redoController.redo);
+        self.iframedoc = innerDoc;
+        //self.marqueeView.render();
+        self.sectionsManager.render();
+        self.sectionShadowView.render();
+        self.sectionEditorsView.render();
 
-            //g_guides = this.guides;
+        //self.guides.setElement(innerDoc.getElementById('elements-container')).render();
+        //$(innerDoc.getElementById('elements-container')).append(self.marqueeView.el);
 
-            this.title = "Editor";
+        self.startUIStateUpdater(proxy);
 
-            if (this.routeModel) {
-                this.urlModel = this.routeModel.get('url');
-                this.listenTo(this.routeModel.get('url').get('urlparts'), 'add remove', this.renderUrlBar);
-            }
+        /* TODO re-implement page templates
+        if (!this.model.get('uielements').length) {
+            var templatePicker = new PageTemplatePicker({ model: this.model, callback: function() {
+                $('.options-area').hide();
+                $('.page-wrapper').addClass('show');
+            }});
 
-            this.listenTo(this.model, 'scroll', this.scrollTo);
+            this.$el.find('.options-area').append(templatePicker.render().el);
+        }
+        else { */
 
-        },
+        this.$el.find('.page-wrapper').addClass('show');
+        this.iframeProxy.updateScrollbar();
+        this.$el.find('.loader').remove();
+        var end = new Date().getTime();
+        var time = end - this.start;
+        console.log('Load time: ' + time);
 
-        render: function () {
+        /* } */
+    },
 
-            this.start = new Date().getTime();
+    getCurrentTemplate: function () {
+        return this.templateModel;
+    },
 
-            var self = this;
-            if (!this.el.innerHTML) {
-                this.el.innerHTML = _.template(util.getHTML('editor-page'), {
-                    pageId: this.pageId
+    renderUrlBar: function () {
+        if (this.routeModel) {
+            this.$el.find('.url-field').html(this.urlModel.getUrlString());
+        }
+    },
+
+    help: function (e) {
+        new TutorialView([6]);
+    },
+
+    startUIStateUpdater: function (proxy) {
+        var self = this;
+        this.listenTo(v1UIEState, 'synced', function () { proxy.reArrangeCSSTag.call(proxy); });
+
+        // XXX XXX XXX
+        // temp disable this.
+        return;
+
+        this.UIStateTimer = setInterval(function () {
+            self.fetchUIState(function (state) {
+                /* crappy fix */
+                _.each(state.texts, function (text) {
+                    text.tagName = "div";
                 });
-            }
 
-            document.body.style.overflow = "hidden";
-
-            this.renderUrlBar();
-            this.galleryEditor.render();
-
-            this.el.appendChild(this.widgetEditorView.render().el);
-            this.cssEditorView.setElement($('#css-editor-panel')).render();
-            this.pageView.setElement($('#page-view-panel')).render();
-
-            /* Access to elements inside iframe */
-            var iframe = document.getElementById('page');
-            this.iframe = iframe;
-
-            this.setupPageWrapper();
-
-            window.addEventListener('resize', this.setupPageWrapper);
-
-            $('#loading-gif').fadeOut().remove();
-
-            $('.left-buttons').tooltip({
-                position: {
-                    my: "left+10 center",
-                    at: "right center",
-                    using: function (position, feedback) {
-                        $(this).css(position);
-                        $("<div>")
-                            .addClass("arrow")
-                            .addClass(feedback.vertical)
-                            .addClass(feedback.horizontal)
-                            .appendTo(this);
-                    }
+                if (!_.isEqual(state, uieState)) {
+                    self.renewUIEState(state, proxy);
                 }
             });
 
-            this.$pageContainer = this.$el.find('.page-container');
-            return this;
-        },
+        }, 10000);
+    },
 
-        renderIFrameContent: function (proxy) {
-            var self = this;
-            var iframe = document.getElementById('page');
-            innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    fetchUIState: function (callback) {
+        // XXX XXX XXX
+        // temp disable this.
+        return;
+        $.ajax({
+            type: "GET",
+            url: '/temp.css',
+            statusCode: {
+                200: callback,
+                400: callback,
+            },
+            dataType: "JSON"
+        });
+    },
 
-            this.widgetEditorView.setupScrollEvents();
+    renewUIEState: function (newState, proxy) {
+        uieState = newState;
+        proxy.reArrangeCSSTag();
+    },
 
-            keyDispatcher.addEnvironment(innerDoc);
+    question: function (e) {
+        olark('api.box.show');
+        olark('api.box.expand');
+    },
 
-            this.iframeProxy = proxy;
-            //this.marqueeView = proxy.setupMarqueeView(this.sectionsCollection.getAllWidgets());
+    clickedUrl: function () {
+        var newView = new UrlView(this.urlModel, this.model);
+        newView.onClose = this.renderUrlBar;
+    },
 
-            this.iframeProxy.injectHeader(this.model.get('head'));
+    refreshPage: function () {
+        this.widgetEditorView.clear();
+        this.sectionsManager.close();
+        this.sectionsManager = null;
+        var self = this;
+        v1.currentApp.fetchPlugins(function () {
+            self.iframeProxy.reloadPage();
+        });
+    },
 
-            this.sectionsManager = proxy.setupSectionsManager(this.sectionsCollection);
-            this.sectionShadowView = new SectionShadowView(this.sectionsCollection);
-            this.sectionEditorsView = new SectionEditorsView(this.sectionsCollection);
+    setupPageWrapper: function () {
+        var height = window.innerHeight - 90;
+        util.get('page-wrapper').style.height = height + 'px';
+        this.$el.find('.page.full').css('height', height - 46);
+    },
 
-            self.iframedoc = innerDoc;
-            //self.marqueeView.render();
-            self.sectionsManager.render();
-            self.sectionShadowView.render();
-            self.sectionEditorsView.render();
+    scrollTo: function (widget) {
 
-            //self.guides.setElement(innerDoc.getElementById('elements-container')).render();
-            //$(innerDoc.getElementById('elements-container')).append(self.marqueeView.el);
+        var pageHeight = window.innerHeight - 90 - 46;
+        var pageTop = $('#page').scrollTop();
 
-            self.startUIStateUpdater(proxy);
+        var pageHeightUnit = Math.floor(pageHeight / 15);
+        var topUnit = Math.floor(pageTop / 15);
 
-            /* TODO re-implement page templates
-            if (!this.model.get('uielements').length) {
-                var templatePicker = new PageTemplatePicker({ model: this.model, callback: function() {
-                    $('.options-area').hide();
-                    $('.page-wrapper').addClass('show');
-                }});
-
-                this.$el.find('.options-area').append(templatePicker.render().el);
-            }
-            else { */
-
-            this.$el.find('.page-wrapper').addClass('show');
-            this.iframeProxy.updateScrollbar();
-            this.$el.find('.loader').remove();
-            var end = new Date().getTime();
-            var time = end - this.start;
-            console.log('Load time: ' + time);
-
-            /* } */
-        },
-
-        getCurrentTemplate: function () {
-            return this.templateModel;
-        },
-
-        renderUrlBar: function () {
-            if (this.routeModel) {
-                this.$el.find('.url-field').html(this.urlModel.getUrlString());
-            }
-        },
-
-        help: function (e) {
-            new TutorialView([6]);
-        },
-
-        startUIStateUpdater: function (proxy) {
-            // XXX XXX XXX
-            // temp disable this.
-            return;
-            var self = this;
-            this.listenTo(v1UIEState, 'synced', proxy.reArrangeCSSTag);
-
-            this.UIStateTimer = setInterval(function () {
-                self.fetchUIState(function (state) {
-                    /* crappy fix */
-                    _.each(state.texts, function (text) {
-                        text.tagName = "div";
-                    });
-
-                    if (!_.isEqual(state, uieState)) {
-                        self.renewUIEState(state, proxy);
-                    }
-                });
-
-            }, 10000);
-        },
-
-        fetchUIState: function (callback) {
-            // XXX XXX XXX
-            // temp disable this.
-            return;
-            $.ajax({
-                type: "GET",
-                url: '/temp.css',
-                statusCode: {
-                    200: callback,
-                    400: callback,
-                },
-                dataType: "JSON"
-            });
-        },
-
-        renewUIEState: function (newState, proxy) {
-            uieState = newState;
-            proxy.reArrangeCSSTag();
-        },
-
-        question: function (e) {
-            olark('api.box.show');
-            olark('api.box.expand');
-        },
-
-        clickedUrl: function () {
-            var newView = new UrlView(this.urlModel, this.model);
-            newView.onClose = this.renderUrlBar;
-        },
-
-        refreshPage: function () {
-            this.widgetEditorView.clear();
-            this.sectionsManager.close();
-            this.sectionsManager = null;
-            var self = this;
-            v1.currentApp.fetchPlugins(function () {
-                self.iframeProxy.reloadPage();
-            });
-        },
-
-        setupPageWrapper: function () {
-            var height = window.innerHeight - 90;
-            util.get('page-wrapper').style.height = height + 'px';
-            this.$el.find('.page.full').css('height', height - 46);
-        },
-
-        scrollTo: function (widget) {
-
-            var pageHeight = window.innerHeight - 90 - 46;
-            var pageTop = $('#page').scrollTop();
-
-            var pageHeightUnit = Math.floor(pageHeight / 15);
-            var topUnit = Math.floor(pageTop / 15);
-
-            if ((widget.getBottom() + 6) > (pageHeightUnit + topUnit)) {
-                $('#page').scrollTop((widget.getBottom() - pageHeightUnit + widget.get('layout').get('height') + 1) * 15);
-            }
-
-        },
-
-        pageInfo: function () {
-            this.pageView.expand();
-        },
-
-        closePageInfo: function () {
-            this.pageView.hide();
-            $('.left-buttons').removeClass('invisible');
-            this.$pageContainer.removeClass('packed');
-            this.galleryEditor.show();
-        },
-
-        switchToDesignMode: function () {
-            this.cssEditorView.expand();
-            $('.left-buttons').addClass('invisible');
-            this.$pageContainer.addClass('packed');
-            this.galleryEditor.hide();
-        },
-
-        switchOffDesignMode: function () {
-            this.cssEditorView.hide();
-            $('.left-buttons').removeClass('invisible');
-            this.$pageContainer.removeClass('packed');
-            this.galleryEditor.show();
-        },
-
-        switchToMobileMode: function () {
-
-            if (!this.mobilePreview) {
-                util.get('page-wrapper').style.width = 270 + 'px';
-                this.mobilePreview = true;
-                $('.mobile-preview').addClass('active');
-            } else {
-                util.get('page-wrapper').style.width = "";
-                this.mobilePreview = false;
-                $('.mobile-preview').removeClass('active');
-            }
-
-        },
-
-        close: function () {
-
-            g_guides = null;
-            window.removeEventListener('resize', this.setupPageWrapper);
-            document.body.style.overflow = "";
-
-            clearInterval(this.UIStateTimer);
-
-            // keyDispatcher.unbind('meta+z', this.redoController.redo);
-            // keyDispatcher.unbind('ctrl+z', this.redoController.redo);
-
-            // TODO: fix this
-            //EditorView.__super__.close.call(this);
-            this.undelegateEvents();
-            this.$el.removeData().unbind();
-            this.remove();
-            this.unbind();
+        if ((widget.getBottom() + 6) > (pageHeightUnit + topUnit)) {
+            $('#page').scrollTop((widget.getBottom() - pageHeightUnit + widget.get('layout').get('height') + 1) * 15);
         }
 
-    });
+    },
 
-    exports.EditorView = EditorView;
+    pageInfo: function () {
+        this.pageView.expand();
+    },
+
+    closePageInfo: function () {
+        this.pageView.hide();
+        $('.left-buttons').removeClass('invisible');
+        this.$pageContainer.removeClass('packed');
+        this.galleryEditor.show();
+    },
+
+    switchToDesignMode: function () {
+        this.cssEditorView.expand();
+        $('.left-buttons').addClass('invisible');
+        this.$pageContainer.addClass('packed');
+        this.galleryEditor.hide();
+    },
+
+    switchOffDesignMode: function () {
+        this.cssEditorView.hide();
+        $('.left-buttons').removeClass('invisible');
+        this.$pageContainer.removeClass('packed');
+        this.galleryEditor.show();
+    },
+
+    switchToMobileMode: function () {
+
+        if (!this.mobilePreview) {
+            util.get('page-wrapper').style.width = 270 + 'px';
+            this.mobilePreview = true;
+            $('.mobile-preview').addClass('active');
+        } else {
+            util.get('page-wrapper').style.width = "";
+            this.mobilePreview = false;
+            $('.mobile-preview').removeClass('active');
+        }
+
+    },
+
+    close: function () {
+
+        g_guides = null;
+        window.removeEventListener('resize', this.setupPageWrapper);
+        document.body.style.overflow = "";
+
+        clearInterval(this.UIStateTimer);
+
+        // keyDispatcher.unbind('meta+z', this.redoController.redo);
+        // keyDispatcher.unbind('ctrl+z', this.redoController.redo);
+
+        // TODO: fix this
+        //EditorView.__super__.close.call(this);
+        this.undelegateEvents();
+        this.$el.removeData().unbind();
+        this.remove();
+        this.unbind();
+    }
+
+});
+
+exports.EditorView = EditorView;
 
 });
 
@@ -7879,360 +7880,363 @@ exports.RedoController = RedoController;
 
 });
 
-require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
-    var UIElementListView = require('./UIElementListView').UIElementListView;
-    var StaticsEditorView = require('./StaticsEditorView').StaticsEditorView;
-    var BaseCSSEditorView = require('./BaseCSSEditorView').BaseCSSEditorView;
-    var FontEditorView = require('./FontEditorView').FontEditorView;
+var UIElementListView = require('./UIElementListView').UIElementListView;
+var StaticsEditorView = require('./StaticsEditorView').StaticsEditorView;
+var BaseCSSEditorView = require('./BaseCSSEditorView').BaseCSSEditorView;
+var FontEditorView = require('./FontEditorView').FontEditorView;
 
-    var UIElementEditingView = require('./UIElementEditingView').UIElementEditingView;
-    var ThemesGalleryView = require('./ThemesGalleryView').ThemesGalleryView;
-
-
-    var CSSEditorView = Backbone.View.extend({
-
-        elements: [{
-                id: "basecss",
-                key: "basecss",
-                text: "Base CSS"
-            }, {
-                id: "fonts",
-                key: "fonts",
-                text: "Fonts"
-            }, {
-                id: "button",
-                key: "buttons",
-                text: "Button"
-            }, {
-                id: "image",
-                key: "images",
-                text: "Images"
-            }, {
-                id: "header-text",
-                key: "headerTexts",
-                text: "Headers"
-            }, {
-                id: "text",
-                key: "texts",
-                text: "Texts"
-            }, {
-                id: "link",
-                key: "links",
-                text: "Links"
-            }, {
-                id: "text-input",
-                key: "textInputs",
-                text: "Text Inputs"
-            }, {
-                id: "password",
-                key: "passwords",
-                text: "Password Inputs"
-            }, {
-                id: "text-area",
-                key: "textAreas",
-                text: "Text Area"
-            }, {
-                id: "line",
-                key: "lines",
-                text: "Lines"
-            }, {
-                id: "dropdown",
-                key: "dropdowns",
-                text: "Dropdowns"
-            }, {
-                id: "box",
-                key: "boxes",
-                text: "Boxes"
-            }, {
-                id: "form",
-                key: "forms",
-                text: "Forms"
-            }, {
-                id: "list",
-                key: "lists",
-                text: "Lists"
-            }, {
-                id: "statics",
-                key: "statics",
-                text: "Static Files"
-            }
-
-        ],
-
-        events: {
-            'click #theme-picker-btn': 'openThemePicker',
-            'click #navigate-back': 'navBack'
-        },
+var UIElementEditingView = require('./UIElementEditingView').UIElementEditingView;
+var ThemesGalleryView = require('./ThemesGalleryView').ThemesGalleryView;
 
 
-        expanded: false,
+var CSSEditorView = Backbone.View.extend({
 
-        initialize: function () {
-            _.bindAll(this);
-
-            this.model = v1UIEState;
-            this.lastSave = null;
-            this.deepListenTo(this.model, 'change', this.save);
-
-            _.each(this.model.getUIElementCollections(), function (coll) {
-                this.listenTo(coll, 'selected', this.styleSelected);
-            }, this);
-
-            // TODO: get this back
-            var self = this;
-            var currentPageInd = v1.currentApp
-            v1State.get('templates').each(function (templateModel) {
-                var elementsCollection = templateModel.getUIElements();
-                // elementsCollection.each(this.bindWidget, this);
-                this.listenToModels(elementsCollection, 'selected', function (widgetModel) {
-                    self.elementSelected(widgetModel);
-                });
-            }, this);
-            // var elementsCollection = v1State.get().get('uielements');
-            // elementsCollection.each(this.bindWidget, this);
-
-            // this.listenTo(elementsCollection, 'add', this.bindWidget);
-        },
-
-        bindWidget: function (widgetModel) {
-            this.listenTo(widgetModel, 'selected', function () {
-
-            });
-        },
-
-        render: function () {
-            var self = this;
-
-            /* Top Row */
-            var titleEl = document.createElement('div');
-            titleEl.className = 'title';
-            this.titleDiv = titleEl;
-            this.$el.find('.top-row').append(this.titleDiv);
-
-            /* Elements List */
-            this.elementsList = document.createElement('ul');
-            this.elementsList.innerHTML += '<li id="theme-picker-btn"><a>Pick a Theme</li>';
-            _.each(this.elements, function (element) {
-                var id = element.id;
-                var liEl = document.createElement('li');
-                liEl.id = id;
-
-                var aEl = document.createElement('a');
-                aEl.innerHTML = element.text;
-                liEl.appendChild(aEl);
-
-                this.elementsList.appendChild(liEl);
-
-                $(liEl).bind('click', function () {
-                    self.showElementType(id, element.key, element.text);
-                });
-
-            }, this);
-            this.el.appendChild(this.elementsList);
-
-            this.setTitle("CSS Editor");
-            this.$el.find('.navback').hide();
-
-            return this;
-        },
-
-        showElementType: function (type, key, text) {
-
-            switch (type) {
-            case "basecss":
-
-                var editorView = new BaseCSSEditorView(this.model);
-                $(this.elementsList).hide();
-                this.setTitle("Base CSS");
-                this.expandExtra();
-                this.makeResizable();
-                this.el.appendChild(editorView.render().el);
-                editorView.setupAce();
-                this.currentView = editorView;
-                this.$el.find('.navback').show();
-
-                break;
-
-            case "fonts":
-
-                var fontEditorView = new FontEditorView(this.model);
-                $(this.elementsList).hide();
-                this.setTitle("Fonts");
-                this.el.appendChild(fontEditorView.render().el);
-                this.currentView = fontEditorView;
-                this.$el.find('.navback').show();
-
-                break;
-
-            case "statics":
-
-                var staticsEditor = new StaticsEditorView(this.model);
-                $(this.elementsList).hide();
-                this.setTitle("Static Files");
-                this.el.appendChild(staticsEditor.render().el);
-                this.currentView = staticsEditor;
-                this.$el.find('.navback').show();
-
-                break;
-
-            default:
-                var listView = new UIElementListView(this.model.get(key), type);
-                $(this.elementsList).hide();
-                this.setTitle(text);
-                this.el.appendChild(listView.render().el);
-                this.currentView = listView;
-                this.$el.find('.navback').show();
-
-                break;
-            }
-        },
-
-        styleSelected: function (styleModel) {
-            if (this.currentView) this.currentView.close();
-            $(this.elementsList).hide();
-
-            styleModel = styleModel[0];
-
-            this.currentView = new UIElementEditingView({
-                model: styleModel
-            });
-            this.el.appendChild(this.currentView.render().el);
-
-            this.setTitle(styleModel.get('class_name'));
-            this.currentView.setupAce();
-        },
-
-        elementSelected: function (widgetModel) {
-
-            if (!this.expanded) return;
-
-            var type = widgetModel.get('type');
-            if (widgetModel.isList()) {
-                type = "lists";
-            }
-            var className = widgetModel.get('className');
-            var styleModel = this.model.getStyleWithClassAndType(className, type);
-            this.$el.find('.navback').show();
-            //this.styleSelected(styleModel);
-        },
-
-        openThemePicker: function () {
-            if (this.currentView) this.currentView.close();
-            $(this.elementsList).hide();
-
-            this.currentView = new ThemesGalleryView();
-            this.el.appendChild(this.currentView.render().el);
-            this.setTitle("Theme Picker");
-            this.$el.find('.navback').show();
-        },
-
-        navBack: function () {
-            if (this.currentView) this.currentView.close();
-            this.expand();
-            this.disableResizable();
-            $(this.elementsList).show();
-            this.setTitle("CSS Editor");
-            this.$el.find('.navback').hide();
-        },
-
-        setTitle: function (str) {
-            this.titleDiv.innerHTML = str;
-        },
-
-        makeResizable: function () {
-            var self = this;
-            this.$el.resizable({
-                handles: "e",
-                iframeFix: true,
-                start: function (event, ui) {
-                    $('#page').css('pointer-events', 'none');
-                    self.$el.removeClass('animated');
-                },
-                stop: function (event, ui) {
-                    $('#page').css('pointer-events', 'auto');
-                    self.$el.addClass('animated');
-                }
-            });
-        },
-
-        disableResizable: function (argument) {
-            if (this.$el.hasClass("ui-resizable")) {
-                this.$el.resizable("destroy");
-                this.el.style.width = '';
-            }
-        },
-
-        expandExtra: function (argument) {
-
-            if (!this.$el.hasClass('expanded')) {
-                this.el.className += ' expanded';
-            }
-
-            if (!this.$el.hasClass('extra')) {
-                this.el.className += ' extra';
-            }
-
-            this.expanded = true;
-        },
-
-        expand: function () {
-            if (!this.$el.hasClass('expanded')) {
-                this.el.className += ' expanded';
-            }
-
-            if (this.$el.hasClass('extra')) {
-                this.$el.removeClass('extra');
-            }
-
-            this.expanded = true;
-        },
-
-        hide: function () {
-            this.$el.removeClass('expanded');
-            this.disableResizable();
-            this.expanded = false;
-        },
-
-        save: function () {
-            var self = this;
-            var json = this.model.serialize();
-            var save_url = '/app/' + appId + '/uiestate/';
-            // var currentTime = new Date().getTime();
-
-            // if(this.lastSave === null || currentTime - this.lastSave < 3000) {
-            //     if(this.timer) clearTimeout(this.timer);
-            //     if(this.lastSave === null) {
-            //         this.lastSave = currentTime + 1;
-            //     }
-
-            //     this.timer = setTimeout(this.save, 3000);
-            //     return;
-            // }
-
-            // this.lastSave = currentTime;
-            $.ajax({
-                type: "POST",
-                url: save_url,
-                data: {
-                    uie_state: JSON.stringify(json)
-                },
-                statusCode: {
-                    200: function (data) {
-                        console.log('Saved.');
-                        self.model.trigger('synced');
-                    },
-                    500: function () {
-                        alert('Server Error');
-                    }
-                },
-                dataType: "JSON"
-            });
+    elements: [{
+            id: "basecss",
+            key: "basecss",
+            text: "Base CSS"
+        }, {
+            id: "fonts",
+            key: "fonts",
+            text: "Fonts"
+        }, {
+            id: "button",
+            key: "buttons",
+            text: "Button"
+        }, {
+            id: "image",
+            key: "images",
+            text: "Images"
+        }, {
+            id: "header-text",
+            key: "headerTexts",
+            text: "Headers"
+        }, {
+            id: "text",
+            key: "texts",
+            text: "Texts"
+        }, {
+            id: "link",
+            key: "links",
+            text: "Links"
+        }, {
+            id: "text-input",
+            key: "textInputs",
+            text: "Text Inputs"
+        }, {
+            id: "password",
+            key: "passwords",
+            text: "Password Inputs"
+        }, {
+            id: "text-area",
+            key: "textAreas",
+            text: "Text Area"
+        }, {
+            id: "line",
+            key: "lines",
+            text: "Lines"
+        }, {
+            id: "dropdown",
+            key: "dropdowns",
+            text: "Dropdowns"
+        }, {
+            id: "box",
+            key: "boxes",
+            text: "Boxes"
+        }, {
+            id: "form",
+            key: "forms",
+            text: "Forms"
+        }, {
+            id: "list",
+            key: "lists",
+            text: "Lists"
+        }, {
+            id: "statics",
+            key: "statics",
+            text: "Static Files"
         }
 
-    });
+    ],
 
-    exports.CSSEditorView = CSSEditorView;
+    events: {
+        'click #theme-picker-btn': 'openThemePicker',
+        'click #navigate-back': 'navBack'
+    },
+
+
+    expanded: false,
+
+    initialize: function () {
+        _.bindAll(this);
+
+        this.model = v1UIEState;
+        this.lastSave = null;
+        this.deepListenTo(this.model, 'change', this.save);
+
+        _.each(this.model.getUIElementCollections(), function (coll) {
+            this.listenTo(coll, 'selected', this.styleSelected);
+        }, this);
+
+        // TODO: get this back
+        var self = this;
+        var currentPageInd = v1.currentApp
+        v1State.get('templates').each(function (templateModel) {
+            var elementsCollection = templateModel.getUIElements();
+            // elementsCollection.each(this.bindWidget, this);
+            this.listenToModels(elementsCollection, 'selected', function (widgetModel) {
+                self.elementSelected(widgetModel);
+            });
+        }, this);
+        // var elementsCollection = v1State.get().get('uielements');
+        // elementsCollection.each(this.bindWidget, this);
+
+        // this.listenTo(elementsCollection, 'add', this.bindWidget);
+    },
+
+    bindWidget: function (widgetModel) {
+        this.listenTo(widgetModel, 'selected', function () {
+
+        });
+    },
+
+    render: function () {
+        var self = this;
+
+        /* Top Row */
+        var titleEl = document.createElement('div');
+        titleEl.className = 'title';
+        this.titleDiv = titleEl;
+        this.$el.find('.top-row').append(this.titleDiv);
+
+        /* Elements List */
+        this.elementsList = document.createElement('ul');
+        this.elementsList.innerHTML += '<li id="theme-picker-btn"><a>Pick a Theme</li>';
+        _.each(this.elements, function (element) {
+            var id = element.id;
+            var liEl = document.createElement('li');
+            liEl.id = id;
+
+            var aEl = document.createElement('a');
+            aEl.innerHTML = element.text;
+            liEl.appendChild(aEl);
+
+            this.elementsList.appendChild(liEl);
+
+            $(liEl).bind('click', function () {
+                self.showElementType(id, element.key, element.text);
+            });
+
+        }, this);
+        this.el.appendChild(this.elementsList);
+
+        this.setTitle("CSS Editor");
+        this.$el.find('.navback').hide();
+
+        return this;
+    },
+
+    showElementType: function (type, key, text) {
+
+        switch (type) {
+        case "basecss":
+
+            var editorView = new BaseCSSEditorView(this.model);
+            $(this.elementsList).hide();
+            this.setTitle("Base CSS");
+            this.expandExtra();
+            this.makeResizable();
+            this.el.appendChild(editorView.render().el);
+            editorView.setupAce();
+            this.currentView = editorView;
+            this.$el.find('.navback').show();
+
+            break;
+
+        case "fonts":
+
+            var fontEditorView = new FontEditorView(this.model);
+            $(this.elementsList).hide();
+            this.setTitle("Fonts");
+            this.el.appendChild(fontEditorView.render().el);
+            this.currentView = fontEditorView;
+            this.$el.find('.navback').show();
+
+            break;
+
+        case "statics":
+
+            var staticsEditor = new StaticsEditorView(this.model);
+            $(this.elementsList).hide();
+            this.setTitle("Static Files");
+            this.el.appendChild(staticsEditor.render().el);
+            this.currentView = staticsEditor;
+            this.$el.find('.navback').show();
+
+            break;
+
+        default:
+            var listView = new UIElementListView(this.model.get(key), type);
+            $(this.elementsList).hide();
+            this.setTitle(text);
+            this.el.appendChild(listView.render().el);
+            this.currentView = listView;
+            this.$el.find('.navback').show();
+
+            break;
+        }
+    },
+
+    styleSelected: function (styleModel) {
+        if (this.currentView) this.currentView.close();
+        $(this.elementsList).hide();
+
+        styleModel = styleModel[0];
+
+        this.currentView = new UIElementEditingView({
+            model: styleModel
+        });
+        this.el.appendChild(this.currentView.render().el);
+
+        this.setTitle(styleModel.get('class_name'));
+        this.currentView.setupAce();
+    },
+
+    elementSelected: function (widgetModel) {
+
+        if (!this.expanded) return;
+
+        var type = widgetModel.get('type');
+        if (widgetModel.isList()) {
+            type = "lists";
+        }
+        var className = widgetModel.get('className');
+        var styleModel = this.model.getStyleWithClassAndType(className, type);
+        this.$el.find('.navback').show();
+        //this.styleSelected(styleModel);
+    },
+
+    openThemePicker: function () {
+        if (this.currentView) this.currentView.close();
+        $(this.elementsList).hide();
+
+        this.currentView = new ThemesGalleryView();
+        this.el.appendChild(this.currentView.render().el);
+        this.setTitle("Theme Picker");
+        this.$el.find('.navback').show();
+    },
+
+    navBack: function () {
+        if (this.currentView) this.currentView.close();
+        this.expand();
+        this.disableResizable();
+        $(this.elementsList).show();
+        this.setTitle("CSS Editor");
+        this.$el.find('.navback').hide();
+    },
+
+    setTitle: function (str) {
+        this.titleDiv.innerHTML = str;
+    },
+
+    makeResizable: function () {
+        var self = this;
+        this.$el.resizable({
+            handles: "e",
+            iframeFix: true,
+            start: function (event, ui) {
+                $('#page').css('pointer-events', 'none');
+                self.$el.removeClass('animated');
+            },
+            stop: function (event, ui) {
+                $('#page').css('pointer-events', 'auto');
+                self.$el.addClass('animated');
+            }
+        });
+    },
+
+    disableResizable: function (argument) {
+        if (this.$el.hasClass("ui-resizable")) {
+            this.$el.resizable("destroy");
+            this.el.style.width = '';
+        }
+    },
+
+    expandExtra: function (argument) {
+
+        if (!this.$el.hasClass('expanded')) {
+            this.el.className += ' expanded';
+        }
+
+        if (!this.$el.hasClass('extra')) {
+            this.el.className += ' extra';
+        }
+
+        this.expanded = true;
+    },
+
+    expand: function () {
+        if (!this.$el.hasClass('expanded')) {
+            this.el.className += ' expanded';
+        }
+
+        if (this.$el.hasClass('extra')) {
+            this.$el.removeClass('extra');
+        }
+
+        this.expanded = true;
+    },
+
+    hide: function () {
+        this.$el.removeClass('expanded');
+        this.disableResizable();
+        this.expanded = false;
+    },
+
+    save: function () {
+        var self = this;
+        self.model.trigger('synced');
+        // DISABLE XXX XXX XXX
+        return;
+
+        var json = this.model.serialize();
+        var save_url = '/app/' + appId + '/uiestate/';
+        // var currentTime = new Date().getTime();
+
+        // if(this.lastSave === null || currentTime - this.lastSave < 3000) {
+        //     if(this.timer) clearTimeout(this.timer);
+        //     if(this.lastSave === null) {
+        //         this.lastSave = currentTime + 1;
+        //     }
+
+        //     this.timer = setTimeout(this.save, 3000);
+        //     return;
+        // }
+
+        // this.lastSave = currentTime;
+        $.ajax({
+            type: "POST",
+            url: save_url,
+            data: {
+                uie_state: JSON.stringify(json)
+            },
+            statusCode: {
+                200: function (data) {
+                    console.log('Saved.');
+                },
+                500: function () {
+                    alert('Server Error');
+                }
+            },
+            dataType: "JSON"
+        });
+    }
+
+});
+
+exports.CSSEditorView = CSSEditorView;
 
 });
 

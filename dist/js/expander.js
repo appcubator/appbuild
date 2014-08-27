@@ -898,6 +898,8 @@ generators.push({
     code: function(data, templates) {
         console.log('i');
         var uiestate = data.uiestate;
+        console.log(uiestate.headerTexts);
+        console.log(uiestate.texts);
         var className = function(clsName) {
             return clsName.split(/\s/).join('.');
         };

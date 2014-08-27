@@ -30733,22 +30733,22 @@ var proxy = {
 
     /* Where should this go? () -> str */
     generateLess: function() {
-        return top.G.generate('templates.uiestateToLess', {uiestate:uieState});
+        return top.G.generate('templates.uiestateToLess', {uiestate:top.v1UIEState.serialize()});
     },
     generateCSS: function(callback) {
         var parser = new(less.Parser);
+        var lessCode = this.generateLess();
 
-        parser.parse(this.generateLess(), function (err, tree) {
+        parser.parse(lessCode, function (err, tree) {
           if (err) {
-            alert('Less generator error. Check console log.');
-            return console.error(err);
+            console.log('malformed CSS');
+          } else {
+            callback(tree.toCSS());
           }
-          callback(tree.toCSS());
         });
     },
     reArrangeCSSTag: function () {
 
-        uieState = top.uieState;
         this.generateCSS(function(cssString) {
 
             var newstyle;
