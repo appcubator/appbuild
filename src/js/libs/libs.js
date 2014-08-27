@@ -3,6 +3,7 @@ window.$ = window.jQuery;
 require('./node_modules/jquery-ui/jquery-ui');
 require('./jquery.hotkeys');
 require("./jquery.scrollbar");
+require('./fontselect/jquery.fontselect.js');
 
 require('./shortcut');
 require('./jquery.freshereditor');
