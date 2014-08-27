@@ -8,6 +8,9 @@ require('./fontselect/jquery.fontselect.js');
 require('./shortcut');
 require('./jquery.freshereditor');
 
+require('./bootstrap/bootstrap.min');
+require('./bootstrap/bootstrap-dropdown');
+
 require('./ace');
 
 window._ = require('./node_modules/underscore/underscore');
