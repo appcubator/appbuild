@@ -28,6 +28,7 @@ build:
 
 	# build appmake
 	cp ./src/js/expander.js ./dist/js/expander.js
+	cp ./src/js/modelslib.js ./dist/js/modelslib.js
 
 	# HTML
 	cp ./src/index.html ./dist/index.html
