@@ -36,43 +36,36 @@ var proxy = {
 
         uieState = top.uieState;
 
-        var style = document.getElementById("css-uiestate");
+        var newstyle;
+
+        /* Create CSS Style tag  */
+        newstyle = document.createElement('style'); 
+        /* TODO put actual style here */
+
+        if (window.LOL === undefined) LOL = true;
+        LOL = !LOL;
+        var color = LOL ? 'red' : 'green';
+        
+        newstyle.appendChild(document.createTextNode(
+            'body { background-color: '+color+' }'
+        ));
+
+        // TODO if this fails we may need to handle the error.
         var head = document.getElementsByTagName('head')[0];
-        var newstyle = null;
-        if (style) {
-            newstyle = style.cloneNode(true);
+        head.appendChild(newstyle);
+        newstyle.onload = function () {
+            $('.tempStyle').remove();
+            /* Remove old Style tag */
+            var style = document.getElementById("css-uiestate");
+            if (style && style.parentNode) style.parentNode.removeChild(style);
 
-        } else {
-            newstyle = document.createElement("link");
-            newstyle.setAttribute("rel", "stylesheet");
-            newstyle.setAttribute("type", "text/css");
-            newstyle.setAttribute("href", '/temp.css');
+            /* Rename new style tag to have proper id */
             newstyle.id = "css-uiestate";
-        }
+        };
 
-        try {
-            var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-
-            if (is_firefox) {
-                newStyle = document.createElement('style');
-                newStyle.type = 'text/css';
-                newStyle.setAttribute('href', "");
-                newStyle.id = "css-uiestate";
-                newStyle.setAttribute('rel', 'stylesheet');
-
-            } else {
-                head.appendChild(newstyle);
-                newstyle.onload = function () {
-                    $('.tempStyle').remove();
-                    if (style && style.parentNode) style.parentNode.removeChild(style);
-                };
-            }
-
-        } catch (e) {
-
-        }
     },
 
+    /* TODO fix this to not rely on the backend. */
     addTempStyleSheet: function (url, callback) {
 
         uieState = top.uieState;
@@ -145,7 +138,7 @@ $(window).on('mouseup', function () {
 
 $(document).ready(function () {
     util.askBeforeLeave();
-})
+});
 
 console.log(top.v1);
 console.log(top.v1.currentApp);
