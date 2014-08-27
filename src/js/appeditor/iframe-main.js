@@ -32,6 +32,21 @@ var proxy = {
         return this.marqueeView;
     },
 
+    /* Where should this go? () -> str */
+    generateLess: function() {
+        return top.G.generate('templates.uiestateToLess', {uiestate:uieState});
+    },
+    generateCSS: function(callback) {
+        var parser = new(less.Parser);
+
+        parser.parse(this.generateLess(), function (err, tree) {
+          if (err) {
+            alert('Less generator error. Check console log.');
+            return console.error(err);
+          }
+          callback(tree.toCSS());
+        });
+    },
     reArrangeCSSTag: function () {
 
         uieState = top.uieState;
@@ -41,13 +56,8 @@ var proxy = {
         /* Create CSS Style tag  */
         newstyle = document.createElement('style'); 
         /* TODO put actual style here */
-
-        if (window.LOL === undefined) LOL = true;
-        LOL = !LOL;
-        var color = LOL ? 'red' : 'green';
-        
         newstyle.appendChild(document.createTextNode(
-            'body { background-color: '+color+' }'
+            this.generateLess()
         ));
 
         // TODO if this fails we may need to handle the error.
@@ -131,6 +141,7 @@ var proxy = {
         $('head').append(headerContent);
     }
 };
+proxy.reArrangeCSSTag();
 
 $(window).on('mouseup', function () {
     top.v1.shrinkDropdowns();

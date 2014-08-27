@@ -12,6 +12,8 @@ require('./bootstrap/bootstrap.min');
 require('./bootstrap/bootstrap-dropdown');
 
 require('./ace');
+// we use this to compile the app's css on the frontend
+require('./less-1.7.4.min');
 
 window._ = require('./node_modules/underscore/underscore');
 window.Backbone = require('./node_modules/backbone/backbone');

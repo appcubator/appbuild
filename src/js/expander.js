@@ -198,7 +198,7 @@ try {
     };
 }
 
-},{"../generators/generators":5,"underscore":13}],2:[function(require,module,exports){
+},{"../generators/generators":5,"underscore":14}],2:[function(require,module,exports){
 exports.uielements = require('./uielements.js').generators;
 exports.model_methods = require('./model_methods.js').generators;
 exports.metadata = {
@@ -459,7 +459,7 @@ stringalize(exports.root);
 stringalize(exports.crud);
 stringalize(exports.userauth);
 
-},{"./crud/generators":2,"./root/generators":7,"./userauth/generators":12}],6:[function(require,module,exports){
+},{"./crud/generators":2,"./root/generators":8,"./userauth/generators":13}],6:[function(require,module,exports){
 var generators = [];
 
 generators.push({
@@ -521,6 +521,199 @@ app.listen(app.get('port'));\n"
 exports.generators = generators;
 
 },{}],7:[function(require,module,exports){
+exports.tmpl = ['',
+'/* * * * * * * * * * *',
+' Import Fonts',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i < uie_state.fonts.length; i ++) { var font = uie_state.fonts[i]; %>',
+'  @import url("https://fonts.googleapis.com/css?family=<%- font.name %>:400,700,400italic,700italic");',
+'<% } %>',
+'',
+'/* * * * * * * * * * *',
+' Base CSS',
+'* * * * * * * * * * */',
+'',
+'<%= uie_state.basecss %>',
+'',
+'',
+'/* * * * * * * * * * *',
+' buttons',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i < uie_state.buttons.length; i ++) { var b = uie_state.buttons[i]; %>',
+'',
+'.<%= className(b.class_name) %> {',
+'<%= b.style %>',
+'}',
+'',
+'<% if (b.hoverStyle) { %>',
+'.<%= className(b.class_name) %>:hover {',
+'<%= b.hoverStyle %>',
+'}',
+'<% } %>',
+'',
+'<% if (b.activeStyle) { %>',
+'.<%= className(b.class_name) %>:active {',
+'<%= b.activeStyle %>',
+'}',
+'<% } %>',
+'',
+'<% } %>',
+'',
+'/* * * * * * * * * * *',
+' Images',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i <  uie_state.images.length; i ++) { var img =  uie_state.images[i]; %>',
+'',
+'<%= img.tagName %>.<%= className(img.class_name) %>,',
+'div.<%= className(img.class_name) %> {',
+'<%= img.style %>',
+'}',
+'',
+'<% } %>',
+'',
+'/* * * * * * * * * * *',
+' Headers',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i <  uie_state.headerTexts.length; i ++) { var ht =  uie_state.headerTexts[i]; %>',
+'',
+'<%= ht.tagName %>.<%= className(ht.class_name) %> {',
+'<%= ht.style %>',
+'}',
+'',
+'<% } %>',
+'',
+'/* * * * * * * * * * *',
+' Text',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i <  uie_state.texts.length; i ++) { var t =  uie_state.texts[i]; %>',
+'',
+'<%= t.tagName %>.<%= className(t.class_name) %> {',
+'<%= t.style %>',
+'}',
+'',
+'<% } %>',
+'',
+'',
+'/* * * * * * * * * * *',
+' Links',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i <  uie_state.links.length; i ++) { var l =  uie_state.links[i]; %>',
+'',
+'<%= l.tagName %>.<%= className(l.class_name) %> {',
+'<%= l.style %>',
+'}',
+'',
+'<% if (l.hoverStyle) { %>',
+'.<%= className(l.class_name) %>:hover {',
+'<%= l.hoverStyle %>',
+'}',
+'<% } %>',
+'',
+'<% } %>',
+'',
+'/* * * * * * * * * * *',
+' Text Input',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i <  uie_state.textInputs.length; i ++) { var ti =  uie_state.textInputs[i]; %>',
+'',
+'<%= ti.tagName %>.<%= className(ti.class_name) %> {',
+'<%= ti.style %>',
+'}',
+'',
+'<% } %>',
+'',
+'/* * * * * * * * * * *',
+' Passwords',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i <  uie_state.passwords.length; i ++) { var p =  uie_state.passwords[i]; %>',
+'',
+'<%= p.tagName %>.<%= className(p.class_name) %> {',
+'<%= p.style %>',
+'}',
+'',
+'<% } %>',
+'',
+'/* * * * * * * * * * *',
+' Text Areas',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i < uie_state.textAreas.length; i ++) { var ta = uie_state.textAreas[i]; %>',
+'',
+'<%= ta.tagName %>.<%= className(ta.class_name) %> {',
+'<%= ta.style %>',
+'}',
+'',
+'<% } %>',
+'',
+'/* * * * * * * * * * *',
+' Lines',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i < uie_state.lines.length; i ++) { var l = uie_state.lines[i]; %>',
+'',
+'<%= l.tagName %>.<%= className(l.class_name) %> {',
+'<%= l.style %>',
+'}',
+'',
+'<% } %>',
+'',
+'/* * * * * * * * * * *',
+' Dropdowns',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i < uie_state.dropdowns.length; i ++) { var d = uie_state.dropdowns[i]; %>',
+'',
+'<%= d.tagName %>.<%= className(d.class_name) %> {',
+'<%= d.style %>',
+'}',
+'',
+'<% } %>',
+'',
+'/* * * * * * * * * * *',
+' Boxes',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i < uie_state.boxes.length; i ++) { var b = uie_state.boxes[i]; %>',
+'',
+'<%= b.tagName %>.<%= className(b.class_name) %> {',
+'<%= b.style %>',
+'}',
+'',
+'<% } %>',
+'',
+'/* * * * * * * * * * *',
+' Forms',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i < uie_state.forms.length; i ++) { var b = uie_state.forms[i]; %>',
+'',
+'<%= b.tagName %>.<%= className(b.class_name) %> {',
+'<%= b.style %>',
+'}',
+'',
+'<% } %>',
+'',
+'/* * * * * * * * * * *',
+' Lists',
+'* * * * * * * * * * */',
+'',
+'<% for (var i = 0; i < uie_state.lists.length; i ++) { var b = uie_state.lists[i]; %>',
+'',
+'<%= b.tagName %>.<%= className(b.class_name) %> {',
+'<%= b.style %>',
+'}',
+'',
+'<% } %>'].join('\n');
+
+},{}],8:[function(require,module,exports){
 exports.routes = require('./routes.js').generators;
 exports.templates = require('./templates.js').generators;
 exports.uielements = require('./uielements.js').generators;
@@ -532,7 +725,7 @@ exports.metadata = {
     displayName: 'Simple Elements'
 };
 
-},{"./app.js":6,"./models.js":8,"./routes.js":9,"./templates.js":10,"./uielements.js":11}],8:[function(require,module,exports){
+},{"./app.js":6,"./models.js":9,"./routes.js":10,"./templates.js":11,"./uielements.js":12}],9:[function(require,module,exports){
 var generators = [];
 
 generators.push({
@@ -583,7 +776,7 @@ exports.<%= name %> = mongoose.model('<%= name %>', <%= name %>Schema);\n"
 
 exports.generators = generators;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var generators = [];
 
 generators.push({
@@ -630,7 +823,7 @@ generators.push({
 
 exports.generators = generators;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var generators = [];
 
 generators.push({
@@ -696,6 +889,25 @@ generators.push({
             ' </body>\n',
             '</html>'
         ].join('\n')
+    }
+});
+
+generators.push({
+    name: 'uiestateToLess',
+    version: '0.1',
+    code: function(data, templates) {
+        console.log('i');
+        var uiestate = data.uiestate;
+        var className = function(clsName) {
+            return clsName.split(/\s/).join('.');
+        };
+        return templates.lessScaffold({
+            uie_state: uiestate,
+            className: className
+        });
+    },
+    templates: {
+        lessScaffold: require('./css_template').tmpl
     }
 });
 
@@ -927,7 +1139,7 @@ generators.push({
             html: htmlStr,
             js: jsLines.join('\n'),
             css: cssLines.join('\n')
-        }
+        };
     },
 
     templates: {
@@ -976,7 +1188,7 @@ generators.push({
 
 exports.generators = generators;
 
-},{}],11:[function(require,module,exports){
+},{"./css_template":7}],12:[function(require,module,exports){
 var generators = [];
 
 generators.push({
@@ -990,8 +1202,7 @@ generators.push({
     code: function(data, templates) {
         return { html: templates.html(data),
                  css: '',
-                 js: '',
-                 layout: data.layout };
+                 js: '' };
     },
     templates: {
         html: '<h1 class="<%= className %>" style="<%= style %>"><%= content %></h1>'
@@ -1015,8 +1226,7 @@ generators.push({
         /* expects: content, className, style */
         return { html: templates.html(data),
                  css: '',
-                 js: '',
-                 layout: data.layout };
+                 js: '' };
     },
     templates: {
         html: '<div class="<%= className %>" style="<%= style %>"><%= content %></div>'
@@ -1040,8 +1250,7 @@ generators.push({
     code: function(data, templates) {
         return { html: templates.html(data),
                  css: '',
-                 js: '',
-                 layout: data.layout };
+                 js: '' };
     },
     templates: {
         html: '<a href="<%= href %>"><img class="<%= className %>" style="<%= style %>" src="<%= src %>"></a>'
@@ -1066,8 +1275,7 @@ generators.push({
         /* expects: content, url, className, style */
         return { html: templates.html(data),
                  css: '',
-                 js: '',
-                 layout: data.layout };
+                 js: '' };
     },
     templates: {
         html: '<a href="<%= href %>" class="<%= className %>" style="<%= style %>"><%= content %></a>'
@@ -1092,8 +1300,7 @@ generators.push({
         /* expects: content, url, className, style */
         return { html: templates.html(data),
                  css: '',
-                 js: '',
-                 layout: data.layout };
+                 js: '' };
     },
     templates: {
         html: '<a href="<%= href %>" class="btn <%= className %>" style="<%= style %>"><%= content %></a>'
@@ -1118,8 +1325,7 @@ generators.push({
         data.style = data.style || '';
         return { html: templates.html(data),
                  css: '',
-                 js: '',
-                 layout: data.layout };
+                 js: '' };
     },
     templates: {
         html: '<hr class="<%= className %>" style="<%= style %>">'
@@ -1145,8 +1351,7 @@ generators.push({
         data.style += " width: 100%; height: 100%;";
         return { html: templates.html(data),
                  css: '',
-                 js: '',
-                 layout: data.layout };
+                 js: '' };
     },
     templates: {
         html: '<div class="<%= className %>" style="<%= style %>"></div>'
@@ -1172,8 +1377,7 @@ generators.push({
         /* expects: content, url, className, style */
         return { html: templates.html(data),
                  css: '',
-                 js: '',
-                 layout: data.layout };
+                 js: '' };
     },
     templates: {
         html:   ['<div id="slider-<%= cid %>" class="carousel slide">',
@@ -1213,15 +1417,13 @@ generators.push({
         if (data.pageLink) {
             obj = { html: templates.htmlForPage(data),
                     css: '',
-                    js: '',
-                    layout: data.layout };
+                    js: '' };
 
         }
         else {
             obj = { html: templates.htmlForCurrentPage(data),
                     css: '',
-                    js: '',
-                    layout: data.layout };
+                    js: '' };
         }
 
         return obj;
@@ -1327,7 +1529,7 @@ generators.push({
 
 exports.generators = generators;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /* plz edit via plugin editor and reserialize as follows. */
 
 exports.uielements = [{"templates":{"html":"<form id=\"<%= id %>\" class=\"<%= className %>\" style=\"<%= style %>\">\n<%= formFields %>\n<br>\n<input type=\"submit\" value=\"Submit\"><br>\n</form>","js":"$('#<%= id %>').submit(function(e){\n    e.preventDefault();\n    var email = $('#<%= id %> input[name=\"email\"]').val();\n    var password1 = $('#<%= id %> input[name=\"password1\"]').val();\n    var password2 = $('#<%= id %> input[name=\"password2\"]').val();\n\n    $('#<%= id %>').attr('disabled','true');\n\n    models.User.signup(email, password1, password2, function(err, data){\n\n        $('#<%= id %>').attr('disabled','false');\n\n        if (err) {\n            alert(err);\n        } else {\n            location.href = '<%= redirect_to %>';\n        }\n\n    });\n\n    return false;\n});"},"_pristine":false,"code":"function (data, templates) {\n    // expect data.redirect_to\n    var fields = [];\n    fields.push({\n        generate: 'uielements.form-field',\n        data: { displayType: 'single-line-text',\n                field_name: 'email',\n                placeholder: 'Email'}\n    });\n    fields.push({\n        generate: 'uielements.form-field',\n        data: { displayType: 'password-text',\n                field_name: 'password1',\n                placeholder: 'Password'}\n    });\n    fields.push({\n        generate: 'uielements.form-field',\n        data: { displayType: 'password-text',\n                field_name: 'password2',\n                placeholder: 'Confirm password'}\n    });\n    data.formFields = _.map(fields, expand).join('<br>');\n    return { html: templates.html(data), js: templates.js(data), css: ''};\n}","name":"signup","package":"authentication","generatorIdentifier":"authentication.uielements.signup","version":"0.1","defaults":{"className":"","style":"","id":"","redirect_to":""}},{"templates":{"html":"<form id=\"<%= id %>\" class=\"<%= className %>\" style=\"<%= style %>\">\n<%= formFields %>\n<br>\n<input type=\"submit\" value=\"Submit\"><br>\n</form>","js":"$('#<%= id %>').submit(function(e){\n    e.preventDefault();\n    var email = $('#<%= id %> input[name=\"email\"]').val();\n    var password = $('#<%= id %> input[name=\"password\"]').val();\n\n    $('#<%= id %>').attr('disabled','true');\n\n    models.User.login(email, password, function(err, data){\n\n        $('#<%= id %>').attr('disabled','false');\n\n        if (err) {\n            alert(err);\n        } else {\n            location.href = '<%= redirect_to %>';\n        }\n\n    });\n\n    return false;\n});"},"code":"function (data, templates) {\n    // expect data.redirect_to\n    var fields = [];\n    fields.push({\n        generate: 'uielements.form-field',\n        data: { displayType: 'single-line-text',\n                field_name: 'email',\n                placeholder: 'Email'}\n    });\n    fields.push({\n        generate: 'uielements.form-field',\n        data: { displayType: 'password-text',\n                field_name: 'password',\n                placeholder: 'Password'}\n    });\n    data.formFields = _.map(fields, expand).join('<br>');\n    return { html: templates.html(data), js: templates.js(data), css: ''};\n}","version":"0.1","defaults":{"className":"","style":"","id":"","redirect_to":""},"name":"login"}];
@@ -1338,7 +1540,7 @@ exports.metadata = {
     description: 'generates some code to support user authentication.'
     };
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 //     Underscore.js 1.5.2
 //     http://underscorejs.org
 //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

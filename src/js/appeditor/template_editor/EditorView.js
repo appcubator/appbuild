@@ -207,6 +207,9 @@
         },
 
         startUIStateUpdater: function (proxy) {
+            // XXX XXX XXX
+            // temp disable this.
+            return;
             var self = this;
             this.listenTo(v1UIEState, 'synced', proxy.reArrangeCSSTag);
 
@@ -226,6 +229,9 @@
         },
 
         fetchUIState: function (callback) {
+            // XXX XXX XXX
+            // temp disable this.
+            return;
             $.ajax({
                 type: "GET",
                 url: '/temp.css',
