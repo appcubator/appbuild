@@ -7,6 +7,8 @@ require("./jquery.scrollbar");
 require('./shortcut');
 require('./jquery.freshereditor');
 
+require('./ace');
+
 window._ = require('./node_modules/underscore/underscore');
 window.Backbone = require('./node_modules/backbone/backbone');
 Backbone.$ = $;
