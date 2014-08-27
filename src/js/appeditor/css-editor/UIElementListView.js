@@ -1,6 +1,6 @@
     'use strict';
 
-    var UIElementView = require('./UIElementView');
+    var UIElementView = require('./UIElementView').UIElementView;
     var baseTags = {
 
         "button": [{

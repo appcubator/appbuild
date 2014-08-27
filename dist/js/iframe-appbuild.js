@@ -30749,29 +30749,28 @@ var proxy = {
     reArrangeCSSTag: function () {
 
         uieState = top.uieState;
+        this.generateCSS(function(cssString) {
 
-        var newstyle;
+            var newstyle;
 
-        /* Create CSS Style tag  */
-        newstyle = document.createElement('style'); 
-        /* TODO put actual style here */
-        newstyle.appendChild(document.createTextNode(
-            this.generateLess()
-        ));
+            /* Create CSS Style tag  */
+            newstyle = document.createElement('style'); 
+            /* TODO put actual style here */
+            newstyle.appendChild(document.createTextNode(cssString));
 
-        // TODO if this fails we may need to handle the error.
-        var head = document.getElementsByTagName('head')[0];
-        head.appendChild(newstyle);
-        newstyle.onload = function () {
-            $('.tempStyle').remove();
-            /* Remove old Style tag */
-            var style = document.getElementById("css-uiestate");
-            if (style && style.parentNode) style.parentNode.removeChild(style);
+            // TODO if this fails we may need to handle the error.
+            var head = document.getElementsByTagName('head')[0];
+            head.appendChild(newstyle);
+            newstyle.onload = function () {
+                $('.tempStyle').remove();
+                /* Remove old Style tag */
+                var style = document.getElementById("css-uiestate");
+                if (style && style.parentNode) style.parentNode.removeChild(style);
 
-            /* Rename new style tag to have proper id */
-            newstyle.id = "css-uiestate";
-        };
-
+                /* Rename new style tag to have proper id */
+                newstyle.id = "css-uiestate";
+            };
+        });
     },
 
     /* TODO fix this to not rely on the backend. */

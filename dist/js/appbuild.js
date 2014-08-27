@@ -8238,7 +8238,7 @@ require.define("/css-editor/CSSEditorView.js",function(require,module,exports,__
 
 require.define("/css-editor/UIElementListView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var UIElementView = require('./UIElementView');
+    var UIElementView = require('./UIElementView').UIElementView;
     var baseTags = {
 
         "button": [{
