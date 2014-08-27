@@ -2197,1102 +2197,471 @@ exports.UrlModel = UrlModel;
 
 });
 
-require.define("/appeditor/template_editor/WidgetView.js",function(require,module,exports,__dirname,__filename,process,global){    require('../../libs/jquery.freshereditor');
-    require('../mixins/BackboneUI');
-    require('./editor-templates');
-
-    'use strict';
-
-    var WidgetView = Backbone.UIView.extend({
-
-        el: null,
-        className: 'widget-wrapper',
-        tagName: 'div',
-        widgetsContainer: null,
-        selected: false,
-        editable: false,
-        editMode: false,
-        shadowElem: null,
-        positionHorizontalGrid: 80,
-        positionVerticalGrid: 15,
-
-        events: {
-            'click': 'select',
-            'click .delete': 'remove',
-            'mouseover': 'hovered',
-            'mouseout': 'unhovered',
-            'mousedown': 'mousedown',
-            'mouseup': 'mouseup'
-        },
-
-        initialize: function (widgetModel) {
-            var self = this;
-            _.bindAll(this);
-
-            this.model = widgetModel;
-            this.listenTo(this.model, "remove", this.close, this);
-
-            this.listenTo(this.model, "rerender", this.reRender, this);
-            this.listenTo(this.model, "change", this.reRender, this);
-
-            if (this.model.has('layout')) {
-                this.listenTo(this.model.get('layout'), "change", this.changedPadding, this);
-            }
-
-            this.listenTo(this.model, "startEditing", this.switchEditModeOn, this);
-
-            this.listenTo(this.model, "deselected", function () {
-                this.model.trigger('stopEditing');
-                this.$el.removeClass('selected');
-                this.selected = false;
-            }, this);
-
-            this.listenTo(this.model, "selected", function () {
-                this.$el.addClass('selected');
-            });
-
-            this.listenTo(this.model, "stopEditing", this.switchEditModeOff);
-            this.listenTo(this.model, "cancelEditing", this.cancelEditing);
-
-            this.listenTo(this.model, "highlight", this.highlight);
-            this.listenTo(this.model, "unhighlight", this.unhighlight);
-            this.listenTo(this.model, "startEditingRow", this.switchRowEditorOn);
-            this.listenTo(this.model, "stopEditingRow", this.switchRowEditorOff);
-
-            keyDispatcher.bind('meta+return', function () {
-                self.model.trigger('stopEditing');
-            });
-
-            keyDispatcher.bind('esc', function () {
-                self.model.trigger('cancelEditing');
-            });
-
-        },
-
-        setFreeMovement: function () {
-            this.positionVerticalGrid = 1;
-            this.positionHorizontalGrid = 1;
-        },
-
-        render: function () {
-
-            var $e = $('[data-cid="' + this.model.cid + '"]');
-            if ($e.length) {
-                this.setElement($e, true);
-            } else {
-                var expanded = this.model.expand();
-                this.setElement($(expanded.html), true);
-                this.placeCSS(expanded);
-                this.placeJS(expanded);
-            }
-
-            // var spin = util.addLoadingSpin(this.el);
-            // var expanded = this.model.safeExpand();
-
-            // this.setElement(this.renderElement(expanded), true);
-            this.$el.addClass("widget-wrapper");
-            // this.$el.data('cid', this.model.cid);
-
-            // this.$el.on('click', function(e) { e.preventDefault(); });
-            // this.$el.find('a').on('click', function(e) { e.preventDefault(); });
-
-            return this;
-        },
-
-        reRender: function () {
-            var expanded = this.model.expand();
-            var $el = $(expanded.html);
-
-            this.$el.replaceWith($el);
-            this.setElement($el, true);
-            this.placeCSS(expanded);
-            this.placeJS(expanded);
-            this.$el.addClass(this.className);
-
-            this.$el.find('a').on('click', function (e) {
-                e.preventDefault();
-            });
-            this.$el.find('form').on('submit', function (e) {
-                e.preventDefault();
-            });
-
-            return this;
-        },
-
-        renderElement: function (expanded) {
-            var html = "";
-            if (!expanded.html || expanded.html == "") {
-                expanded.html = "Custom Widget";
-            }
-            return expanded.html;
-        },
-
-        placeCSS: function (expanded) {
-
-            var styleTag = document.getElementById('custom-css-widget-' + this.model.cid);
-            if (styleTag) $(styleTag).remove();
-
-            var style = document.createElement('style');
-            style.id = 'custom-css-widget-' + this.model.cid;
-            style.type = 'text/css';
-
-            var css = expanded.css;
-            if (style.styleSheet) {
-                style.styleSheet.cssText = css;
-            } else {
-                style.appendChild(document.createTextNode(css));
-            }
-            document.getElementsByTagName('head')[0].appendChild(style);
-        },
-
-        placeJS: function (expanded) {
-
-            if (!expanded.js || expanded.js === '') return;
-
-            var self = this;
-
-            this.model.trigger('selected');
-
-            var jsTag = 'custom-js-widget-' + this.model.cid;
-            if (jsTag) $(jsTag).remove();
-
-            var appendJSTag = function () {
-
-                var customJSTemp = [
-                    'try {',
-                    '<%= code %>',
-                    '} catch(err) { console.log("Error executing custom js: "+ err); }',
-                ].join('\n');
-
-                try {
-                    jsTag = document.createElement('script');
-                    jsTag.id = 'custom-js-widget-' + self.model.cid;
-                    jsTag.setAttribute("type", "text/javascript");
-
-                    jsTag.text = _.template(customJSTemp, {
-                        code: expanded.js
-                    });
-
-                    console.log(jsTag);
-                    document.body.appendChild(jsTag);
-                } catch (err) {
-                    console.log('Error adding custom js:' + err);
-                }
-            };
-
-            setTimeout(function () {
-                $(document).ready(appendJSTag);
-            }, 3000);
-            // this.listenTo(v1, 'editor-loaded', appendJSTag, this);
-        },
-
-        select: function (e) {
-            if (this.selected && !this.editMode) {
-                this.model.trigger('doubleClicked');
-                return;
-            }
-
-            if (!this.editMode) {
-                this.model.trigger('selected');
-                this.el.style.zIndex = 2003;
-                this.selected = true;
-            }
-        },
-
-        changedAlignment: function () {
-            this.el.style.textAlign = this.model.get('layout').get('alignment');
-        },
-
-        staticsAdded: function (files) {
-            _(files).each(function (file) {
-                file.name = file.filename;
-                statics.push(file);
-            });
-            this.model.set('src', _.last(files).url);
-            //this.show(this.model);
-        },
-
-        hovered: function () {
-            if (this.editMode || mouseDispatcher.isMousedownActive) return;
-            if (this.model.isBgElement()) return;
-            this.hovered = true;
-            this.model.trigger('hovered');
-        },
-
-        unhovered: function (e) {
-            if (this.isMouseOn(e)) return;
-            this.model.trigger('unhovered');
-        },
-
-        isMouseOn: function (e) {
-            var self = this;
-
-            var mouseX = e.pageX;
-            var mouseY = e.pageY;
-            var div = $('#widget-wrapper-' + this.model.cid);
-            if (!div.offset()) return false;
-
-            var divTop = div.offset().top;
-            var divLeft = div.offset().left;
-            var divRight = divLeft + div.width();
-            var divBottom = divTop + div.height();
-
-            if (mouseX >= divLeft && mouseX <= divRight && mouseY >= divTop && mouseY <= divBottom) {
-                $('#hover-div').bind('mouseout', function (e) {
-                    self.unhovered(e);
-                    $(e.target).unbind('mouseout');
-                });
-                return true;
-            }
-
-            return false;
-        },
-
-        switchEditModeOn: function () {
-
-            if (this.model.get('content') && this.el.childNodes.length < 2) {
-                this.editMode = true;
-
-                //var el = $(this.el.firstChild);
-                this.el.style.zIndex = 2003;
-                this.$el.addClass('textediting');
-                //el.attr('contenteditable', 'true');
-                //el.focus();
-
-                var excludes = [
-                    'removeFormat',
-                    'insertheading1',
-                    'insertheading2',
-                    'insertheading3',
-                    'insertheading4',
-                    'fontname',
-                    'code',
-                    'superscript',
-                    'subscript',
-                    'forecolor',
-                    'backcolor',
-                    'strikethrough',
-                    'insertimage',
-                    'insertparagraph',
-                    'blockquote',
-                    'justifyfull'
-                ];
-
-                this.$el.freshereditor({
-                    toolbar_selector: ".widget-editor",
-                    excludes: excludes
-                });
-                this.$el.freshereditor("edit", true);
-                util.selectText(this.$el);
-
-                keyDispatcher.textEditing = true;
-            }
-
-        },
-
-        switchEditModeOff: function (e) {
-            if (e) e.preventDefault();
-            if (this.editMode === false) return;
-
-            this.editMode = false;
-            this.$el.removeClass('textediting');
-            var val = this.$el.html();
-            this.$el.freshereditor("edit", false);
-            this.model.set('content', val);
-
-            keyDispatcher.textEditing = false;
-            util.unselectText();
-        },
-
-        cancelEditing: function () {
-            if (this.editMode === false) return;
-
-            this.editMode = false;
-            this.$el.removeClass('textediting');
-            var el = $(this.el.firstChild);
-            this.model.trigger('change:content');
-            el.attr('contenteditable', 'false');
-            keyDispatcher.textEditing = false;
-            util.unselectText();
-        },
-
-        switchRowEditorOn: function () {
-
-            this.model.get('row').get('columns').each(function (columnModel) {
-
-                var self = this;
-                var $col = this.$el.find('[data-cid="' + columnModel.cid + '"]');
-                $col.attr('data-rowcolumn', "true");
-                $col.sortable({
-                    connectWith: "[data-rowcolumn]",
-                    update: function () {
-                        self.updatedRowCol(columnModel, $col);
-                    },
-                    sort: function (e, ui) {
-                        var amt = $(window).scrollTop();
-                        ui.position.top += amt;
-                    },
-                    start: function (e, ui) {
-                        self.highlightCols();
-                    },
-                    stop: function (e, ui) {
-                        self.unhighlightCols();
-                    }
-                });
-
-            }, this);
-
-        },
-
-        switchRowEditorOff: function () {
-
-            this.reRender();
-            this.model.get('row').get('columns').each(function (columnModel) {
-                var $col = this.$el.find('[data-cid="' + columnModel.cid + '"]');
-                $col.attr('data-rowcolumn', "true");
-                if ($col.hasClass('ui-sortable')) {
-                    $col.sortable("destroy");
-                }
-            }, this);
-
-        },
-
-        updatedRowCol: function (columnModel, $col) {
-            var newArr = $col.sortable("toArray", {
-                attribute: "data-cid"
-            });
-            var curArr = _(columnModel.get('uielements').models).pluck('cid');
-
-            if (!_.isEqual(curArr, newArr)) {
-
-                _.each(newArr, function (elCid, ind) {
-
-                    var widgetModel = {};
-
-                    if (columnModel.get('uielements').get(elCid)) {
-                        widgetModel = columnModel.get('uielements').get(elCid);
-                    } else {
-                        var coll = this.model.getWidgetsCollection();
-                        widgetModel = coll.get(elCid);
-                        widgetModel.collection.remove(widgetModel, {
-                            silent: true
-                        });
-                        columnModel.get('uielements').add(widgetModel, {
-                            silent: true
-                        });
-                    }
-
-                }, this);
-
-            }
-        },
-
-        highlightCols: function () {
-            this.$el.find('.ycol').addClass("fancy-borders");
-        },
-
-        unhighlightCols: function () {
-            this.$el.find('.ycol').removeClass("fancy-borders");
-        },
-
-        highlight: function () {
-
-            var $el = this.$el;
-            if (this.$el.find('.row').length) {
-                $el = this.$el.find('.row').first();
-            }
-
-            var position = $el.offset();
-
-            var topDiv = document.createElement('div');
-            topDiv.style.top = 0;
-            topDiv.style.width = "100%";
-            topDiv.style.height = position.top + "px";
-            topDiv.className = "shadow-elem";
-
-            var bottomDiv = document.createElement('div');
-            bottomDiv.style.top = ($el.outerHeight() + position.top) + "px";
-            bottomDiv.style.width = "100%";
-            bottomDiv.style.height = "100%";
-            bottomDiv.className = "shadow-elem";
-
-            var leftDiv = document.createElement('div');
-            leftDiv.style.top = position.top + "px";
-            leftDiv.style.left = 0;
-            leftDiv.style.width = position.left + "px";
-            leftDiv.style.height = $el.outerHeight() + "px";
-            leftDiv.className = "shadow-elem";
-
-            var rightDiv = document.createElement('div');
-            rightDiv.style.top = position.top + "px";
-            rightDiv.style.left = (position.left + $el.outerWidth()) + "px";
-            rightDiv.style.width = "100%";
-            rightDiv.style.height = $el.outerHeight() + "px";
-            rightDiv.className = "shadow-elem";
-
-            this.highlightDivs = [topDiv, bottomDiv, leftDiv, rightDiv];
-
-            $el.append(topDiv);
-            $el.append(bottomDiv);
-            $el.append(leftDiv);
-            $el.append(rightDiv);
-
-            this.$el.removeClass('widget-wrapper');
-
-        },
-
-        unhighlight: function () {
-            _.each(this.highlightDivs, function (el) {
-                $(el).remove();
-            });
-            this.$el.addClass("widget-wrapper");
-        },
-
-        mousedown: function (e) {
-            mouseDispatcher.isMousedownActive = true;
-        },
-
-        mouseup: function () {
-            mouseDispatcher.isMousedownActive = false;
-        },
-
-        close: function () {
-            this.stopListening();
-            WidgetView.__super__.close.call(this);
+require.define("/appeditor/template_editor/WidgetView.js",function(require,module,exports,__dirname,__filename,process,global){require('./editor-templates');
+
+'use strict';
+
+var WidgetView = Backbone.UIView.extend({
+
+    el: null,
+    className: 'widget-wrapper',
+    tagName: 'div',
+    widgetsContainer: null,
+    selected: false,
+    editable: false,
+    editMode: false,
+    shadowElem: null,
+    positionHorizontalGrid: 80,
+    positionVerticalGrid: 15,
+
+    events: {
+        'click': 'select',
+        'click .delete': 'remove',
+        'mouseover': 'hovered',
+        'mouseout': 'unhovered',
+        'mousedown': 'mousedown',
+        'mouseup': 'mouseup'
+    },
+
+    initialize: function (widgetModel) {
+        var self = this;
+        _.bindAll(this);
+
+        this.model = widgetModel;
+        this.listenTo(this.model, "remove", this.close, this);
+
+        this.listenTo(this.model, "rerender", this.reRender, this);
+        this.listenTo(this.model, "change", this.reRender, this);
+
+        if (this.model.has('layout')) {
+            this.listenTo(this.model.get('layout'), "change", this.changedPadding, this);
         }
 
-    });
+        this.listenTo(this.model, "startEditing", this.switchEditModeOn, this);
 
-    exports.WidgetView = WidgetView;
+        this.listenTo(this.model, "deselected", function () {
+            this.model.trigger('stopEditing');
+            this.$el.removeClass('selected');
+            this.selected = false;
+        }, this);
 
-});
+        this.listenTo(this.model, "selected", function () {
+            this.$el.addClass('selected');
+        });
 
-require.define("/libs/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {}
-});
+        this.listenTo(this.model, "stopEditing", this.switchEditModeOff);
+        this.listenTo(this.model, "cancelEditing", this.cancelEditing);
 
-require.define("/libs/jquery.freshereditor.js",function(require,module,exports,__dirname,__filename,process,global){(function() {
-    (function($) {
-        var methods;
-        methods = {
-            edit: function(isEditing) {
-                return this.each(function() {
-                    return $(this).attr("contentEditable", isEditing || false);
+        this.listenTo(this.model, "highlight", this.highlight);
+        this.listenTo(this.model, "unhighlight", this.unhighlight);
+        this.listenTo(this.model, "startEditingRow", this.switchRowEditorOn);
+        this.listenTo(this.model, "stopEditingRow", this.switchRowEditorOff);
+
+        keyDispatcher.bind('meta+return', function () {
+            self.model.trigger('stopEditing');
+        });
+
+        keyDispatcher.bind('esc', function () {
+            self.model.trigger('cancelEditing');
+        });
+
+    },
+
+    setFreeMovement: function () {
+        this.positionVerticalGrid = 1;
+        this.positionHorizontalGrid = 1;
+    },
+
+    render: function () {
+
+        var $e = $('[data-cid="' + this.model.cid + '"]');
+        if ($e.length) {
+            this.setElement($e, true);
+        } else {
+            var expanded = this.model.expand();
+            this.setElement($(expanded.html), true);
+            this.placeCSS(expanded);
+            this.placeJS(expanded);
+        }
+
+        // var spin = util.addLoadingSpin(this.el);
+        // var expanded = this.model.safeExpand();
+
+        // this.setElement(this.renderElement(expanded), true);
+        this.$el.addClass("widget-wrapper");
+        // this.$el.data('cid', this.model.cid);
+
+        // this.$el.on('click', function(e) { e.preventDefault(); });
+        // this.$el.find('a').on('click', function(e) { e.preventDefault(); });
+
+        return this;
+    },
+
+    reRender: function () {
+        var expanded = this.model.expand();
+        var $el = $(expanded.html);
+
+        this.$el.replaceWith($el);
+        this.setElement($el, true);
+        this.placeCSS(expanded);
+        this.placeJS(expanded);
+        this.$el.addClass(this.className);
+
+        this.$el.find('a').on('click', function (e) {
+            e.preventDefault();
+        });
+        this.$el.find('form').on('submit', function (e) {
+            e.preventDefault();
+        });
+
+        return this;
+    },
+
+    renderElement: function (expanded) {
+        var html = "";
+        if (!expanded.html || expanded.html == "") {
+            expanded.html = "Custom Widget";
+        }
+        return expanded.html;
+    },
+
+    placeCSS: function (expanded) {
+
+        var styleTag = document.getElementById('custom-css-widget-' + this.model.cid);
+        if (styleTag) $(styleTag).remove();
+
+        var style = document.createElement('style');
+        style.id = 'custom-css-widget-' + this.model.cid;
+        style.type = 'text/css';
+
+        var css = expanded.css;
+        if (style.styleSheet) {
+            style.styleSheet.cssText = css;
+        } else {
+            style.appendChild(document.createTextNode(css));
+        }
+        document.getElementsByTagName('head')[0].appendChild(style);
+    },
+
+    placeJS: function (expanded) {
+
+        if (!expanded.js || expanded.js === '') return;
+
+        var self = this;
+
+        this.model.trigger('selected');
+
+        var jsTag = 'custom-js-widget-' + this.model.cid;
+        if (jsTag) $(jsTag).remove();
+
+        var appendJSTag = function () {
+
+            var customJSTemp = [
+                'try {',
+                '<%= code %>',
+                '} catch(err) { console.log("Error executing custom js: "+ err); }',
+            ].join('\n');
+
+            try {
+                jsTag = document.createElement('script');
+                jsTag.id = 'custom-js-widget-' + self.model.cid;
+                jsTag.setAttribute("type", "text/javascript");
+
+                jsTag.text = _.template(customJSTemp, {
+                    code: expanded.js
                 });
-            },
-            save: function(callback) {
-                return this.each(function() {
-                    return callback($(this).attr('id'), $(this).html());
-                });
-            },
-            createlink: function() {
-                var urlPrompt;
-                urlPrompt = prompt("Enter URL:", "http://");
-                return document.execCommand("createlink", false, urlPrompt);
-            },
-            insertimage: function() {
-                var urlPrompt;
-                urlPrompt = prompt("Enter Image URL:", "http://");
-                return document.execCommand("insertimage", false, urlPrompt);
-            },
-            formatblock: function(block) {
-                return document.execCommand("formatblock", null, block);
-            },
-            init: function(opts) {
-                var $toolbar, button, command, commands, excludes, font, font_list, fontnames, fontsize, fontsizes, group, groups, options, shortcuts, size_list, _i, _j, _k, _l, _len, _len2, _len3, _len4;
-                options = opts || {};
-                groups = [
-                    [{
-                        name: 'bold',
-                        label: "<span style='font-weight:bold;'>B</span>",
-                        title: 'Bold (Ctrl+B)',
-                        classname: 'toolbar_bold'
-                    }, {
-                        name: 'italic',
-                        label: "<span style='font-style:italic;'>I</span>",
-                        title: 'Italic (Ctrl+I)',
-                        classname: 'toolbar_italic'
-                    }, {
-                        name: 'underline',
-                        label: "<span style='text-decoration:underline!important;'>U</span>",
-                        title: 'Underline (Ctrl+U)',
-                        classname: 'toolbar_underline'
-                    }, {
-                        name: 'strikethrough',
-                        label: "<span style='text-shadow:none;text-decoration:line-through;'>ABC</span>",
-                        title: 'Strikethrough',
-                        classname: 'toolbar_strikethrough'
-                    }, {
-                        name: 'removeFormat',
-                        label: "<i class='icon-minus'></i>",
-                        title: 'Remove Formating (Ctrl+M)',
-                        classname: 'toolbar_remove'
-                    }],
-                    [{
-                        name: 'fontname',
-                        label: "F <span class='caret'></span>",
-                        title: 'Select font name',
-                        classname: 'toolbar_fontname dropdown-toggle',
-                        dropdown: true
-                    }],
-                    [{
-                        name: 'FontSize',
-                        label: "<span style='font:bold 16px;'>A</span><span style='font-size:8px;'>A</span> <span class='caret'></span>",
-                        title: 'Select font size',
-                        classname: 'toolbar_fontsize dropdown-toggle',
-                        dropdown: true
-                    }],
-                    [{
-                        name: 'forecolor',
-                        label: "<div style='color:#ff0000;'>A <span class='caret'></span></div>",
-                        title: 'Select font color',
-                        classname: 'toolbar_forecolor dropdown-toggle',
-                        dropdown: true
-                    }],
-                    [{
-                        name: 'backcolor',
-                        label: "<div style='display:inline-block;margin:3px;width:15px;height:12px;background-color:#0000ff;'></div> <span class='caret'></span>",
-                        title: 'Select background color',
-                        classname: 'toolbar_bgcolor dropdown-toggle',
-                        dropdown: true
-                    }],
-                    [{
-                        name: 'justifyleft',
-                        label: "<i class='icon-align-left'></i>",
-                        title: 'Left justify',
-                        classname: 'toolbar_justifyleft'
-                    }, {
-                        name: 'justifycenter',
-                        label: "<i class='icon-align-center'></i>",
-                        title: 'Center justify',
-                        classname: 'toolbar_justifycenter'
-                    }, {
-                        name: 'justifyright',
-                        label: "<i class='icon-align-right'></i>",
-                        title: 'Right justify',
-                        classname: 'toolbar_justifyright'
-                    }, {
-                        name: 'justifyfull',
-                        label: "<i class='icon-align-justify'></i>",
-                        title: 'Full justify',
-                        classname: 'toolbar_justifyfull'
-                    }],
-                    [{
-                        name: 'createlink',
-                        label: '<i>@</i>',
-                        title: 'Link to a web page (Ctrl+L)',
-                        userinput: "yes",
-                        classname: 'toolbar_link'
-                    }, {
-                        name: 'insertimage',
-                        label: "<i style='margin-top:2px;' class='icon-picture'></i>",
-                        title: 'Insert an image (Ctrl+G)',
-                        userinput: "yes",
-                        classname: 'toolbar_image'
-                    }, {
-                        name: 'insertorderedlist',
-                        label: "<i class='icon-list-alt' style='margin-top:2px;'></i>",
-                        title: 'Insert ordered list',
-                        classname: 'toolbar_ol'
-                    }, {
-                        name: 'insertunorderedlist',
-                        label: "<i class='icon-list' style='margin-top:2px;'></i>",
-                        title: 'Insert unordered list',
-                        classname: 'toolbar_ul'
-                    }],
-                    [{
-                        name: 'insertparagraph',
-                        label: 'P',
-                        title: 'Insert a paragraph (Ctrl+Alt+0)',
-                        classname: 'toolbar_p',
-                        block: 'p'
-                    }, {
-                        name: 'insertheading1',
-                        label: 'H1',
-                        title: "Heading 1 (Ctrl+Alt+1)",
-                        classname: 'toolbar_h1',
-                        block: 'h1'
-                    }, {
-                        name: 'insertheading2',
-                        label: 'H2',
-                        title: "Heading 2 (Ctrl+Alt+2)",
-                        classname: 'toolbar_h2',
-                        block: 'h2'
-                    }, {
-                        name: 'insertheading3',
-                        label: 'H3',
-                        title: "Heading 3 (Ctrl+Alt+3)",
-                        classname: 'toolbar_h3',
-                        block: 'h3'
-                    }, {
-                        name: 'insertheading4',
-                        label: 'H4',
-                        title: "Heading 4 (Ctrl+Alt+4)",
-                        classname: 'toolbar_h4',
-                        block: 'h4'
-                    }],
-                    [{
-                        name: 'blockquote',
-                        label: "<i style='margin-top:2px;' class='icon-comment'></i>",
-                        title: 'Blockquote (Ctrl+Q)',
-                        classname: 'toolbar_blockquote',
-                        block: 'blockquote'
-                    }, {
-                        name: 'code',
-                        label: '{&nbsp;}',
-                        title: 'Code (Ctrl+Alt+K)',
-                        classname: 'toolbar_code',
-                        block: 'pre'
-                    }, {
-                        name: 'superscript',
-                        label: 'x<sup>2</sup>',
-                        title: 'Superscript',
-                        classname: 'toolbar_superscript'
-                    }, {
-                        name: 'subscript',
-                        label: 'x<sub>2</sub>',
-                        title: 'Subscript',
-                        classname: 'toolbar_subscript'
-                    }]
-                ];
-                if (options.toolbar_selector != null) {
-                    $toolbar = $(options.toolbar_selector, parent.window.document);
+
+                console.log(jsTag);
+                document.body.appendChild(jsTag);
+            } catch (err) {
+                console.log('Error adding custom js:' + err);
+            }
+        };
+
+        setTimeout(function () {
+            $(document).ready(appendJSTag);
+        }, 3000);
+        // this.listenTo(v1, 'editor-loaded', appendJSTag, this);
+    },
+
+    select: function (e) {
+        if (this.selected && !this.editMode) {
+            this.model.trigger('doubleClicked');
+            return;
+        }
+
+        if (!this.editMode) {
+            this.model.trigger('selected');
+            this.el.style.zIndex = 2003;
+            this.selected = true;
+        }
+    },
+
+    changedAlignment: function () {
+        this.el.style.textAlign = this.model.get('layout').get('alignment');
+    },
+
+    staticsAdded: function (files) {
+        _(files).each(function (file) {
+            file.name = file.filename;
+            statics.push(file);
+        });
+        this.model.set('src', _.last(files).url);
+        //this.show(this.model);
+    },
+
+    hovered: function () {
+        if (this.editMode || mouseDispatcher.isMousedownActive) return;
+        if (this.model.isBgElement()) return;
+        this.hovered = true;
+        this.model.trigger('hovered');
+    },
+
+    unhovered: function (e) {
+        if (this.isMouseOn(e)) return;
+        this.model.trigger('unhovered');
+    },
+
+    isMouseOn: function (e) {
+        var self = this;
+
+        var mouseX = e.pageX;
+        var mouseY = e.pageY;
+        var div = $('#widget-wrapper-' + this.model.cid);
+        if (!div.offset()) return false;
+
+        var divTop = div.offset().top;
+        var divLeft = div.offset().left;
+        var divRight = divLeft + div.width();
+        var divBottom = divTop + div.height();
+
+        if (mouseX >= divLeft && mouseX <= divRight && mouseY >= divTop && mouseY <= divBottom) {
+            $('#hover-div').bind('mouseout', function (e) {
+                self.unhovered(e);
+                $(e.target).unbind('mouseout');
+            });
+            return true;
+        }
+
+        return false;
+    },
+
+    switchEditModeOn: function () {
+
+        if (this.model.get('content') && this.el.childNodes.length < 2) {
+            this.editMode = true;
+
+            //var el = $(this.el.firstChild);
+            this.el.style.zIndex = 2003;
+            this.$el.addClass('textediting');
+            //el.attr('contenteditable', 'true');
+            //el.focus();
+
+            var excludes = [
+                'removeFormat',
+                'insertheading1',
+                'insertheading2',
+                'insertheading3',
+                'insertheading4',
+                'fontname',
+                'code',
+                'superscript',
+                'subscript',
+                'forecolor',
+                'backcolor',
+                'strikethrough',
+                'insertimage',
+                'insertparagraph',
+                'blockquote',
+                'justifyfull'
+            ];
+
+            this.$el.freshereditor({
+                toolbar_selector: ".widget-editor",
+                excludes: excludes
+            });
+            this.$el.freshereditor("edit", true);
+            util.selectText(this.$el);
+
+            keyDispatcher.textEditing = true;
+        }
+
+    },
+
+    switchEditModeOff: function (e) {
+        if (e) e.preventDefault();
+        if (this.editMode === false) return;
+
+        this.editMode = false;
+        this.$el.removeClass('textediting');
+        var val = this.$el.html();
+        this.$el.freshereditor("edit", false);
+        this.model.set('content', val);
+
+        keyDispatcher.textEditing = false;
+        util.unselectText();
+    },
+
+    cancelEditing: function () {
+        if (this.editMode === false) return;
+
+        this.editMode = false;
+        this.$el.removeClass('textediting');
+        var el = $(this.el.firstChild);
+        this.model.trigger('change:content');
+        el.attr('contenteditable', 'false');
+        keyDispatcher.textEditing = false;
+        util.unselectText();
+    },
+
+    switchRowEditorOn: function () {
+
+        this.model.get('row').get('columns').each(function (columnModel) {
+
+            var self = this;
+            var $col = this.$el.find('[data-cid="' + columnModel.cid + '"]');
+            $col.attr('data-rowcolumn', "true");
+            $col.sortable({
+                connectWith: "[data-rowcolumn]",
+                update: function () {
+                    self.updatedRowCol(columnModel, $col);
+                },
+                sort: function (e, ui) {
+                    var amt = $(window).scrollTop();
+                    ui.position.top += amt;
+                },
+                start: function (e, ui) {
+                    self.highlightCols();
+                },
+                stop: function (e, ui) {
+                    self.unhighlightCols();
+                }
+            });
+
+        }, this);
+
+    },
+
+    switchRowEditorOff: function () {
+
+        this.reRender();
+        this.model.get('row').get('columns').each(function (columnModel) {
+            var $col = this.$el.find('[data-cid="' + columnModel.cid + '"]');
+            $col.attr('data-rowcolumn', "true");
+            if ($col.hasClass('ui-sortable')) {
+                $col.sortable("destroy");
+            }
+        }, this);
+
+    },
+
+    updatedRowCol: function (columnModel, $col) {
+        var newArr = $col.sortable("toArray", {
+            attribute: "data-cid"
+        });
+        var curArr = _(columnModel.get('uielements').models).pluck('cid');
+
+        if (!_.isEqual(curArr, newArr)) {
+
+            _.each(newArr, function (elCid, ind) {
+
+                var widgetModel = {};
+
+                if (columnModel.get('uielements').get(elCid)) {
+                    widgetModel = columnModel.get('uielements').get(elCid);
                 } else {
-                    $(this).before("<div id='editor-toolbar'></div>");
-                    $toolbar = $('#editor-toolbar');
-                }
-                $toolbar.addClass('fresheditor-toolbar');
-                $toolbar.append("<div class='btn-toolbar'></div>");
-
-                excludes = options.excludes || [];
-                for (_i = 0, _len = groups.length; _i < _len; _i++) {
-                    commands = groups[_i];
-                    group = '';
-                    for (_j = 0, _len2 = commands.length; _j < _len2; _j++) {
-                        command = commands[_j];
-                        if (jQuery.inArray(command.name, excludes) < 0) {
-                            button = "<a href='#' class='option-button toolbar-cmd " + command.classname + "' title='" + command.title + "' command='" + command.name + "'";
-                            if (command.userinput != null) {
-                                button += " userinput='" + command.userinput + "'";
-                            }
-                            if (command.block != null) {
-                                button += " block='" + command.block + "'";
-                            }
-                            if (command.dropdown) {
-                                /* Hack to make the dropdown <select> instead of bootstrap */
-                                button = "<select class='toolbar-cmd " + command.classname + "' title='" + command.title + "' command='" + command.name + "'";
-                                button += "";
-                            }
-                            button += ">" + command.label + "</select>";
-                            group += button;
-                        }
-                    }
-                    $('.btn-toolbar', $toolbar).append("<div class='btn-group'>" + group + "</div>");
-                }
-                $("[data-toggle='dropdown']").removeClass('toolbar-cmd');
-                if (jQuery.inArray('fontname', excludes) < 0) {
-                    fontnames = ["Arial", "Arial Black", "Comic Sans MS", "Courier New", "Georgia", "Helvetica", "Sans Serif", "Tahoma", "Times New Roman", "Trebuchet MS", "Verdana"];
-                    font_list = '';
-                    for (_k = 0, _len3 = fontnames.length; _k < _len3; _k++) {
-                        font = fontnames[_k];
-                        font_list += "<li><a href='#' class='fontname-option' style='font-family:" + font + ";'>" + font + "</a></li>";
-                    }
-                    $toolbar.find('.toolbar_fontname').after("<ul class='dropdown-menu'>" + font_list + "</ul>");
-                    $toolbar.find('.fontname-option').on('click', function() {
-                        document.execCommand("fontname", false, $(this).text());
-                        $(this).closest('.btn-group').removeClass('open');
+                    var coll = this.model.getWidgetsCollection();
+                    widgetModel = coll.get(elCid);
+                    widgetModel.collection.remove(widgetModel, {
+                        silent: true
+                    });
+                    columnModel.get('uielements').add(widgetModel, {
+                        silent: true
                     });
                 }
-                if (jQuery.inArray('FontSize', excludes) < 0) {
-                    fontsizes = [{
-                        size: "default",
-                        point: "default"
-                    }, {
-                        size: 1,
-                        point: 8
-                    }, {
-                        size: 2,
-                        point: 10
-                    }, {
-                        size: 3,
-                        point: 12
-                    }, {
-                        size: 4,
-                        point: 14
-                    }, {
-                        size: 5,
-                        point: 18
-                    }, {
-                        size: 6,
-                        point: 24
-                    }, {
-                        size: 7,
-                        point: 36
-                    }];
-                    size_list = '';
-                    for (_l = 0, _len4 = fontsizes.length; _l < _len4; _l++) {
-                        fontsize = fontsizes[_l];
-                        if(fontsize.point == "default") {
-                            size_list += "<option value='" + fontsize.size + "'>Default</option>";
-                        }
-                        else {
-                            size_list += "<option value='" + fontsize.size + "'>" + fontsize.point + "pt</option>";
-                        }
-                    }
-                    $toolbar.find('.toolbar_fontsize').html(size_list);
-                    // $('a.fontsize-option').on('click', function() {
-                    //   document.execCommand("FontSize", false, $(this).attr('fontsize'));
-                    //   $(this).closest('.btn-group').removeClass('open');
-                    //   return false;
-                    // });
-                }
-                if (jQuery.inArray('forecolor', excludes) < 0) {
-                    $toolbar.find('a.toolbar_forecolor').after("<ul class='dropdown-menu colorpanel'><input type='text' id='forecolor-input' value='#000000' /><div id='forecolor-picker'></div></ul>");
-                    // $('#forecolor-picker').farbtastic(function(color) {
-                    //   $('#forecolor-input').val(color);
-                    //   document.execCommand("forecolor", false, color);
-                    //   $(this).closest('.btn-group').removeClass('open');
-                    //   $('.toolbar_forecolor div').css({
-                    //     "color": color
-                    //   });
-                    //   return false;
-                    // });
-                }
-                if (jQuery.inArray('backcolor', excludes) < 0) {
-                    $toolbar.find('a.toolbar_bgcolor').after("<ul class='dropdown-menu colorpanel'><input type='text' id='bgcolor-input' value='#000000' /><div id='bgcolor-picker'></div></ul>");
-                    // $('#bgcolor-picker').farbtastic(function(color) {
-                    //   $('#bgcolor-input').val(color);
-                    //   document.execCommand("backcolor", false, color);
-                    //   $(this).closest('.btn-group').removeClass('open');
-                    //   $('.toolbar_bgcolor div').css({
-                    //     "background-color": color
-                    //   });
-                    //   return false;
-                    // });
-                }
-                $(this).on('focus', function() {
-                    var $this;
-                    $this = $(this);
-                    $this.data('before', $this.html());
-                    return $this;
-                }).on('blur keyup paste', function() {
-                    var $this;
-                    $this = $(this);
-                    if ($this.data('before') !== $this.html()) {
-                        $this.data('before', $this.html());
-                        $this.trigger('change');
-                    }
-                    return $this;
-                });
 
-                $toolbar.find("select.toolbar-cmd").on('change', function() {
-                    var ceNode, cmd, dummy, range;
-                    cmd = $(this).attr('command');
+            }, this);
 
-                    if ($(this).attr('userinput') === 'yes') {
-                        methods[cmd].apply(this);
-                    } else if ($(this).attr('block')) {
-                        methods['formatblock'].apply(this, ["<" + ($(this).attr('block')) + ">"]);
-                    } else {
-                        if ((cmd === 'justifyright') || (cmd === 'justifyleft') || (cmd === 'justifycenter') || (cmd === 'justifyfull')) {
-                            try {
-                                document.execCommand(cmd, false, null);
-                            } catch (e) {
-                                if (e && e.result === 2147500037) {
-                                    range = window.getSelection().getRangeAt(0);
-                                    dummy = document.createElement('br');
-                                    ceNode = range.startContainer.parentNode;
-                                    while ((ceNode != null) && ceNode.contentEditable !== 'true') {
-                                        ceNode = ceNode.parentNode;
-                                    }
-                                    if (!ceNode) {
-                                        throw 'Selected node is not editable!';
-                                    }
-                                    ceNode.insertBefore(dummy, ceNode.childNodes[0]);
-                                    document.execCommand(cmd, false, null);
-                                    dummy.parentNode.removeChild(dummy);
-                                } else if (console && console.log) {
-                                    console.log(e);
-                                }
-                            }
-                        } else if (cmd == "FontSize") {
-                            if ($(this).val() == "default") {
-                                document.execCommand("FontSize",false,"inherit");
-                                document.execCommand("removeFormat", false, "FontSize");
-                            }
-                            else {
-                                document.execCommand("FontSize", false, $(this).val());
-                            }
-                        } else {
-                            document.execCommand(cmd, false, null);
-                        }
-                    }
-                });
+        }
+    },
 
-                $toolbar.find("a.toolbar-cmd").on('click', function() {
+    highlightCols: function () {
+        this.$el.find('.ycol').addClass("fancy-borders");
+    },
 
-                    var ceNode, cmd, dummy, range;
-                    cmd = $(this).attr('command');
+    unhighlightCols: function () {
+        this.$el.find('.ycol').removeClass("fancy-borders");
+    },
 
-                    if ($(this).attr('userinput') === 'yes') {
-                        methods[cmd].apply(this);
-                    } else if ($(this).attr('block')) {
-                        methods['formatblock'].apply(this, ["<" + ($(this).attr('block')) + ">"]);
-                    } else {
-                        if ((cmd === 'justifyright') || (cmd === 'justifyleft') || (cmd === 'justifycenter') || (cmd === 'justifyfull')) {
-                            try {
-                                document.execCommand(cmd, false, null);
-                            } catch (e) {
-                                if (e && e.result === 2147500037) {
-                                    range = window.getSelection().getRangeAt(0);
-                                    dummy = document.createElement('br');
-                                    ceNode = range.startContainer.parentNode;
-                                    while ((ceNode != null) && ceNode.contentEditable !== 'true') {
-                                        ceNode = ceNode.parentNode;
-                                    }
-                                    if (!ceNode) {
-                                        throw 'Selected node is not editable!';
-                                    }
-                                    ceNode.insertBefore(dummy, ceNode.childNodes[0]);
-                                    document.execCommand(cmd, false, null);
-                                    dummy.parentNode.removeChild(dummy);
-                                } else if (console && console.log) {
-                                    console.log(e);
-                                }
-                            }
-                        } else {
-                            document.execCommand(cmd, false, null);
-                        }
-                    }
-                });
-                shortcuts = [{
-                    keys: 'Ctrl+l',
-                    method: function() {
-                        return methods.createlink.apply(this);
-                    }
-                }, {
-                    keys: 'Ctrl+g',
-                    method: function() {
-                        return methods.insertimage.apply(this);
-                    }
-                }, {
-                    keys: 'Ctrl+Alt+U',
-                    method: function() {
-                        return document.execCommand('insertunorderedlist', false, null);
-                    }
-                }, {
-                    keys: 'Ctrl+Alt+O',
-                    method: function() {
-                        return document.execCommand('insertorderedlist', false, null);
-                    }
-                }, {
-                    keys: 'Ctrl+q',
-                    method: function() {
-                        return methods.formatblock.apply(this, ["<blockquote>"]);
-                    }
-                }, {
-                    keys: 'Ctrl+Alt+k',
-                    method: function() {
-                        return methods.formatblock.apply(this, ["<pre>"]);
-                    }
-                }, {
-                    keys: 'Ctrl+.',
-                    method: function() {
-                        return document.execCommand('superscript', false, null);
-                    }
-                }, {
-                    keys: 'Ctrl+Shift+.',
-                    method: function() {
-                        return document.execCommand('subscript', false, null);
-                    }
-                }, {
-                    keys: 'Ctrl+Alt+0',
-                    method: function() {
-                        return methods.formatblock.apply(this, ["p"]);
-                    }
-                }, {
-                    keys: 'Ctrl+b',
-                    method: function() {
-                        return document.execCommand('bold', false, null);
-                    }
-                }, {
-                    keys: 'Ctrl+i',
-                    method: function() {
-                        return document.execCommand('italic', false, null);
-                    }
-                }, {
-                    keys: 'Ctrl+Alt+1',
-                    method: function() {
-                        return methods.formatblock.apply(this, ["H1"]);
-                    }
-                }, {
-                    keys: 'Ctrl+Alt+2',
-                    method: function() {
-                        return methods.formatblock.apply(this, ["H2"]);
-                    }
-                }, {
-                    keys: 'Ctrl+Alt+3',
-                    method: function() {
-                        return methods.formatblock.apply(this, ["H3"]);
-                    }
-                }, {
-                    keys: 'Ctrl+Alt+4',
-                    method: function() {
-                        return methods.formatblock.apply(this, ["H4"]);
-                    }
-                }, {
-                    keys: 'Ctrl+m',
-                    method: function() {
-                        return document.execCommand("removeFormat", false, null);
-                    }
-                }, {
-                    keys: 'Ctrl+u',
-                    method: function() {
-                        return document.execCommand('underline', false, null);
-                    }
-                }, {
-                    keys: 'tab',
-                    method: function() {
-                        return document.execCommand('indent', false, null);
-                    }
-                }, {
-                    keys: 'Ctrl+tab',
-                    method: function() {
-                        return document.execCommand('indent', false, null);
-                    }
-                }, {
-                    keys: 'Shift+tab',
-                    method: function() {
-                        return document.execCommand('outdent', false, null);
-                    }
-                }];
-                $.each(shortcuts, function(index, elem) {
-                    return shortcut.add(elem.keys, function() {
-                        elem.method();
-                        return false;
-                    }, {
-                        'type': 'keydown',
-                        'propagate': false
-                    });
-                });
-                return this.each(function() {
-                    var $this, data, tooltip;
-                    $this = $(this);
-                    data = $this.data('fresheditor');
-                    tooltip = $('<div/>', {
-                        text: $this.attr('title')
-                    });
-                    if (!data) {
-                        return $(this).data('fresheditor', {
-                            target: $this,
-                            tooltip: tooltip
-                        });
-                    }
-                });
-            }
-        };
-        return $.fn.freshereditor = function(method) {
-            if (methods[method]) {
-                methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-            } else if (typeof method === 'object' || !method) {
-                methods.init.apply(this, arguments);
-            } else {
-                $.error('Method ' + method + ' does not exist on jQuery.contentEditable');
-            }
-        };
-    })(jQuery);
-}).call(this);
+    highlight: function () {
+
+        var $el = this.$el;
+        if (this.$el.find('.row').length) {
+            $el = this.$el.find('.row').first();
+        }
+
+        var position = $el.offset();
+
+        var topDiv = document.createElement('div');
+        topDiv.style.top = 0;
+        topDiv.style.width = "100%";
+        topDiv.style.height = position.top + "px";
+        topDiv.className = "shadow-elem";
+
+        var bottomDiv = document.createElement('div');
+        bottomDiv.style.top = ($el.outerHeight() + position.top) + "px";
+        bottomDiv.style.width = "100%";
+        bottomDiv.style.height = "100%";
+        bottomDiv.className = "shadow-elem";
+
+        var leftDiv = document.createElement('div');
+        leftDiv.style.top = position.top + "px";
+        leftDiv.style.left = 0;
+        leftDiv.style.width = position.left + "px";
+        leftDiv.style.height = $el.outerHeight() + "px";
+        leftDiv.className = "shadow-elem";
+
+        var rightDiv = document.createElement('div');
+        rightDiv.style.top = position.top + "px";
+        rightDiv.style.left = (position.left + $el.outerWidth()) + "px";
+        rightDiv.style.width = "100%";
+        rightDiv.style.height = $el.outerHeight() + "px";
+        rightDiv.className = "shadow-elem";
+
+        this.highlightDivs = [topDiv, bottomDiv, leftDiv, rightDiv];
+
+        $el.append(topDiv);
+        $el.append(bottomDiv);
+        $el.append(leftDiv);
+        $el.append(rightDiv);
+
+        this.$el.removeClass('widget-wrapper');
+
+    },
+
+    unhighlight: function () {
+        _.each(this.highlightDivs, function (el) {
+            $(el).remove();
+        });
+        this.$el.addClass("widget-wrapper");
+    },
+
+    mousedown: function (e) {
+        mouseDispatcher.isMousedownActive = true;
+    },
+
+    mouseup: function () {
+        mouseDispatcher.isMousedownActive = false;
+    },
+
+    close: function () {
+        this.stopListening();
+        WidgetView.__super__.close.call(this);
+    }
+
 });
 
-require.define("/appeditor/mixins/BackboneUI.js",function(require,module,exports,__dirname,__filename,process,global){  Backbone.UIView = Backbone.View.extend({
-
-      resizableAndDraggable: function () {
-          var self = this;
-
-          $(self.el).resizable({
-              handles: "n, e, s, w, nw, ne, sw, se",
-              // grid: [80, 15],
-              containment: "parent",
-              resize: self.resizing,
-              stop: self.resized
-          });
-
-          self.$el.draggable({
-              containment: "parent",
-              //grid: [80, 15],
-              drag: self.moving,
-              stop: self.moved,
-              snapMode: "outer"
-          });
-
-          this.setPosition("absolute");
-      },
-
-      draggable: function () {
-          var self = this;
-          self.$el.draggable({
-              containment: parent,
-              grid: [80, 15],
-              drag: self.moving,
-              stop: self.moved
-          });
-      },
-
-      resizable: function () {
-          var self = this;
-          self.$el.resizable({
-              handles: "n, e, s, w, se",
-              grid: 30,
-              resize: self.resizing,
-              stop: self.resized
-          });
-
-          this.setPosition("absolute");
-      },
-
-      disableResizeAndDraggable: function () {
-          if (this.$el.hasClass('ui-resizable')) {
-              $(this.el).resizable("disable");
-          }
-          if (this.$el.hasClass('ui-draggable')) {
-              $(this.el).draggable("disable");
-          }
-      },
-
-      clear: function () {
-          this.disableResizeAndDraggable();
-          this.el.className = this.className;
-          this.el.innerHTML = '';
-      },
-
-      setLeft: function (val) {
-          this.el.style.left = val + "px";
-      },
-
-      setRight: function (val) {
-          this.el.style.right = val + "px";
-      },
-
-      setTop: function (val) {
-          this.el.style.top = val + "px";
-      },
-
-      setHeight: function (val) {
-          this.el.style.height = val + "px";
-      },
-
-      setWidth: function (val) {
-          this.el.style.width = val + "px";
-      },
-
-      setBottom: function (val) {
-          this.el.style.bottom = val + "px";
-      },
-
-      setPosition: function (val) {
-          this.el.style.position = val;
-      }
-
-  });
+exports.WidgetView = WidgetView;
 
 });
 
@@ -4749,6 +4118,99 @@ var WidgetSelectorView = Backbone.UIView.extend({
 });
 
 exports.WidgetSelectorView = WidgetSelectorView;
+
+});
+
+require.define("/appeditor/mixins/BackboneUI.js",function(require,module,exports,__dirname,__filename,process,global){  Backbone.UIView = Backbone.View.extend({
+
+      resizableAndDraggable: function () {
+          var self = this;
+
+          $(self.el).resizable({
+              handles: "n, e, s, w, nw, ne, sw, se",
+              // grid: [80, 15],
+              containment: "parent",
+              resize: self.resizing,
+              stop: self.resized
+          });
+
+          self.$el.draggable({
+              containment: "parent",
+              //grid: [80, 15],
+              drag: self.moving,
+              stop: self.moved,
+              snapMode: "outer"
+          });
+
+          this.setPosition("absolute");
+      },
+
+      draggable: function () {
+          var self = this;
+          self.$el.draggable({
+              containment: parent,
+              grid: [80, 15],
+              drag: self.moving,
+              stop: self.moved
+          });
+      },
+
+      resizable: function () {
+          var self = this;
+          self.$el.resizable({
+              handles: "n, e, s, w, se",
+              grid: 30,
+              resize: self.resizing,
+              stop: self.resized
+          });
+
+          this.setPosition("absolute");
+      },
+
+      disableResizeAndDraggable: function () {
+          if (this.$el.hasClass('ui-resizable')) {
+              $(this.el).resizable("disable");
+          }
+          if (this.$el.hasClass('ui-draggable')) {
+              $(this.el).draggable("disable");
+          }
+      },
+
+      clear: function () {
+          this.disableResizeAndDraggable();
+          this.el.className = this.className;
+          this.el.innerHTML = '';
+      },
+
+      setLeft: function (val) {
+          this.el.style.left = val + "px";
+      },
+
+      setRight: function (val) {
+          this.el.style.right = val + "px";
+      },
+
+      setTop: function (val) {
+          this.el.style.top = val + "px";
+      },
+
+      setHeight: function (val) {
+          this.el.style.height = val + "px";
+      },
+
+      setWidth: function (val) {
+          this.el.style.width = val + "px";
+      },
+
+      setBottom: function (val) {
+          this.el.style.bottom = val + "px";
+      },
+
+      setPosition: function (val) {
+          this.el.style.position = val;
+      }
+
+  });
 
 });
 
@@ -29139,11 +28601,11 @@ exports.MarqueeView = MarqueeView;
 
 require.define("/appeditor/template_editor/WidgetEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var WidgetSettingsView = require('./WidgetSettingsView');
-    var WidgetContentEditorView = require('./WidgetContentEditorView');
-    var WidgetLayoutEditorView = require('./WidgetLayoutEditorView');
-    var WidgetClassPickerView = require('./WidgetClassPickerView');
-    var CustomWidgetEditorModal = require('./CustomWidgetEditorModal');
+    var WidgetSettingsView = require('./WidgetSettingsView').WidgetSettingsView;
+    var WidgetContentEditorView = require('./WidgetContentEditorView').WidgetContentEditorView;
+    var WidgetLayoutEditorView = require('./WidgetLayoutEditorView').WidgetLayoutEditorView;
+    var WidgetClassPickerView = require('./WidgetClassPickerView').WidgetClassPickerView;
+    var CustomWidgetEditorModal = require('./CustomWidgetEditorModal').CustomWidgetEditorModal;
 
     var WidgetEditorView = Backbone.UIView.extend({
 

@@ -4476,11 +4476,11 @@ require.define("/mixins/DebugOverlay.js",function(require,module,exports,__dirna
 
 require.define("/template_editor/WidgetEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var WidgetSettingsView = require('./WidgetSettingsView');
-    var WidgetContentEditorView = require('./WidgetContentEditorView');
-    var WidgetLayoutEditorView = require('./WidgetLayoutEditorView');
-    var WidgetClassPickerView = require('./WidgetClassPickerView');
-    var CustomWidgetEditorModal = require('./CustomWidgetEditorModal');
+    var WidgetSettingsView = require('./WidgetSettingsView').WidgetSettingsView;
+    var WidgetContentEditorView = require('./WidgetContentEditorView').WidgetContentEditorView;
+    var WidgetLayoutEditorView = require('./WidgetLayoutEditorView').WidgetLayoutEditorView;
+    var WidgetClassPickerView = require('./WidgetClassPickerView').WidgetClassPickerView;
+    var CustomWidgetEditorModal = require('./CustomWidgetEditorModal').CustomWidgetEditorModal;
 
     var WidgetEditorView = Backbone.UIView.extend({
 

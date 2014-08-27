@@ -3,7 +3,9 @@ window.$ = window.jQuery;
 require('./node_modules/jquery-ui/jquery-ui');
 require('./jquery.hotkeys');
 require("./jquery.scrollbar");
-// Prettycheckable
+
+require('./shortcut');
+require('./jquery.freshereditor');
 
 window._ = require('./node_modules/underscore/underscore');
 window.Backbone = require('./node_modules/backbone/backbone');

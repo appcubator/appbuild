@@ -1,10 +1,10 @@
     'use strict';
 
-    var WidgetSettingsView = require('./WidgetSettingsView');
-    var WidgetContentEditorView = require('./WidgetContentEditorView');
-    var WidgetLayoutEditorView = require('./WidgetLayoutEditorView');
-    var WidgetClassPickerView = require('./WidgetClassPickerView');
-    var CustomWidgetEditorModal = require('./CustomWidgetEditorModal');
+    var WidgetSettingsView = require('./WidgetSettingsView').WidgetSettingsView;
+    var WidgetContentEditorView = require('./WidgetContentEditorView').WidgetContentEditorView;
+    var WidgetLayoutEditorView = require('./WidgetLayoutEditorView').WidgetLayoutEditorView;
+    var WidgetClassPickerView = require('./WidgetClassPickerView').WidgetClassPickerView;
+    var CustomWidgetEditorModal = require('./CustomWidgetEditorModal').CustomWidgetEditorModal;
 
     var WidgetEditorView = Backbone.UIView.extend({
 
