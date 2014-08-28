@@ -6232,13 +6232,11 @@ require.define("/template_editor/WidgetClassPickerView.js",function(require,modu
                 return;
             }
 
-
             var ind = String(e.currentTarget.id).replace('li-' + this.cid + '-', '');
+            
             if (!this.list[ind]) return;
 
             this.model.set('tagName', this.uieVals[this.list[ind].val].tagName);
-            console.log(this.model);
-            console.log(this.uieVals[this.list[ind].val].class_name);
             this.model.set('className', this.uieVals[this.list[ind].val].class_name);
         },
 
