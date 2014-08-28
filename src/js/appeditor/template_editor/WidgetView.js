@@ -99,6 +99,7 @@ var WidgetView = Backbone.UIView.extend({
     },
 
     reRender: function () {
+        console.log("rerender");
         var expanded = this.model.expand();
         var $el = $(expanded.html);
 
