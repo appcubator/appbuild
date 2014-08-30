@@ -5,6 +5,7 @@ var SettingsView = require('./SettingsView').SettingsView;
 var RoutesView = require('./RoutesView').RoutesView;
 
 var PluginsModel = require('./models/PluginsModel').PluginsModel;
+var DeployManagerModel = require('./DeployManagerModel').DeployManagerModel;
 
 var SoftErrorView = require("./SoftErrorView").SoftErrorView;
 var ErrorDialogueView = require('./mixins/ErrorDialogueView').ErrorDialogueView;
@@ -50,6 +51,7 @@ var AppView = Backbone.View.extend({
         this.settingsView.setToggleEl($('.menu-app-settings'));
         this.settingsView.setPointerPosition("30px");
 
+        this.deployManager = new DeployManagerModel(this.appId);
         this.listenTo(v1State.get('plugins'), 'fork', this.save);
         //var autoSave = setInterval(this.save, 30000);
         this.render();

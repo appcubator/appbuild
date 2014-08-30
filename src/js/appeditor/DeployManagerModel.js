@@ -1,5 +1,5 @@
-var DeployView = require('DeployView');
-var ErrorDialogueView = require('mixins/ErrorDialogueView');
+var DeployView = require('./DeployView').DeployView;
+var ErrorDialogueView = require('./mixins/ErrorDialogueView').ErrorDialogueView;
 
 var DeployManagerModel = Backbone.Model.extend({
     DeployView: DeployView,
@@ -110,4 +110,4 @@ var DeployManagerModel = Backbone.Model.extend({
     },
 });
 
-return DeployManagerModel;
+exports.DeployManagerModel = DeployManagerModel;

@@ -3046,6 +3046,7 @@ var SettingsView = require('./SettingsView').SettingsView;
 var RoutesView = require('./RoutesView').RoutesView;
 
 var PluginsModel = require('./models/PluginsModel').PluginsModel;
+var DeployManagerModel = require('./DeployManagerModel').DeployManagerModel;
 
 var SoftErrorView = require("./SoftErrorView").SoftErrorView;
 var ErrorDialogueView = require('./mixins/ErrorDialogueView').ErrorDialogueView;
@@ -3091,6 +3092,7 @@ var AppView = Backbone.View.extend({
         this.settingsView.setToggleEl($('.menu-app-settings'));
         this.settingsView.setPointerPosition("30px");
 
+        this.deployManager = new DeployManagerModel(this.appId);
         this.listenTo(v1State.get('plugins'), 'fork', this.save);
         //var autoSave = setInterval(this.save, 30000);
         this.render();
@@ -9292,7 +9294,7 @@ exports.SectionEditorsView = SectionEditorsView;
 
 require.define("/template_editor/SectionEditorView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
 
-    var WidgetSettingsView = require('./WidgetSettingsView');
+    var WidgetSettingsView = require('./WidgetSettingsView').WidgetSettingsView;
 
     var SectionEditorView = Backbone.View.extend({
 
@@ -10260,6 +10262,177 @@ require.define("/RouteView.js",function(require,module,exports,__dirname,__filen
     });
 
     exports.RouteView = RouteView;
+
+});
+
+require.define("/DeployManagerModel.js",function(require,module,exports,__dirname,__filename,process,global){var DeployView = require('./DeployView').DeployView;
+var ErrorDialogueView = require('./mixins/ErrorDialogueView').ErrorDialogueView;
+
+var DeployManagerModel = Backbone.Model.extend({
+    DeployView: DeployView,
+
+    isDeployed: false,
+    lastDeploy: null,
+    disableSave: false,
+
+    initialize: function (appId) {
+        _.bindAll(this);
+        this.deployUrl = '/app/' + appId + '/deploy/';
+    },
+
+    deploySuccessHandler: function (data, callback) {
+        var self = this;
+        callback.call(this, data);
+        new DeployView(data);
+        util.log_to_server('deployed app', {
+            status: 'success',
+            deploy_time: data.deploy_time + " seconds"
+        }, appId);
+        self.trigger('deployed');
+        return data;
+    },
+
+    deploySoftErrorHandler: function (data) {
+        v1State.set('version_id', data.version_id);
+        this.disableSave = true;
+        new SoftErrorView({
+            text: data.message,
+            path: data.path
+        }, function () {
+            this.disableSave = false;
+        });
+        return data;
+    },
+
+
+    deployHardErrorHandler: function (data) {
+        var content = {};
+        if (DEBUG) content.text = data.responseText;
+        else content.text = "There has been a problem. Please refresh your page. We're really sorry for the inconvenience and will be fixing it very soon.";
+        new ErrorDialogueView(content);
+        util.log_to_server('deployed app', {
+            status: 'FAILURE',
+            deploy_time: data.deploy_time + " seconds",
+            message: data.errors
+        }, appId);
+        return data;
+    },
+
+    deploy: function (callback, hold_on_callback) {
+        if (this.disableSave === true) return;
+        var self = this;
+
+        var isDeployed = false;
+        var before_deploy = new Date().getTime(); // global, b/c accessed in an ajax handler
+
+        this.disableSave = true;
+
+        var jqxhrToJson = function (jqxhr) {
+            var data = {};
+            try {
+                data = JSON.parse(jqxhr.responseText);
+            } catch (e) {
+                data.errors = ["JSON response from server failed to parse", jqxhr.responseText];
+            }
+            return data;
+        };
+
+        // compose this w the other callbacks
+        var completeCallback = function (data) {
+            self.disableSave = false;
+            isDeployed = true;
+            data.deploy_time = (new Date().getTime() - before_deploy) / 1000;
+            self.lastDeploy = new Date().getTime();
+            return data;
+        };
+
+        $.ajax({
+            type: "POST",
+            url: self.deployUrl,
+            statusCode: {
+                200: function (data) {
+                    data = completeCallback(data);
+                    data = self.deploySuccessHandler(data, callback);
+                },
+                400: function (jqxhr) {
+                    var data = jqxhrToJson(jqxhr);
+                    data = completeCallback(data);
+                    data = self.softErrorHandler(data);
+                    data = callback(data);
+                },
+                500: function (jqxhr) {
+                    var data = jqxhrToJson(jqxhr);
+                    data = completeCallback(data);
+                    data = self.deployHardErrorHandler(data);
+                    data = callback(data);
+                },
+            },
+            dataType: "JSON"
+        });
+
+        var holdOnTimer = setTimeout(function () {
+            if (!isDeployed && hold_on_callback) hold_on_callback.call(this);
+            clearTimeout(holdOnTimer);
+        }, 10000);
+    },
+});
+
+exports.DeployManagerModel = DeployManagerModel;
+
+});
+
+require.define("/DeployView.js",function(require,module,exports,__dirname,__filename,process,global){var DeployView = Backbone.ModalView.extend({
+    el: null,
+    className: "deploy-panel",
+    width: 620,
+    height: 370,
+    events: {
+        'click .download-pane': 'downloaded'
+    },
+    theme: null,
+
+    initialize: function (data) {
+        _.bindAll(this);
+        this.data = data;
+        this.render();
+    },
+
+    render: function () {
+        var template = util.getHTML('deploy-panel');
+        this.el.innerHTML = _.template(template, this.data);
+        this.g_js = {};
+        var self = this;
+        ! function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0],
+                p = /^http:/.test(d.location) ? 'http' : 'https';
+            if (!d.getElementById(id)) {
+                js = d.createElement(s);
+                self.g_js = js;
+                js.id = id;
+                js.src = p + '://platform.twitter.com/widgets.js';
+                fjs.parentNode.insertBefore(js, fjs);
+            }
+        }(document, 'script', 'twitter-wjs');
+        return this;
+    },
+
+    downloaded: function () {
+        $(".download-pane .loading-wheel").css('visibility', 'visible')
+        var hideWheel = function () {
+            $(".download-pane .loading-wheel").css('visibility', 'hidden');
+        }
+        v1.currentApp.download(hideWheel);
+    },
+
+    close: function () {
+        if (this.g_js) {
+            this.g_js.parentNode.removeChild(this.g_js);
+        }
+        DeployView.__super__.close.call(this);
+    }
+});
+
+exports.DeployView = DeployView;
 
 });
 
