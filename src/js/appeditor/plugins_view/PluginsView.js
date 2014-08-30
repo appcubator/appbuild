@@ -1,6 +1,6 @@
     'use strict';
     require('../mixins/BackboneDropdownView');
-    var PluginBrowserView = require('./PluginBrowserView');
+    var PluginBrowserView = require('./PluginBrowserView').PluginBrowserView;
 
     var tempPluginsView = [
         '<div class="hoff1">',

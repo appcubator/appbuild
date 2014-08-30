@@ -1,7 +1,7 @@
     'use strict';
 
-    var NodeModelModel = require('../models/NodeModelModel');
-    var NodeModelView = require('./NodeModelView');
+    var NodeModelModel = require('../models/NodeModelModel').NodeModelModel;
+    var NodeModelView = require('./NodeModelView').NodeModelView;
     require('../mixins/BackboneDropdownView');
 
     var template = ['<div class="arrow_box"></div>',

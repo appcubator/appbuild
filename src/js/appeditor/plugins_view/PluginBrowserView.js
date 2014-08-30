@@ -32,10 +32,10 @@
                 success: function (data) {
                     console.log(data);
                     $(loadingSpin).remove();
+                    data = {};
                     self.layoutPlugins(data);
                 }
             });
-
             return this;
         },
 
