@@ -21,6 +21,8 @@ Backbone.$ = $;
 require('./BackboneRegrettable');
 require('../appeditor/mixins/BackboneConvenience');
 require('../appeditor/mixins/BackboneUI');
+require('../appeditor/mixins/BackboneCardView');
+require('../appeditor/mixins/BackboneDropdownView');
 
 require('./util/util');
 require('./util/util.path');
