@@ -118,4 +118,4 @@ var NodeModelPluginsView = Backbone.View.extend({
 
 });
 
-exports.NodeModelMethodModel = NodeModelMethodModel;
+exports.NodeModelPluginsView = NodeModelPluginsView;

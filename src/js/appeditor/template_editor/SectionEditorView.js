@@ -1,6 +1,6 @@
     'use strict';
 
-    var WidgetSettingsView = require('./WidgetSettingsView');
+    var WidgetSettingsView = require('./WidgetSettingsView').WidgetSettingsView;
 
     var SectionEditorView = Backbone.View.extend({
 

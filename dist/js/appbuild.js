@@ -9809,7 +9809,7 @@ exports.EditorTemplates = Templates;
 
 require.define("/plugins_view/PluginsView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
     require('../mixins/BackboneDropdownView');
-    var PluginBrowserView = require('./PluginBrowserView');
+    var PluginBrowserView = require('./PluginBrowserView').PluginBrowserView;
 
     var tempPluginsView = [
         '<div class="hoff1">',
@@ -10003,10 +10003,10 @@ require.define("/plugins_view/PluginBrowserView.js",function(require,module,expo
                 success: function (data) {
                     console.log(data);
                     $(loadingSpin).remove();
+                    data = {};
                     self.layoutPlugins(data);
                 }
             });
-
             return this;
         },
 
@@ -10370,721 +10370,717 @@ exports.SoftErrorView = SoftErrorView;
 
 });
 
-require.define("/models_view/NodeModelsView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+require.define("/models_view/NodeModelsView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
-    var NodeModelModel = require('../models/NodeModelModel');
-    var NodeModelView = require('./NodeModelView');
-    require('../mixins/BackboneDropdownView');
+var NodeModelModel = require('../models/NodeModelModel').NodeModelModel;
+var NodeModelView = require('./NodeModelView').NodeModelView;
 
-    var template = ['<div class="arrow_box"></div>',
-        '<div class="" id="entities-page">',
-        '<h2 class="pheader">Models</h2>',
-        '<ul id="list-tables">',
-        '</ul>',
-        '</div>'
-    ].join('\n');
+var template = ['<div class="arrow_box"></div>',
+    '<div class="" id="entities-page">',
+    '<h2 class="pheader">Models</h2>',
+    '<ul id="list-tables">',
+    '</ul>',
+    '</div>'
+].join('\n');
 
-    var NodeModelsView = Backbone.DropdownView.extend({
+var NodeModelsView = Backbone.DropdownView.extend({
 
-        title: 'Tables',
-        className: 'dropdown-view entities-view',
-        events: {
-            'click .table-name': 'clickedTableName',
-            'click .remove-model': 'clickedRemoveTable'
-        },
-        subviews: [],
+    title: 'Tables',
+    className: 'dropdown-view entities-view',
+    events: {
+        'click .table-name': 'clickedTableName',
+        'click .remove-model': 'clickedRemoveTable'
+    },
+    subviews: [],
 
-        initialize: function () {
-            _.bindAll(this);
-            this.subviews = [this.tablesView, this.relationsView, this.createRelationView];
-            this.collection = v1State.get('models');
-            this.listenTo(this.collection, 'add', this.renderTable);
-            this.listenTo(this.collection, 'remove', this.removeTable);
+    initialize: function () {
+        _.bindAll(this);
+        this.subviews = [this.tablesView, this.relationsView, this.createRelationView];
+        this.collection = v1State.get('models');
+        this.listenTo(this.collection, 'add', this.renderTable);
+        this.listenTo(this.collection, 'remove', this.removeTable);
 
-            this.title = "Tables";
-        },
+        this.title = "Tables";
+    },
 
-        render: function () {
+    render: function () {
 
-            this.$el.html(_.template(template, {}));
-            this.renderTables();
-            // this.renderRelations();
+        this.$el.html(_.template(template, {}));
+        this.renderTables();
+        // this.renderRelations();
 
-            var addTableBtn = document.createElement('div');
-            addTableBtn.id = 'add-entity';
-            addTableBtn.innerHTML = '<span class="box-button">+ Create Model</span>';
+        var addTableBtn = document.createElement('div');
+        addTableBtn.id = 'add-entity';
+        addTableBtn.innerHTML = '<span class="box-button">+ Create Model</span>';
 
-            var createTableBox = new Backbone.NameBox({}).setElement(addTableBtn).render();
-            createTableBox.on('submit', this.createTable);
-            this.subviews.push(createTableBox);
+        var createTableBox = new Backbone.NameBox({}).setElement(addTableBtn).render();
+        createTableBox.on('submit', this.createTable);
+        this.subviews.push(createTableBox);
 
-            this.$el.append(addTableBtn);
-            return this;
-        },
+        this.$el.append(addTableBtn);
+        return this;
+    },
 
-        renderTables: function () {
-            this.collection.each(this.renderTable);
-            //this.$('#users').append(this.userTablesView.render().el);
-        },
+    renderTables: function () {
+        this.collection.each(this.renderTable);
+        //this.$('#users').append(this.userTablesView.render().el);
+    },
 
-        renderTable: function (tableModel) {
-            this.$el.find('#list-tables').append('<li class="table-name" id="table-' + tableModel.cid + '">' + tableModel.get('name') + '<span class="remove-model pull-right" id="remove-table-' + tableModel.cid + '">×<span></li>');
-        },
+    renderTable: function (tableModel) {
+        this.$el.find('#list-tables').append('<li class="table-name" id="table-' + tableModel.cid + '">' + tableModel.get('name') + '<span class="remove-model pull-right" id="remove-table-' + tableModel.cid + '">×<span></li>');
+    },
 
-        removeTable: function (tableModel) {
-            this.$el.find('#table-' + tableModel.cid).remove();
-        },
+    removeTable: function (tableModel) {
+        this.$el.find('#table-' + tableModel.cid).remove();
+    },
 
-        clickedTableName: function (e) {
-            var cid = String(e.currentTarget.id).replace('table-', '');
-            var tableModel = v1State.get('models').get(cid);
-            var tableView = new NodeModelView(tableModel);
-            tableView.render();
-            // this.el.appendChild(tableView.render().el);
-        },
+    clickedTableName: function (e) {
+        var cid = String(e.currentTarget.id).replace('table-', '');
+        var tableModel = v1State.get('models').get(cid);
+        var tableView = new NodeModelView(tableModel);
+        tableView.render();
+        // this.el.appendChild(tableView.render().el);
+    },
 
-        clickedRemoveTable: function (e) {
-            e.preventDefault();
+    clickedRemoveTable: function (e) {
+        e.preventDefault();
 
-            var cid = String(e.currentTarget.id).replace('remove-table-', '');
-            var tableModel = v1State.get('models').get(cid);
-            var modelName = tableModel.get('name');
+        var cid = String(e.currentTarget.id).replace('remove-table-', '');
+        var tableModel = v1State.get('models').get(cid);
+        var modelName = tableModel.get('name');
 
-            var r = confirm("Are you sure you want to delete " + modelName + " model?");
-            if (r == true) {
-                v1State.get('models').remove(tableModel);
-            }
-
-            return false;
-        },
-
-        renderRelations: function () {
-            //util.get('relations').appendChild(this.createRelationView.render().el);
-            //util.get('relations').appendChild(this.relationsView.render().el);
-        },
-
-        createTable: function (val) {
-            //force table names to be singular
-            var name = val;
-
-            var elem = new NodeModelModel({
-                name: name,
-                fields: []
-            });
-
-            v1State.get('models').push(elem);
-            return elem;
-        },
-
-        showCreateRelationForm: function () {
-            var self = this;
-            this.createRelationView.$el.fadeIn('fast');
-            util.scrollToElement(self.$('#new-relation'));
-        },
-
-        scrollToRelation: function (e) {
-            e.preventDefault();
-            var hash = e.currentTarget.hash;
-            if (hash === '#relation-new') {
-                this.showCreateRelationForm();
-                return;
-            }
-            util.scrollToElement($(hash));
+        var r = confirm("Are you sure you want to delete " + modelName + " model?");
+        if (r == true) {
+            v1State.get('models').remove(tableModel);
         }
-    });
 
-    exports.NodeModelsView = NodeModelsView;
+        return false;
+    },
+
+    renderRelations: function () {
+        //util.get('relations').appendChild(this.createRelationView.render().el);
+        //util.get('relations').appendChild(this.relationsView.render().el);
+    },
+
+    createTable: function (val) {
+        //force table names to be singular
+        var name = val;
+
+        var elem = new NodeModelModel({
+            name: name,
+            fields: []
+        });
+
+        v1State.get('models').push(elem);
+        return elem;
+    },
+
+    showCreateRelationForm: function () {
+        var self = this;
+        this.createRelationView.$el.fadeIn('fast');
+        util.scrollToElement(self.$('#new-relation'));
+    },
+
+    scrollToRelation: function (e) {
+        e.preventDefault();
+        var hash = e.currentTarget.hash;
+        if (hash === '#relation-new') {
+            this.showCreateRelationForm();
+            return;
+        }
+        util.scrollToElement($(hash));
+    }
+});
+
+exports.NodeModelsView = NodeModelsView;
 
 });
 
-require.define("/models_view/NodeModelView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+require.define("/models_view/NodeModelView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
-    var FieldModel = require('../models/FieldModel').FieldModel;
-    //var AdminPanelView = require('../AdminPanelView').AdminPanelView;
+var FieldModel = require('../models/FieldModel').FieldModel;
+//var AdminPanelView = require('../AdminPanelView').AdminPanelView;
 
-    var NodeModelPluginsView = require('./NodeModelPluginsView').NodeModelPluginsView;
-    var NodeModelDescriptionView = require('./NodeModelDescriptionView').NodeModelDescriptionView;
-    var TableDataView = require('./NodeModelDataView').NodeModelDataView;
-    var TableCodeView = require('./NodeModelCodeView').NodeModelCodeView;
-
-
-    var SoftErrorView = require('../SoftErrorView');
-    var DialogueView = require('../mixins/DialogueView');
-    require('../mixins/BackboneCardView');
-
-    var tableTemplate = [
-        '<div class="header">',
-        '<div>',
-        '<h2><%= name %></h2>',
-        '<div class="q-mark-circle"></div>',
-        '</div>',
-        '<ul class="tabs">',
-        '<li class="description-li right-icon">',
-        '<span>Description</span>',
-        '</li><li class="code-li right-icon">',
-        '<span>Code</span>',
-        '</li><li class="data-li right-icon">',
-        '<span>Access Data</span>',
-        '</li>',
-        '</ul>',
-        '</div>',
-        '<div class="current-content"></div>',
-    ].join('\n');
-
-    var NodeModelView = Backbone.CardView.extend({
-        el: null,
-        tagName: 'div',
-        collection: null,
-        parentName: "",
-        className: 'entity-pane',
-        subviews: [],
-
-        events: {
-            'change .attribs': 'changedAttribs',
-            'click .q-mark-circle': 'showTableTutorial',
-            'click .right-icon': 'tabClicked'
-        },
+var NodeModelPluginsView = require('./NodeModelPluginsView').NodeModelPluginsView;
+var NodeModelDescriptionView = require('./NodeModelDescriptionView').NodeModelDescriptionView;
+var TableDataView = require('./NodeModelDataView').NodeModelDataView;
+var TableCodeView = require('./NodeModelCodeView').NodeModelCodeView;
 
 
-        initialize: function (tableModel) {
-            _.bindAll(this);
-            this.model = tableModel;
-            this.listenTo(this.model, 'remove', this.remove);
-            this.listenTo(this.model, 'newRelation removeRelation', this.renderRelations);
-            this.otherEntities = _(v1State.get('models').pluck('name')).without(this.model.get('name'));
-        },
+var SoftErrorView = require('../SoftErrorView').SoftErrorView;
+var DialogueView = require('../mixins/DialogueView').DialogueView;
 
-        render: function () {
-            this.el.innerHTML = _.template(tableTemplate, this.model.toJSON());
-            this.el.id = 'table-' + this.model.cid;
+var tableTemplate = [
+    '<div class="header">',
+    '<div>',
+    '<h2><%= name %></h2>',
+    '<div class="q-mark-circle"></div>',
+    '</div>',
+    '<ul class="tabs">',
+    '<li class="description-li right-icon">',
+    '<span>Description</span>',
+    '</li><li class="code-li right-icon">',
+    '<span>Code</span>',
+    '</li><li class="data-li right-icon">',
+    '<span>Access Data</span>',
+    '</li>',
+    '</ul>',
+    '</div>',
+    '<div class="current-content"></div>',
+].join('\n');
+
+var NodeModelView = Backbone.CardView.extend({
+    el: null,
+    tagName: 'div',
+    collection: null,
+    parentName: "",
+    className: 'entity-pane',
+    subviews: [],
+
+    events: {
+        'change .attribs': 'changedAttribs',
+        'click .q-mark-circle': 'showTableTutorial',
+        'click .right-icon': 'tabClicked'
+    },
+
+
+    initialize: function (tableModel) {
+        _.bindAll(this);
+        this.model = tableModel;
+        this.listenTo(this.model, 'remove', this.remove);
+        this.listenTo(this.model, 'newRelation removeRelation', this.renderRelations);
+        this.otherEntities = _(v1State.get('models').pluck('name')).without(this.model.get('name'));
+    },
+
+    render: function () {
+        this.el.innerHTML = _.template(tableTemplate, this.model.toJSON());
+        this.el.id = 'table-' + this.model.cid;
+        this.renderDescription();
+
+        return this;
+    },
+
+    renderDescription: function () {
+        this.$el.find('.current-content').html('');
+        this.$el.find('.current-content').append(new NodeModelDescriptionView(this.model).render().el);
+        var nodeModelPlugins = new NodeModelPluginsView(this.model);
+
+        //.render().el
+        this.$el.find('.current-content').append(nodeModelPlugins.render().el);
+        this.$el.find('.description-li').addClass('active');
+    },
+
+    renderData: function () {
+        this.$el.find('.current-content').html('');
+        this.$el.find('.current-content').append(new TableDataView(this.model).render().el);
+        this.$el.find('.data-li').addClass('active');
+    },
+
+    renderCode: function () {
+        var tableCodeView = new TableCodeView(this.model);
+        this.$el.find('.current-content').html('');
+        this.$el.find('.current-content').append(tableCodeView.render().el);
+        tableCodeView.setupAce();
+        this.$el.find('.code-li').addClass('active');
+    },
+
+    tabClicked: function (e) {
+        this.$el.find('.active').removeClass('active');
+        if ($(e.currentTarget).hasClass('description-li')) {
             this.renderDescription();
+        } else if ($(e.currentTarget).hasClass('data-li')) {
+            this.renderData();
+        } else if ($(e.currentTarget).hasClass('code-li')) {
+            this.renderCode();
+        }
+    },
 
-            return this;
-        },
+    addedEntity: function (item) {
+        var optString = '<option value="{{' + item.get('name') + '}}">List of ' + item.get('name') + 's</option>';
+        $('.attribs', this.el).append(optString);
+    },
 
-        renderDescription: function () {
-            this.$el.find('.current-content').html('');
-            this.$el.find('.current-content').append(new NodeModelDescriptionView(this.model).render().el);
-            var nodeModelPlugins = new NodeModelPluginsView(this.model);
+    clickedDelete: function (e) {
+        this.askToDelete(v1State.get('tables'));
+    },
 
-            //.render().el
-            this.$el.find('.current-content').append(nodeModelPlugins.render().el);
-            this.$el.find('.description-li').addClass('active');
-        },
+    askToDelete: function (tableColl) {
+        var widgets = v1State.getWidgetsRelatedToTable(this.model);
+        var model = this.model;
+        if (widgets.length) {
 
-        renderData: function () {
-            this.$el.find('.current-content').html('');
-            this.$el.find('.current-content').append(new TableDataView(this.model).render().el);
-            this.$el.find('.data-li').addClass('active');
-        },
-
-        renderCode: function () {
-            var tableCodeView = new TableCodeView(this.model);
-            this.$el.find('.current-content').html('');
-            this.$el.find('.current-content').append(tableCodeView.render().el);
-            tableCodeView.setupAce();
-            this.$el.find('.code-li').addClass('active');
-        },
-
-        tabClicked: function (e) {
-            this.$el.find('.active').removeClass('active');
-            if ($(e.currentTarget).hasClass('description-li')) {
-                this.renderDescription();
-            } else if ($(e.currentTarget).hasClass('data-li')) {
-                this.renderData();
-            } else if ($(e.currentTarget).hasClass('code-li')) {
-                this.renderCode();
-            }
-        },
-
-        addedEntity: function (item) {
-            var optString = '<option value="{{' + item.get('name') + '}}">List of ' + item.get('name') + 's</option>';
-            $('.attribs', this.el).append(optString);
-        },
-
-        clickedDelete: function (e) {
-            this.askToDelete(v1State.get('tables'));
-        },
-
-        askToDelete: function (tableColl) {
-            var widgets = v1State.getWidgetsRelatedToTable(this.model);
-            var model = this.model;
-            if (widgets.length) {
-
-                var widgetsNL = _.map(widgets, function (widget) {
-                    return widget.widget.get('type') + ' on ' + widget.pageName;
-                });
-                var widgetsNLString = widgetsNL.join('\n');
-                new DialogueView({
-                    text: "The related widgets listed below will be deleted with this table. Do you want to proceed? <br><br> " + widgetsNLString
-                }, function () {
-                    tableColl.remove(model.cid);
-                    v1State.get('pages').removePagesWithContext(model);
-                    _.each(widgets, function (widget) {
-                        widget.widget.collection.remove(widget.widget);
-                    });
-                });
-
-            } else {
+            var widgetsNL = _.map(widgets, function (widget) {
+                return widget.widget.get('type') + ' on ' + widget.pageName;
+            });
+            var widgetsNLString = widgetsNL.join('\n');
+            new DialogueView({
+                text: "The related widgets listed below will be deleted with this table. Do you want to proceed? <br><br> " + widgetsNLString
+            }, function () {
                 tableColl.remove(model.cid);
                 v1State.get('pages').removePagesWithContext(model);
-            }
-        },
+                _.each(widgets, function (widget) {
+                    widget.widget.collection.remove(widget.widget);
+                });
+            });
 
-        typeClicked: function (e) {
-            var cid = e.target.id.replace('type-row-', '');
-            $('#type-' + cid).click();
-            e.preventDefault();
-        },
-
-        showTableTutorial: function (e) {
-            v1.showTutorial("Tables");
+        } else {
+            tableColl.remove(model.cid);
+            v1State.get('pages').removePagesWithContext(model);
         }
+    },
 
-    });
+    typeClicked: function (e) {
+        var cid = e.target.id.replace('type-row-', '');
+        $('#type-' + cid).click();
+        e.preventDefault();
+    },
 
-    exports.NodeModelView = NodeModelView;
+    showTableTutorial: function (e) {
+        v1.showTutorial("Tables");
+    }
 
 });
 
-require.define("/models_view/NodeModelPluginsView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
-
-    var NodeModelMethodModel = require('../models/NodeModelMethodModel');
-
-    var pluginAttribsTemplate = [
-        '<div class="plugins-list">',
-        '<% _.each(plugins, function(plugin, i) { %>',
-        '<div class="plugin-li">',
-        '<h4><%= plugin.name %></h4>',
-        '<div class="onoffswitch nodemodel" id="myonoffswitch-wrapper-<%=i%>">',
-        '<input type="checkbox" name="onoffswitch<%=i%>" class="onoffswitch-checkbox <%= plugin.isChecked %>" id="myonoffswitch<%=i%>" >',
-        '<label class="onoffswitch-label" for="myonoffswitch<%=i%>">',
-        '<div class="onoffswitch-inner"></div>',
-        '<div class="onoffswitch-switch"></div>',
-        '</label>',
-        '</div>',
-        '</div>',
-        '<% }); %>',
-        '</div>'
-    ].join('\n');
-
-    var NodeModelPluginsView = Backbone.View.extend({
-
-        className: 'description-view description-plugins',
-        subviews: [],
-
-        events: {
-            'click .onoffswitch.nodemodel': 'clickedPluginToggle'
-        },
-
-
-        initialize: function (tableModel) {
-            _.bindAll(this);
-            this.model = tableModel;
-        },
-
-        render: function () {
-            var plugins = v1State.get('plugins').getAllPluginsWithModule('model_methods');
-
-
-            var gens = _.map(plugins, function (pluginM) {
-                var gen = {};
-                try {
-                    gen.name = pluginM.name || pluginM.get('metadata').name
-                } catch (e) {
-                    gen.name = "Unnamed";
-                    alert("There is an unnamed plugin.");
-                }
-
-                if (v1State.get('plugins').isPluginInstalledToModel(pluginM, this.model)) {
-                    gen.isChecked = "checked";
-                } else {
-                    gen.isChecked = "";
-                }
-
-                return gen;
-            }, this);
-
-            this.plugins = plugins;
-            var html = _.template(pluginAttribsTemplate, {
-                plugins: gens
-            });
-            this.el.innerHTML = html;
-
-            return this;
-        },
-
-        clickedPluginToggle: function (e) {
-
-            var pluginInd = e.currentTarget.id.replace('myonoffswitch-wrapper-', '');
-            var isChecked = this.$el.find('#myonoffswitch' + pluginInd).hasClass('checked');
-
-            if (isChecked) {
-                v1State.get("plugins").uninstallPluginToModel(this.plugins[pluginInd], this.model);
-                this.$el.find('#myonoffswitch' + pluginInd).removeClass('checked');
-            } else {
-                v1State.get("plugins").installPluginToModel(this.plugins[pluginInd], this.model);
-                this.$el.find('#myonoffswitch' + pluginInd).addClass('checked');
-            }
-
-            e.preventDefault();
-        },
-
-        changedAttribs: function (e) {
-            var props = String(e.target.id).split('-');
-            var cid = props[1];
-            var attrib = props[0];
-            var value = e.target.options[e.target.selectedIndex].value || e.target.value;
-            this.fieldsCollection.get(cid).set(attrib, value);
-        },
-
-        addedEntity: function (item) {
-            var optString = '<option value="{{' + item.get('name') + '}}">List of ' + item.get('name') + 's</option>';
-            $('.attribs', this.el).append(optString);
-        },
-
-        clickedPropDelete: function (e) {
-            var cid = String(e.target.id || e.target.parentNode.id).replace('delete-', '');
-
-            var model = this.fieldsCollection.get(cid);
-            var widgets = v1State.getWidgetsRelatedToField(model);
-
-            _.each(widgets, function (widget) {
-                widget.widget.getForm().removeFieldsConnectedToField(model);
-            });
-
-            this.fieldsCollection.remove(cid);
-            $('#column-' + cid).remove();
-        },
-
-        clickedUploadExcel: function (e) {
-            new AdminPanelView();
-        },
-
-        showTableTutorial: function (e) {
-            v1.showTutorial("Tables");
-        }
-
-    });
-
-    exports.NodeModelMethodModel = NodeModelMethodModel;
+exports.NodeModelView = NodeModelView;
 
 });
 
-require.define("/models_view/NodeModelDescriptionView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+require.define("/models_view/NodeModelPluginsView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
-    var FieldModel = require('../models/FieldModel');
-    // var AdminPanelView = require('../AdminPanelView');
-    var SoftErrorView = require('../SoftErrorView');
-    var DialogueView = require('../mixins/DialogueView');
-    require('../mixins/BackboneCardView');
+var NodeModelMethodModel = require('../models/NodeModelMethodModel').NodeModelMethodModel;
 
-    var descriptionTemplate = [
-        '<div class="description">',
-        '<span class="tbl-wrapper">',
-        '<span class="tbl">',
-        '<ul class="property-list">',
-        '<div class="column header">',
-        '<div class="hdr">Property</div>',
-        '<div class="type-field desc">Type</div>',
-        '</div>',
-        '</ul>',
-        '<div class="column add-property-column">',
-        '<form class="add-property-form" style="display:none">',
-        '<input type="text" class="property-name-input" placeholder="Property Name...">',
-        '<input type="submit" class="done-btn" value="Done">',
-        '</form>',
-        '<span class="add-property-button box-button"><span class="plus-icon"></span>Add Property</span>',
-        '</div>',
-        '</span>',
-        '</span>',
-        '</div>'
-    ].join('\n');
+var pluginAttribsTemplate = [
+    '<div class="plugins-list">',
+    '<% _.each(plugins, function(plugin, i) { %>',
+    '<div class="plugin-li">',
+    '<h4><%= plugin.name %></h4>',
+    '<div class="onoffswitch nodemodel" id="myonoffswitch-wrapper-<%=i%>">',
+    '<input type="checkbox" name="onoffswitch<%=i%>" class="onoffswitch-checkbox <%= plugin.isChecked %>" id="myonoffswitch<%=i%>" >',
+    '<label class="onoffswitch-label" for="myonoffswitch<%=i%>">',
+    '<div class="onoffswitch-inner"></div>',
+    '<div class="onoffswitch-switch"></div>',
+    '</label>',
+    '</div>',
+    '</div>',
+    '<% }); %>',
+    '</div>'
+].join('\n');
 
+var NodeModelPluginsView = Backbone.View.extend({
 
-    var propertyTemplate = [
-        '<div class="column <% if(isNew) { %>newcol<% } %>" id="column-<%- cid %>">',
-        '<div class="hdr"><%- name %></div>',
-        '<div class="type-field" id="type-row-<%- cid %>">',
-        '<select class="attribs" id="type-<%- cid %>">',
-        '<% _.each(fieldTypes, function(fieldType) { %>',
-        '<option value="<%= fieldType %>" <% if(type == fieldType) %> selected <% %>><%= fieldType %></option>',
-        '<% }); %>',
-        '</select>',
-        '</div>',
-        '<div class="prop-cross" id="delete-<%- cid %>">',
-        '<div class="remove hoff1">Remove</div>',
-        '</div>',
-        '</div>'
-    ].join('\n');
+    className: 'description-view description-plugins',
+    subviews: [],
 
-    var mongooseTypes = [
-        'String',
-        'Number',
-        'Date',
-        'Boolean',
-        'Buffer'
-    ];
-
-    var NodeModelDescriptionView = Backbone.View.extend({
-        el: null,
-        tagName: 'div',
-        collection: null,
-        parentName: "",
-        className: 'description-view',
-        subviews: [],
-
-        events: {
-            'change .attribs': 'changedAttribs',
-            'click .q-mark-circle': 'showTableTutorial',
-            'click .remove': 'clickedPropDelete',
-            'mouseover .right-arrow': 'slideRight',
-            'mousemove .right-arrow': 'slideRight',
-            'mouseover .left-arrow': 'slideLeft',
-            'mousemove .left-arrow': 'slideLeft',
-            'click     .right-arrow': 'slideRight',
-            'click .type-field': 'typeClicked'
-        },
+    events: {
+        'click .onoffswitch.nodemodel': 'clickedPluginToggle'
+    },
 
 
-        initialize: function (tableModel) {
-            _.bindAll(this);
-            this.model = tableModel;
-            this.fieldsCollection = tableModel.getFieldsColl();
+    initialize: function (tableModel) {
+        _.bindAll(this);
+        this.model = tableModel;
+    },
 
-            this.listenTo(this.model, 'remove', this.remove);
-            this.listenTo(this.model.get('fields'), 'add', this.appendField, true);
-            this.listenTo(this.model.get('fields'), 'remove', this.removeField);
-            this.listenTo(this.model, 'newRelation removeRelation', this.renderRelations);
+    render: function () {
+        var plugins = v1State.get('plugins').getAllPluginsWithModule('model_methods');
 
-            this.otherEntities = _(v1State.get('models').pluck('name')).without(this.model.get('name'));
-            this.bindDupeWarning();
-        },
 
-        render: function () {
-
-            var html = _.template(descriptionTemplate, this.model.serialize());
-
-            this.$el.html(html);
-
-            this.renderProperties();
-
-            this.addPropertyBox = new Backbone.NameBox({}).setElement(this.$el.find('.add-property-column').get(0)).render();
-            this.subviews.push(this.addPropertyBox);
-            this.addPropertyBox.on('submit', this.createNewProperty);
-
-            return this;
-        },
-
-        renderProperties: function () {
-            this.fieldsCollection.each(function (field) {
-                // only render non-relational properties
-                if (!field.isRelatedField()) {
-                    this.appendField(field);
-                }
-            }, this);
-        },
-
-        bindDupeWarning: function () {
-            this.listenTo(this.fieldsCollection, 'duplicate', function (key, val) {
-                new SoftErrorView({
-                    text: "Duplicate entry should not be duplicate. " + key + " of the field should not be the same: " + val,
-                    path: ""
-                });
-            });
-        },
-
-        clickedAddProperty: function (e) {
-            this.$el.find('.add-property-button').hide();
-            this.$el.find('.add-property-form').fadeIn();
-            $('.property-name-input', this.el).focus();
-        },
-
-        createNewProperty: function (val) {
-            var name = val;
-            if (!name.length) return;
-            var newField = new FieldModel({
-                name: name
-            });
-            this.fieldsCollection.push(newField);
-        },
-
-        appendField: function (fieldModel, isNew) {
-            // don't append field if it's a relational field
-            if (fieldModel.isRelatedField()) {
-                return false;
+        var gens = _.map(plugins, function (pluginM) {
+            var gen = {};
+            try {
+                gen.name = pluginM.name || pluginM.get('metadata').name
+            } catch (e) {
+                gen.name = "Unnamed";
+                alert("There is an unnamed plugin.");
             }
-            var page_context = {};
-            page_context = _.clone(fieldModel.attributes);
-            page_context.cid = fieldModel.cid;
-            page_context.entityName = this.model.get('name');
-            page_context.entities = this.otherEntities;
-            page_context.isNew = isNew;
 
-            var types = v1State.get('models').map(function (nodeModelModel) {
-                // { type: Schema.Types.ObjectId, ref: "Studio" }
-                if (page_context.type == "{ type: Schema.Types.ObjectId, ref: '" + nodeModelModel.get('name') + "'}") {
-                    page_context.type = "{ ref: '" + nodeModelModel.get('name') + "',  type: Schema.Types.ObjectId}";
-                }
-
-                return "{ ref: '" + nodeModelModel.get('name') + "',  type: Schema.Types.ObjectId}";
-            });
-            types = _.union(types, mongooseTypes);
-
-            page_context.fieldTypes = types;
-
-            var template = _.template(propertyTemplate, page_context);
-
-            this.$el.find('.property-list').append(template);
-        },
-
-        removeField: function (fieldModel) {
-            this.$el.find('#column-' + fieldModel.cid).remove();
-        },
-
-        changedAttribs: function (e) {
-            var cid = String(e.currentTarget.id).replace('type-', '');
-            var value = e.currentTarget.value;
-            this.fieldsCollection.get(cid).set("type", value);
-        },
-
-        addedEntity: function (item) {
-            var optString = '<option value="{{' + item.get('name') + '}}">List of ' + item.get('name') + 's</option>';
-            $('.attribs', this.el).append(optString);
-        },
-
-        clickedDelete: function (e) {
-            this.askToDelete(v1State.get('tables'));
-        },
-
-        askToDelete: function (tableColl) {
-            var widgets = v1State.getWidgetsRelatedToTable(this.model);
-            var model = this.model;
-            if (widgets.length) {
-
-                var widgetsNL = _.map(widgets, function (widget) {
-                    return widget.widget.get('type') + ' on ' + widget.pageName;
-                });
-                var widgetsNLString = widgetsNL.join('\n');
-                new DialogueView({
-                    text: "The related widgets listed below will be deleted with this table. Do you want to proceed? <br><br> " + widgetsNLString
-                }, function () {
-                    tableColl.remove(model.cid);
-                    v1State.get('pages').removePagesWithContext(model);
-                    _.each(widgets, function (widget) {
-                        widget.widget.collection.remove(widget.widget);
-                    });
-                });
-
+            if (v1State.get('plugins').isPluginInstalledToModel(pluginM, this.model)) {
+                gen.isChecked = "checked";
             } else {
+                gen.isChecked = "";
+            }
+
+            return gen;
+        }, this);
+
+        this.plugins = plugins;
+        var html = _.template(pluginAttribsTemplate, {
+            plugins: gens
+        });
+        this.el.innerHTML = html;
+
+        return this;
+    },
+
+    clickedPluginToggle: function (e) {
+
+        var pluginInd = e.currentTarget.id.replace('myonoffswitch-wrapper-', '');
+        var isChecked = this.$el.find('#myonoffswitch' + pluginInd).hasClass('checked');
+
+        if (isChecked) {
+            v1State.get("plugins").uninstallPluginToModel(this.plugins[pluginInd], this.model);
+            this.$el.find('#myonoffswitch' + pluginInd).removeClass('checked');
+        } else {
+            v1State.get("plugins").installPluginToModel(this.plugins[pluginInd], this.model);
+            this.$el.find('#myonoffswitch' + pluginInd).addClass('checked');
+        }
+
+        e.preventDefault();
+    },
+
+    changedAttribs: function (e) {
+        var props = String(e.target.id).split('-');
+        var cid = props[1];
+        var attrib = props[0];
+        var value = e.target.options[e.target.selectedIndex].value || e.target.value;
+        this.fieldsCollection.get(cid).set(attrib, value);
+    },
+
+    addedEntity: function (item) {
+        var optString = '<option value="{{' + item.get('name') + '}}">List of ' + item.get('name') + 's</option>';
+        $('.attribs', this.el).append(optString);
+    },
+
+    clickedPropDelete: function (e) {
+        var cid = String(e.target.id || e.target.parentNode.id).replace('delete-', '');
+
+        var model = this.fieldsCollection.get(cid);
+        var widgets = v1State.getWidgetsRelatedToField(model);
+
+        _.each(widgets, function (widget) {
+            widget.widget.getForm().removeFieldsConnectedToField(model);
+        });
+
+        this.fieldsCollection.remove(cid);
+        $('#column-' + cid).remove();
+    },
+
+    clickedUploadExcel: function (e) {
+        new AdminPanelView();
+    },
+
+    showTableTutorial: function (e) {
+        v1.showTutorial("Tables");
+    }
+
+});
+
+exports.NodeModelPluginsView = NodeModelPluginsView;
+
+});
+
+require.define("/models_view/NodeModelDescriptionView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
+
+var FieldModel = require('../models/FieldModel').FieldModel;
+var SoftErrorView = require('../SoftErrorView').SoftErrorView;
+var DialogueView = require('../mixins/DialogueView').DialogueView;
+
+var descriptionTemplate = [
+    '<div class="description">',
+    '<span class="tbl-wrapper">',
+    '<span class="tbl">',
+    '<ul class="property-list">',
+    '<div class="column header">',
+    '<div class="hdr">Property</div>',
+    '<div class="type-field desc">Type</div>',
+    '</div>',
+    '</ul>',
+    '<div class="column add-property-column">',
+    '<form class="add-property-form" style="display:none">',
+    '<input type="text" class="property-name-input" placeholder="Property Name...">',
+    '<input type="submit" class="done-btn" value="Done">',
+    '</form>',
+    '<span class="add-property-button box-button"><span class="plus-icon"></span>Add Property</span>',
+    '</div>',
+    '</span>',
+    '</span>',
+    '</div>'
+].join('\n');
+
+
+var propertyTemplate = [
+    '<div class="column <% if(isNew) { %>newcol<% } %>" id="column-<%- cid %>">',
+    '<div class="hdr"><%- name %></div>',
+    '<div class="type-field" id="type-row-<%- cid %>">',
+    '<select class="attribs" id="type-<%- cid %>">',
+    '<% _.each(fieldTypes, function(fieldType) { %>',
+    '<option value="<%= fieldType %>" <% if(type == fieldType) %> selected <% %>><%= fieldType %></option>',
+    '<% }); %>',
+    '</select>',
+    '</div>',
+    '<div class="prop-cross" id="delete-<%- cid %>">',
+    '<div class="remove hoff1">Remove</div>',
+    '</div>',
+    '</div>'
+].join('\n');
+
+var mongooseTypes = [
+    'String',
+    'Number',
+    'Date',
+    'Boolean',
+    'Buffer'
+];
+
+var NodeModelDescriptionView = Backbone.View.extend({
+    el: null,
+    tagName: 'div',
+    collection: null,
+    parentName: "",
+    className: 'description-view',
+    subviews: [],
+
+    events: {
+        'change .attribs': 'changedAttribs',
+        'click .q-mark-circle': 'showTableTutorial',
+        'click .remove': 'clickedPropDelete',
+        'mouseover .right-arrow': 'slideRight',
+        'mousemove .right-arrow': 'slideRight',
+        'mouseover .left-arrow': 'slideLeft',
+        'mousemove .left-arrow': 'slideLeft',
+        'click     .right-arrow': 'slideRight',
+        'click .type-field': 'typeClicked'
+    },
+
+
+    initialize: function (tableModel) {
+        _.bindAll(this);
+        this.model = tableModel;
+        this.fieldsCollection = tableModel.getFieldsColl();
+
+        this.listenTo(this.model, 'remove', this.remove);
+        this.listenTo(this.model.get('fields'), 'add', this.appendField, true);
+        this.listenTo(this.model.get('fields'), 'remove', this.removeField);
+        this.listenTo(this.model, 'newRelation removeRelation', this.renderRelations);
+
+        this.otherEntities = _(v1State.get('models').pluck('name')).without(this.model.get('name'));
+        this.bindDupeWarning();
+    },
+
+    render: function () {
+
+        var html = _.template(descriptionTemplate, this.model.serialize());
+
+        this.$el.html(html);
+
+        this.renderProperties();
+
+        this.addPropertyBox = new Backbone.NameBox({}).setElement(this.$el.find('.add-property-column').get(0)).render();
+        this.subviews.push(this.addPropertyBox);
+        this.addPropertyBox.on('submit', this.createNewProperty);
+
+        return this;
+    },
+
+    renderProperties: function () {
+        this.fieldsCollection.each(function (field) {
+            // only render non-relational properties
+            if (!field.isRelatedField()) {
+                this.appendField(field);
+            }
+        }, this);
+    },
+
+    bindDupeWarning: function () {
+        this.listenTo(this.fieldsCollection, 'duplicate', function (key, val) {
+            new SoftErrorView({
+                text: "Duplicate entry should not be duplicate. " + key + " of the field should not be the same: " + val,
+                path: ""
+            });
+        });
+    },
+
+    clickedAddProperty: function (e) {
+        this.$el.find('.add-property-button').hide();
+        this.$el.find('.add-property-form').fadeIn();
+        $('.property-name-input', this.el).focus();
+    },
+
+    createNewProperty: function (val) {
+        var name = val;
+        if (!name.length) return;
+        var newField = new FieldModel({
+            name: name
+        });
+        this.fieldsCollection.push(newField);
+    },
+
+    appendField: function (fieldModel, isNew) {
+        // don't append field if it's a relational field
+        if (fieldModel.isRelatedField()) {
+            return false;
+        }
+        var page_context = {};
+        page_context = _.clone(fieldModel.attributes);
+        page_context.cid = fieldModel.cid;
+        page_context.entityName = this.model.get('name');
+        page_context.entities = this.otherEntities;
+        page_context.isNew = isNew;
+
+        var types = v1State.get('models').map(function (nodeModelModel) {
+            // { type: Schema.Types.ObjectId, ref: "Studio" }
+            if (page_context.type == "{ type: Schema.Types.ObjectId, ref: '" + nodeModelModel.get('name') + "'}") {
+                page_context.type = "{ ref: '" + nodeModelModel.get('name') + "',  type: Schema.Types.ObjectId}";
+            }
+
+            return "{ ref: '" + nodeModelModel.get('name') + "',  type: Schema.Types.ObjectId}";
+        });
+        types = _.union(types, mongooseTypes);
+
+        page_context.fieldTypes = types;
+
+        var template = _.template(propertyTemplate, page_context);
+
+        this.$el.find('.property-list').append(template);
+    },
+
+    removeField: function (fieldModel) {
+        this.$el.find('#column-' + fieldModel.cid).remove();
+    },
+
+    changedAttribs: function (e) {
+        var cid = String(e.currentTarget.id).replace('type-', '');
+        var value = e.currentTarget.value;
+        this.fieldsCollection.get(cid).set("type", value);
+    },
+
+    addedEntity: function (item) {
+        var optString = '<option value="{{' + item.get('name') + '}}">List of ' + item.get('name') + 's</option>';
+        $('.attribs', this.el).append(optString);
+    },
+
+    clickedDelete: function (e) {
+        this.askToDelete(v1State.get('tables'));
+    },
+
+    askToDelete: function (tableColl) {
+        var widgets = v1State.getWidgetsRelatedToTable(this.model);
+        var model = this.model;
+        if (widgets.length) {
+
+            var widgetsNL = _.map(widgets, function (widget) {
+                return widget.widget.get('type') + ' on ' + widget.pageName;
+            });
+            var widgetsNLString = widgetsNL.join('\n');
+            new DialogueView({
+                text: "The related widgets listed below will be deleted with this table. Do you want to proceed? <br><br> " + widgetsNLString
+            }, function () {
                 tableColl.remove(model.cid);
                 v1State.get('pages').removePagesWithContext(model);
-            }
-        },
-
-        clickedPropDelete: function (e) {
-            var cid = String(e.target.id || e.target.parentNode.id).replace('delete-', '');
-            this.fieldsCollection.remove(cid);
-        },
-
-        clickedUploadExcel: function (e) {
-            new AdminPanelView();
-        },
-
-        renderRelations: function () {
-            var tableRelations = v1State.get('models').getRelationsWithEntityName(this.model.get('name'));
-            var list = this.$el.find('.related-fields').empty();
-            _(tableRelations).each(function (relation) {
-                var suffix;
-                var text = 'Has ' + relation.related_name;
-                if (relation.type == "m2m" || relation.type == "fk") suffix = 'List of ' + util.pluralize(relation.entity);
-                if (relation.type == "o2o") suffix = 'Single ' + relation.entity;
-                list.append('<a href="#relation-' + relation.cid + '"class="related-tag offset1">' + text + ' (' + suffix + ')</a>');
+                _.each(widgets, function (widget) {
+                    widget.widget.collection.remove(widget.widget);
+                });
             });
-            list.append('<a href="#relation-new" class="related-tag offset1"><span style="font-size: 13px">+</span>  Add a data relationship</a>');
-        },
 
-        initializeTableWidth: function () {
-            var width = (this.model.getFieldsColl().length + 2) * 100;
-            width += 120;
-            this.width = width;
-            if (this.width < 300) this.width = 300;
-            this.$el.find('.tbl').width(this.width);
-            if (width > 870 && !this.hasArrow) {
-                this.hasArrow = true;
-                var div = document.createElement('div');
-                div.className = 'right-arrow';
-                this.$el.find('.description').append(div);
-            }
-        },
-
-        slideRight: function () {
-            var left = this.$el.find('.tbl-wrapper').scrollLeft();
-            this.$el.find('.tbl-wrapper').scrollLeft(left + 6);
-            if (!this.hasLeftArrow) {
-                var div = document.createElement('div');
-                div.className = 'left-arrow';
-                this.$el.find('.description').append(div);
-                this.hasLeftArrow = true;
-            }
-        },
-
-        slideLeft: function () {
-            var tblWrapper = this.$el.find('.tbl-wrapper');
-            var left = tblWrapper.scrollLeft();
-            tblWrapper.scrollLeft(left - 6);
-            if (tblWrapper.scrollLeft() === 0) {
-                this.$el.find('.left-arrow').remove();
-                this.hasLeftArrow = false;
-            }
-        },
-
-        typeClicked: function (e) {
-            var cid = e.target.id.replace('type-row-', '');
-            $('#type-' + cid).click();
-            e.preventDefault();
-        },
-
-        showTableTutorial: function (e) {
-            v1.showTutorial("Tables");
+        } else {
+            tableColl.remove(model.cid);
+            v1State.get('pages').removePagesWithContext(model);
         }
+    },
 
-    });
+    clickedPropDelete: function (e) {
+        var cid = String(e.target.id || e.target.parentNode.id).replace('delete-', '');
+        this.fieldsCollection.remove(cid);
+    },
 
-    exports.NodeModelDescriptionView = NodeModelDescriptionView;
+    clickedUploadExcel: function (e) {
+        new AdminPanelView();
+    },
+
+    renderRelations: function () {
+        var tableRelations = v1State.get('models').getRelationsWithEntityName(this.model.get('name'));
+        var list = this.$el.find('.related-fields').empty();
+        _(tableRelations).each(function (relation) {
+            var suffix;
+            var text = 'Has ' + relation.related_name;
+            if (relation.type == "m2m" || relation.type == "fk") suffix = 'List of ' + util.pluralize(relation.entity);
+            if (relation.type == "o2o") suffix = 'Single ' + relation.entity;
+            list.append('<a href="#relation-' + relation.cid + '"class="related-tag offset1">' + text + ' (' + suffix + ')</a>');
+        });
+        list.append('<a href="#relation-new" class="related-tag offset1"><span style="font-size: 13px">+</span>  Add a data relationship</a>');
+    },
+
+    initializeTableWidth: function () {
+        var width = (this.model.getFieldsColl().length + 2) * 100;
+        width += 120;
+        this.width = width;
+        if (this.width < 300) this.width = 300;
+        this.$el.find('.tbl').width(this.width);
+        if (width > 870 && !this.hasArrow) {
+            this.hasArrow = true;
+            var div = document.createElement('div');
+            div.className = 'right-arrow';
+            this.$el.find('.description').append(div);
+        }
+    },
+
+    slideRight: function () {
+        var left = this.$el.find('.tbl-wrapper').scrollLeft();
+        this.$el.find('.tbl-wrapper').scrollLeft(left + 6);
+        if (!this.hasLeftArrow) {
+            var div = document.createElement('div');
+            div.className = 'left-arrow';
+            this.$el.find('.description').append(div);
+            this.hasLeftArrow = true;
+        }
+    },
+
+    slideLeft: function () {
+        var tblWrapper = this.$el.find('.tbl-wrapper');
+        var left = tblWrapper.scrollLeft();
+        tblWrapper.scrollLeft(left - 6);
+        if (tblWrapper.scrollLeft() === 0) {
+            this.$el.find('.left-arrow').remove();
+            this.hasLeftArrow = false;
+        }
+    },
+
+    typeClicked: function (e) {
+        var cid = e.target.id.replace('type-row-', '');
+        $('#type-' + cid).click();
+        e.preventDefault();
+    },
+
+    showTableTutorial: function (e) {
+        v1.showTutorial("Tables");
+    }
 
 });
 
-require.define("/models_view/NodeModelDataView.js",function(require,module,exports,__dirname,__filename,process,global){    'use strict';
+exports.NodeModelDescriptionView = NodeModelDescriptionView;
 
-    var SoftErrorView = require('../SoftErrorView').SoftErrorView;
-    var DialogueView = require('../mixins/DialogueView').DialogueViews;
+});
 
-    var NodeModelDataView = Backbone.View.extend({
-        el: null,
-        tagName: 'div',
-        collection: null,
-        parentName: "",
-        className: 'data-view',
-        subviews: [],
+require.define("/models_view/NodeModelDataView.js",function(require,module,exports,__dirname,__filename,process,global){'use strict';
 
-        events: {},
+var SoftErrorView = require('../SoftErrorView').SoftErrorView;
+var DialogueView = require('../mixins/DialogueView').DialogueViews;
 
+var NodeModelDataView = Backbone.View.extend({
+    el: null,
+    tagName: 'div',
+    collection: null,
+    parentName: "",
+    className: 'data-view',
+    subviews: [],
 
-        initialize: function (tableModel) {
-            _.bindAll(this);
-            this.model = tableModel;
-        },
-
-        render: function () {
-            this.el.innerHTML = 'Coming soon...';
-            return this;
-        },
+    events: {},
 
 
-    });
+    initialize: function (tableModel) {
+        _.bindAll(this);
+        this.model = tableModel;
+    },
 
-    exports.NodeModelDataView = NodeModelDataView;
+    render: function () {
+        this.el.innerHTML = 'Coming soon...';
+        return this;
+    },
+
+
+});
+
+exports.NodeModelDataView = NodeModelDataView;
 
 });
 
