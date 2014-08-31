@@ -10003,9 +10003,7 @@ require.define("/plugins_view/PluginBrowserView.js",function(require,module,expo
                 url: "//plugins.appcubator.com/plugins/list",
                 dataType: "json",
                 success: function (data) {
-                    console.log(data);
                     $(loadingSpin).remove();
-                    data = {};
                     self.layoutPlugins(data);
                 }
             });
