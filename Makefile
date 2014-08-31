@@ -34,14 +34,14 @@ build:
 	cp ./src/index.html ./dist/index.html
 
 	# CSS
-	cp -rf ./src/css/ ./dist/css/
+	cp -rf ./src/css/* ./dist/css/
 	cp ./src/temp.css ./dist/temp.css
 
 	# Fonts
-	cp -rf ./src/font/ ./dist/font/
+	cp -rf ./src/font/* ./dist/font/
 
 	# Images
-	cp -rf ./src/img/ ./dist/img/
+	cp -rf ./src/img/* ./dist/img/
 
 	./node_modules/less/bin/lessc --verbose --rootpath=/static/css/app/ -x --yui-compress --ru --line-numbers=mediaquery ./src/css/app/app.less ./dist/css/app/app.css
 	echo "[BUILD] Compiled app/app.less to app.css"
