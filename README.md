@@ -6,11 +6,11 @@ Appcubator
 - Interop with existing community code
 - Should be usable by people who don't have domain knowledge in Web dev 
 
-Update (\today)
----------------
-We want to share our vision, knowledge, and experience with the web development community, in the hopes that together we can devise a system that people would actually use for educational purposes or otherwise.
+Table of Contents
+-----------------
 
-- Concepts
+1. What is an Appcubator app?
+2. Concepts
     - Template
         - UI Element
     - Model
@@ -18,10 +18,16 @@ We want to share our vision, knowledge, and experience with the web development 
         - Methods
     - Route (or Page)
 
-- Architecture
-- Hacking
+3. User Interface Code
+4. Code Generation
 
-Architecture
+What is an Appcubator app?
+--------------------------
+
+Concepts
+--------
+
+Old text that i dont know what to do with
 ------------
 
 Your app is a JSON tree of macros which expand to code.
