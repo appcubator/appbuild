@@ -27,7 +27,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "//plugins.appcubator.com/plugins/list",
+                url: "http://plugins.appcubator.com/plugins/list",
                 dataType: "json",
                 success: function (data) {
                     console.log(data);

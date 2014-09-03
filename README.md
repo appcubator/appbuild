@@ -1,29 +1,25 @@
 Appcubator
 ==========
 
+- Implementing web software should be easy.
+- Allow extensibility with custom code
+- Interop with existing community code
+- Should be usable by people who don't have domain knowledge in Web dev 
+
 Update (\today)
 ---------------
 We want to share our vision, knowledge, and experience with the web development community, in the hopes that together we can devise a system that people would actually use for educational purposes or otherwise.
 
-- What is Appcubator
-- Design Goals
-- Capabilities
+- Concepts
+    - Template
+        - UI Element
+    - Model
+        - Fields
+        - Methods
+    - Route (or Page)
+
 - Architecture
 - Hacking
-
-Design Goals
-------------
-
-Appcubator started with the premise that web software tends to be conceptually simple,
-and implementing web software should be easy.
-
-Goal: Reduce the time from idea to working prototype.
-
-Target Users: People who didn't already have a domain knowledge in Web development. 
-
-Web Development should be more visual in the way it's developed.
-
-Code should be introduced into a web app at the point where it needs to be customized.
 
 Architecture
 ------------
