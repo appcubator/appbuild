@@ -30,9 +30,7 @@
                 url: "http://plugins.appcubator.com/plugins/list",
                 dataType: "json",
                 success: function (data) {
-                    console.log(data);
                     $(loadingSpin).remove();
-                    data = {};
                     self.layoutPlugins(data);
                 }
             });
