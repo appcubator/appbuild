@@ -56,8 +56,7 @@ At the top level, we have the following keys:
 
 Each section will be elaborated below.
 
-models
-------
+### models
 
 A list of objects representing models, each of the following schema. Note that each model object will render into it's own model file <modelname.js> in the ./models directory.
 
@@ -74,8 +73,8 @@ See http://mongoosejs.com/docs/api.html#schema_Schema-method to understand how t
 **staticmethods**: An object where the keys are the names of the staticmethods and the values should be the string representation of the anonymous functions that will be bound to the given name.
 See http://mongoosejs.com/docs/api.html#schema_Schema-static to understand how the code is injected into the application.
 
-templates
----------
+### templates
+
 A list of objects each representing an ejs template. Each will turn into it's own EJS file and go in ./views. Each object has the following schema:
 
 **name**: (The name of the template file. try to make this a sane filename and avoid spaces.)
@@ -86,8 +85,8 @@ A list of objects each representing an ejs template. Each will turn into it's ow
 
 Note that if the layout strategy limits you in some way, you can add your own CSS in the **css** section below. But this will get messy after a while. Reserve this use case of css for desperately needed one-offs and exceptions. Better to define a new layoutStrategy if you're repeatedly writing layout css.
 
-routes
-------
+### routes
+
 A list of objects each representing a route. This will be injected serially into ./routes.js, so order matters. Each object has the following schema:
 
 **method**: A string of the http method you want to use. Casing doesn't matter. 
@@ -98,13 +97,13 @@ A list of objects each representing a route. This will be injected serially into
 
 TODO what will be imported into this file? <- hard question to answer
 
-css
----
+### css
+
 Some uiestate structure that will generate CSS in a straightforward way. @ican
 
 
-generators
-----------
+### generators
+
 Functions of the type (data -> (code as data)).
 Generators allow developers to write highly "configurable" code.
 These exist in order to allow a people to generate code from a visual interface.
