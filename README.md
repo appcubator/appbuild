@@ -48,20 +48,21 @@ User Interface
 --------------
 
 Main editor is the Template editor
-CSS Editor
-Model Editor
-Routes Editor
-Generic Generator Editor
-Plugin Editor
+
+* CSS Editor
+* Model Editor
+* Routes Editor
+* Generic Generator Editor
+* Plugin Editor
 
 (List any other major views here)
 
 Describe how the app state turns into a Nested Backbone Model and Collection structure
 
-Implementation details
-Rendering and drag and drop in the iframe
-Any Backbone hacks
-Overall structure of the backbone code
+* Implementation details
+* Rendering and drag and drop in the iframe
+* Any Backbone hacks
+* Overall structure of the backbone code
 
 
 Code Generation
