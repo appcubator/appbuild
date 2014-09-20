@@ -23,6 +23,30 @@ Table of Contents
 
 What is an Appcubator app?
 --------------------------
+There are many levels of abstraction of an Appcubator app.
+
+Very brief overview:
+--------------------
+It starts out as a JSON of data which the user can modify using the browser interface.
+Then the nodes of the JSON tree go through macro-expansion to generate code.
+Then the code is written to disk, and shipped off to a server to be redeployed.
+
+Detailed overview:
+------------------
+First, an Appcubator app is an Express.js web server application,
+which responds to HTTP requests to serve pages and respond to form submissions.
+It also connects to a MongoDB instance to persist and retrieve data.
+
+On a higher level, an Appcubator app can be thought of in terms of
+Data Models, Pages (or Routes), and Templates.
+
+On a higher level, each component of the app can be generated from user-inputted data,
+using a "Generator".
+A Generator is a javascript function which takes in data which the user provides, and turns it into an Appcubator component.
+
+On a higher level, the components of an Appcubator app form a tree of data which can be represented as a JSON in the browser. This JSON tree is called the app-state.
+
+
 
 Concepts
 --------
