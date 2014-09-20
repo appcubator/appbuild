@@ -43,7 +43,21 @@ On a higher level, each component of the app can be generated from user-inputted
 using a "Generator".
 A Generator is a built-in or community-written javascript function which expects user-configurable data and returns an Appcubator component.
 
-On a higher level, the components of an Appcubator app form a tree of data which can be represented as a JSON in the browser. This JSON tree is called the app-state.
+On a higher level, the components of an Appcubator app form a tree of data which can be represented as a JSON in the browser.
+
+The JSON tree, called the app state, has the following structure:
+
+- models - database schema, functions for backend logic, and API endpoints
+- templates - html templates for pages
+- routes - url + logic that runs when you serve pages. also server side db or misc apis
+- css - styling code for your pages. you can use prewritten themes to get started quickly
+
+and some more keys which you can read about in the Code Generation wiki.
+
+When you interact with the visual interface, you’re implicitly adding or configuring the generators in the hierarchy.
+
+When you "publish", the app state is sent to the server where your app is hosted. There the code generators in each section are fully expanded to code and stored on disk.
+
 
 User Interface
 --------------
@@ -75,23 +89,3 @@ which you can download.
 
 You can extract the code, run npm install to install dependences,
 and run the server with `node app.js`.
-
-
-
-
-Old text that i dont know what to do with
-------------
-
-Your app is a JSON tree of macros which expand to code.
-The generated apps are powered by Node.js and MongoDB.
-
-The JSON tree, called the app state, has the following structure:
-
-- models - database schema, functions for backend logic, and API endpoints
-- templates - html templates for pages
-- routes - url + logic that runs when you serve pages. also server side db or misc apis
-- css - styling code for your pages. you can use prewritten themes to get started quickly
-
-When you interact with the visual interface, you’re implicitly adding or configuring the code generators in these sections.
-When you "publish", the app state is sent to the server where your app is hosted. There the code generators in each section are fully expanded to code and stored on disk.
-
