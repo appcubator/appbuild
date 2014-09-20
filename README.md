@@ -10,15 +10,15 @@ Table of Contents
 -----------------
 
 * What is an Appcubator App?
-* Appcubator Components
+* User Interface
+* Deployment
+* Documentation (Appcubator Components)
     * Template
     * UI Element
     * Model
         * Fields
         * Methods
     * Route (or Page)
-* Browser Interface
-* Deployment
 
 What is an Appcubator App?
 --------------------------
@@ -43,6 +43,46 @@ using a "Generator".
 A Generator is a javascript function which takes in data which the user provides, and turns it into an Appcubator component.
 
 On a higher level, the components of an Appcubator app form a tree of data which can be represented as a JSON in the browser. This JSON tree is called the app-state.
+
+User Interface
+--------------
+
+Main editor is the Template editor
+CSS Editor
+Model Editor
+Routes Editor
+Generic Generator Editor
+Plugin Editor
+
+(List any other major views here)
+
+Describe how the app state turns into a Nested Backbone Model and Collection structure
+
+Implementation details
+Rendering and drag and drop in the iframe
+Any Backbone hacks
+Overall structure of the backbone code
+
+
+Code Generation
+---------------
+
+
+Deployment
+----------
+
+
+
+
+
+
+
+
+
+Below this part will go somewhere else.
+There will be a component example gallery
+
+
 
 Appcubator Components
 ---------------------
