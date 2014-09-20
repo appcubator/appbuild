@@ -9,16 +9,16 @@ Appcubator
 Table of Contents
 -----------------
 
-A. What is an Appcubator App?
-B. Appcubator Components
-    1. Template
-    2. UI Element
-    3. Model
-        a. Fields
-        b. Methods
-    4. Route (or Page)
-C. Browser Interface
-D. Deployment
+* What is an Appcubator App?
+* Appcubator Components
+    * Template
+    * UI Element
+    * Model
+        * Fields
+        * Methods
+    * Route (or Page)
+* Browser Interface
+* Deployment
 
 What is an Appcubator App?
 --------------------------
