@@ -4,9 +4,7 @@ Appcubator
 Overview
 --------
 
-Appcubator is a web-based tool for rapidly building web applications.
-
-It has an in-browser user interface for building the app, and generates a Express.js/MongoDB app based on user input.
+Appcubator is a browser-based WYSIWYG interface for rapidly building Express.js/MongoDB applications.
 
 Design Goals
 ------------
