@@ -1,9 +1,3 @@
-Appcubator
-==========
-
-Overview
---------
-
 Appcubator is a browser-based WYSIWYG interface for rapidly building Express.js/MongoDB applications.
 
 Design Goals
