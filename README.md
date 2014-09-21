@@ -1,91 +1,30 @@
 Appcubator
 ==========
 
-* Design Goals
-* What is an Appcubator App?
-* User Interface
-* Deployment
-* Documentation (Appcubator Components)
-    * Template
-    * UI Element
-    * Model
-        * Fields
-        * Methods
-    * Route (or Page)
+Appcubator is a web-based tool for rapidly building web applications.
 
-Design Goals
-------------
+It has an in-browser user interface for building the app, and generates a Express.js/MongoDB app based on user input.
 
-- Implementing web software should be easy.
-- Allow extensibility with custom code
-- Interop with existing community code
-- Should be usable by people who don't have domain knowledge in Web dev 
+It was designed with these goals:
 
-What is an Appcubator App?
---------------------------
+1. Simple things should be simple: Easy to build a canonical web app.
+2. Complex things should be possible: Allow extensibility with custom code
+3. Interoperate with existing community code
+4. Usable by people who don't have knowledge of web dev.
 
-### Short version
+Here's an overview of how it works:
 
-It starts out as a JSON of data which the user can modify using the browser interface.
-Then the nodes of the JSON tree go through macro-expansion to generate code.
-Then the code is written to disk, and shipped off to a server to be redeployed.
+1. An Appcubator app is represented as a javascript object in the browser, called the App State. It has a hierarchical structure with a well-defined schema.
+2. The user creates and modifies App Components via the User Interface in order to build their app. These interactions correspond to data changes in nodes of the Javascript object.
+3. When the user presses Publish, the javascript object is serialized to JSON, and shipped to a server.
+4. The nodes of the javascript object go through macro-expansion to turn the user-inputted data into code.
+5. The the code is written to disk, zipped, and shipped back to the user, or pushed to a server to be deployed.
 
-### Longer version
+Here are more detailed docs on the system:
 
-At the lowest level, an Appcubator app is an Express.js web server application,
-which responds to HTTP requests to serve pages and respond to form submissions.
-It also connects to a MongoDB instance to persist and retrieve data.
-
-On a higher level, an Appcubator app can be thought of in terms of
-Data Models, UIElements, Templates, and Pages (or Routes).
-
-On a higher level, each component of the app can be generated from user-inputted data,
-using a "Generator".
-A Generator is a built-in or community-written javascript function which expects user-configurable data and returns an Appcubator component.
-
-On a higher level, the components of an Appcubator app form a tree of data which can be represented as a JSON in the browser.
-
-The JSON tree, called the app state, has the following structure:
-
-- models - database schema, functions for backend logic, and API endpoints
-- templates - html templates for pages
-- routes - url + logic that runs when you serve pages. also server side db or misc apis
-- css - styling code for your pages. you can use prewritten themes to get started quickly
-
-and some more keys which you can read about in the Code Generation wiki.
-
-When you interact with the visual interface, you’re implicitly adding or configuring the generators in the hierarchy.
-
-When you "publish", the app state is sent to the server where your app is hosted. There the code generators in each section are fully expanded to code and stored on disk.
-
-
-User Interface
---------------
-
-Main editor is the Template editor
-
-* CSS Editor
-* Model Editor
-* Routes Editor
-* Generic Generator Editor
-* Plugin Editor
-
-(List any other major views here)
-
-Describe how the app state turns into a Nested Backbone Model and Collection structure
-
-* Implementation details
-* Rendering and drag and drop in the iframe
-* Any Backbone hacks
-* Overall structure of the backbone code
-
-
-Deployment
-----------
-
-For local testing, the app state will be sent to a server running the code generator,
-which will expand the macros, and return a zip file of the source code
-which you can download.
-
-You can extract the code, run npm install to install dependences,
-and run the server with `node app.js`.
+1. mapping from the app state to the generated Node.js app
+2. generator system
+3. base app components built using generators
+4. plugin system
+5. user interface design and code
+6. deployment
