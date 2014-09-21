@@ -11,11 +11,15 @@ Design Goals
 What is an Appcubator App?
 --------------------------
 
-1. An Appcubator app is represented as a javascript object in the browser, called the App State. It has a hierarchical structure with a well-defined schema.
-2. The user creates and modifies App Components via the User Interface in order to build their app. These interactions correspond to data changes in nodes of the Javascript object.
-3. When the user presses Publish, the javascript object is serialized to JSON, and shipped to a server.
-4. The nodes of the javascript object go through macro-expansion to turn the user-inputted data into code.
-5. The the code is written to disk, zipped, and shipped back to the user, or pushed to a server to be deployed.
+An Appcubator app is represented as a javascript object in the browser, called the App State. It has a hierarchical structure with a well-defined schema.
+
+The user creates and modifies App Components via the User Interface in order to build their app. These interactions correspond to data changes in nodes of the Javascript object.
+
+When the user presses Publish, the javascript object is serialized to JSON, and shipped to a server.
+
+The nodes of the javascript object go through macro-expansion to turn the user-inputted data into code.
+
+The the code is written to disk, zipped, and shipped back to the user, or pushed to a server to be deployed.
 
 Documentation
 -------------
